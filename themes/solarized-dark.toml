@@ -1,0 +1,95 @@
+# Solarized Dark Theme for Cerium
+# Solarized colour palette by Ethan Schoonover
+# https://ethanschoonover.com/solarized/
+#
+# Usage: Copy this file to ~/.config/cerium.toml
+
+
+# Size Gradients (green tones)
+size_bytes = { r = 133, g = 153, b = 0 }        # green
+size_kb = { r = 133, g = 153, b = 0 }           # green
+size_mb = { r = 42, g = 161, b = 152 }          # cyan
+size_gb = { r = 181, g = 137, b = 0 }           # yellow
+
+# Date Gradients (blue tones - recent to old)
+date_recent = { r = 42, g = 161, b = 152 }      # cyan
+date_hours = { r = 38, g = 139, b = 210 }       # blue
+date_days = { r = 38, g = 139, b = 210 }        # blue
+date_weeks = { r = 108, g = 113, b = 196 }      # violet
+date_months = { r = 147, g = 161, b = 161 }     # base1
+date_old = { r = 88, g = 110, b = 117 }         # base01
+
+# Permission Colours
+perm_read = { r = 181, g = 137, b = 0 }         # yellow
+perm_write = { r = 220, g = 50, b = 47 }        # red
+perm_execute = { r = 133, g = 153, b = 0 }      # green
+perm_none = { r = 88, g = 110, b = 117 }        # base01
+perm_special = { r = 211, g = 54, b = 130 }     # magenta
+perm_filetype = { r = 38, g = 139, b = 210 }    # blue
+
+# Entry Type Colours
+entry_directory = { r = 38, g = 139, b = 210 }  # blue
+entry_symlink = { r = 42, g = 161, b = 152 }    # cyan
+entry_file = { r = 131, g = 148, b = 150 }      # base0
+
+# User and Group Colours
+user = { r = 181, g = 137, b = 0 }              # yellow
+group = { r = 203, g = 75, b = 22 }             # orange
+
+# Code File Type Colours
+code_rust = { r = 203, g = 75, b = 22 }         # orange
+code_python = { r = 38, g = 139, b = 210 }      # blue
+code_javascript = { r = 181, g = 137, b = 0 }   # yellow
+code_c = { r = 42, g = 161, b = 152 }           # cyan
+code_go = { r = 42, g = 161, b = 152 }          # cyan
+code_java = { r = 203, g = 75, b = 22 }         # orange
+code_ruby = { r = 220, g = 50, b = 47 }         # red
+code_php = { r = 108, g = 113, b = 196 }        # violet
+code_lua = { r = 108, g = 113, b = 196 }        # violet
+
+# Web File Type Colours
+web_html = { r = 220, g = 50, b = 47 }          # red
+web_css = { r = 108, g = 113, b = 196 }         # violet
+web_json = { r = 211, g = 54, b = 130 }         # magenta
+web_xml = { r = 131, g = 148, b = 150 }         # base0
+web_yaml = { r = 42, g = 161, b = 152 }         # cyan
+
+# Document Type Colours
+doc_text = { r = 131, g = 148, b = 150 }        # base0
+doc_markdown = { r = 131, g = 148, b = 150 }    # base0
+doc_pdf = { r = 220, g = 50, b = 47 }           # red
+
+# Media File Type Colours
+media_image = { r = 211, g = 54, b = 130 }      # magenta
+media_video = { r = 203, g = 75, b = 22 }       # orange
+media_audio = { r = 133, g = 153, b = 0 }       # green
+
+# Archive Type Colours
+archive = { r = 181, g = 137, b = 0 }           # yellow
+
+# UI Element Colours
+tree_connector = { r = 88, g = 110, b = 117 }   # base01
+table_header = { r = 181, g = 137, b = 0 }      # yellow
+path_display = { r = 38, g = 139, b = 210 }     # blue
+checksum = { r = 42, g = 161, b = 152 }         # cyan
+magic = { r = 211, g = 54, b = 130 }            # magenta
+xattr = { r = 42, g = 161, b = 152 }            # cyan
+acl = { r = 133, g = 153, b = 0 }               # green
+mountpoint = { r = 211, g = 54, b = 130 }       # magenta
+numeric = { r = 42, g = 161, b = 152 }          # cyan
+placeholder = { r = 88, g = 110, b = 117 }      # base01
+
+# CLI Help Colours
+cli_help_header = { r = 181, g = 137, b = 0 }        # yellow
+cli_help_usage = { r = 133, g = 153, b = 0 }         # green
+cli_help_literal = { r = 42, g = 161, b = 152 }      # cyan
+cli_help_placeholder = { r = 203, g = 75, b = 22 }   # orange
+
+# Banner Gradient Colours
+banner_gradient_1 = { r = 42, g = 161, b = 152 }     # cyan
+banner_gradient_2 = { r = 133, g = 153, b = 0 }      # green
+banner_gradient_3 = { r = 181, g = 137, b = 0 }      # yellow
+banner_gradient_4 = { r = 203, g = 75, b = 22 }      # orange
+banner_gradient_5 = { r = 220, g = 50, b = 47 }      # red
+banner_gradient_6 = { r = 211, g = 54, b = 130 }     # magenta
+banner_gradient_7 = { r = 38, g = 139, b = 210 }     # blue

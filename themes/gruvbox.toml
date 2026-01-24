@@ -1,0 +1,95 @@
+# Gruvbox Dark Theme for Cerium
+# Authentic Gruvbox colour palette by Pavel Pertsev (morhetz)
+# https://github.com/morhetz/gruvbox
+#
+# Usage: Copy this file to ~/.config/cerium.toml
+
+
+# Size Gradients (green tones - smallest to largest)
+size_bytes = { r = 152, g = 151, b = 26 }       # green
+size_kb = { r = 184, g = 187, b = 38 }          # bright_green
+size_mb = { r = 142, g = 192, b = 124 }         # bright_aqua
+size_gb = { r = 250, g = 189, b = 47 }          # bright_yellow
+
+# Date Gradients (blue/aqua tones - recent to old)
+date_recent = { r = 142, g = 192, b = 124 }     # bright_aqua
+date_hours = { r = 104, g = 157, b = 106 }      # aqua
+date_days = { r = 131, g = 165, b = 152 }       # bright_blue
+date_weeks = { r = 69, g = 133, b = 136 }       # blue
+date_months = { r = 69, g = 133, b = 136 }      # blue
+date_old = { r = 146, g = 131, b = 116 }        # gray
+
+# Permission Colours
+perm_read = { r = 215, g = 153, b = 33 }        # yellow
+perm_write = { r = 204, g = 36, b = 29 }        # red
+perm_execute = { r = 152, g = 151, b = 26 }     # green
+perm_none = { r = 146, g = 131, b = 116 }       # gray
+perm_special = { r = 177, g = 98, b = 134 }     # purple
+perm_filetype = { r = 69, g = 133, b = 136 }    # blue
+
+# Entry Type Colours
+entry_directory = { r = 131, g = 165, b = 152 } # bright_blue
+entry_symlink = { r = 142, g = 192, b = 124 }   # bright_aqua
+entry_file = { r = 235, g = 219, b = 178 }      # fg (light1)
+
+# User and Group Colours
+user = { r = 250, g = 189, b = 47 }             # bright_yellow
+group = { r = 254, g = 128, b = 25 }            # bright_orange
+
+# Code File Type Colours
+code_rust = { r = 214, g = 93, b = 14 }         # orange
+code_python = { r = 69, g = 133, b = 136 }      # blue
+code_javascript = { r = 250, g = 189, b = 47 }  # bright_yellow
+code_c = { r = 104, g = 157, b = 106 }          # aqua
+code_go = { r = 131, g = 165, b = 152 }         # bright_blue
+code_java = { r = 254, g = 128, b = 25 }        # bright_orange
+code_ruby = { r = 204, g = 36, b = 29 }         # red
+code_php = { r = 177, g = 98, b = 134 }         # purple
+code_lua = { r = 69, g = 133, b = 136 }         # blue
+
+# Web File Type Colours
+web_html = { r = 251, g = 73, b = 52 }          # bright_red
+web_css = { r = 177, g = 98, b = 134 }          # purple
+web_json = { r = 211, g = 134, b = 155 }        # bright_purple
+web_xml = { r = 235, g = 219, b = 178 }         # fg
+web_yaml = { r = 104, g = 157, b = 106 }        # aqua
+
+# Document Type Colours
+doc_text = { r = 235, g = 219, b = 178 }        # fg
+doc_markdown = { r = 235, g = 219, b = 178 }    # fg
+doc_pdf = { r = 251, g = 73, b = 52 }           # bright_red
+
+# Media File Type Colours
+media_image = { r = 211, g = 134, b = 155 }     # bright_purple
+media_video = { r = 254, g = 128, b = 25 }      # bright_orange
+media_audio = { r = 142, g = 192, b = 124 }     # bright_aqua
+
+# Archive Type Colours
+archive = { r = 215, g = 153, b = 33 }          # yellow
+
+# UI Element Colours
+tree_connector = { r = 146, g = 131, b = 116 }  # gray
+table_header = { r = 250, g = 189, b = 47 }     # bright_yellow
+path_display = { r = 69, g = 133, b = 136 }     # blue
+checksum = { r = 142, g = 192, b = 124 }        # bright_aqua
+magic = { r = 211, g = 134, b = 155 }           # bright_purple
+xattr = { r = 104, g = 157, b = 106 }           # aqua
+acl = { r = 152, g = 151, b = 26 }              # green
+mountpoint = { r = 177, g = 98, b = 134 }       # purple
+numeric = { r = 131, g = 165, b = 152 }         # bright_blue
+placeholder = { r = 146, g = 131, b = 116 }     # gray
+
+# CLI Help Colours
+cli_help_header = { r = 250, g = 189, b = 47 }       # bright_yellow
+cli_help_usage = { r = 184, g = 187, b = 38 }        # bright_green
+cli_help_literal = { r = 142, g = 192, b = 124 }     # bright_aqua
+cli_help_placeholder = { r = 215, g = 153, b = 33 }  # yellow
+
+# Banner Gradient Colours
+banner_gradient_1 = { r = 104, g = 157, b = 106 }    # aqua
+banner_gradient_2 = { r = 152, g = 151, b = 26 }     # green
+banner_gradient_3 = { r = 215, g = 153, b = 33 }     # yellow
+banner_gradient_4 = { r = 214, g = 93, b = 14 }      # orange
+banner_gradient_5 = { r = 204, g = 36, b = 29 }      # red
+banner_gradient_6 = { r = 177, g = 98, b = 134 }     # purple
+banner_gradient_7 = { r = 69, g = 133, b = 136 }     # blue

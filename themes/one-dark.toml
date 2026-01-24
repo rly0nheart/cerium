@@ -1,0 +1,95 @@
+# One Dark Theme for Cerium
+# Atom's iconic One Dark theme
+# https://github.com/atom/atom/tree/master/packages/one-dark-syntax
+#
+# Usage: Copy this file to ~/.config/cerium.toml
+
+
+# Size Gradients (green tones)
+size_bytes = { r = 152, g = 195, b = 121 }      # green
+size_kb = { r = 152, g = 195, b = 121 }         # green
+size_mb = { r = 86, g = 182, b = 194 }          # cyan
+size_gb = { r = 229, g = 192, b = 123 }         # yellow
+
+# Date Gradients (blue tones - recent to old)
+date_recent = { r = 86, g = 182, b = 194 }      # cyan
+date_hours = { r = 97, g = 175, b = 239 }       # blue
+date_days = { r = 198, g = 120, b = 221 }       # purple
+date_weeks = { r = 198, g = 120, b = 221 }      # purple
+date_months = { r = 92, g = 99, b = 112 }       # comment
+date_old = { r = 76, g = 82, b = 99 }           # gutter
+
+# Permission Colours
+perm_read = { r = 229, g = 192, b = 123 }       # yellow
+perm_write = { r = 224, g = 108, b = 117 }      # red
+perm_execute = { r = 152, g = 195, b = 121 }    # green
+perm_none = { r = 92, g = 99, b = 112 }         # comment
+perm_special = { r = 198, g = 120, b = 221 }    # purple
+perm_filetype = { r = 97, g = 175, b = 239 }    # blue
+
+# Entry Type Colours
+entry_directory = { r = 97, g = 175, b = 239 }  # blue
+entry_symlink = { r = 86, g = 182, b = 194 }    # cyan
+entry_file = { r = 171, g = 178, b = 191 }      # fg
+
+# User and Group Colours
+user = { r = 229, g = 192, b = 123 }            # yellow
+group = { r = 209, g = 154, b = 102 }           # orange
+
+# Code File Type Colours
+code_rust = { r = 209, g = 154, b = 102 }       # orange
+code_python = { r = 97, g = 175, b = 239 }      # blue
+code_javascript = { r = 229, g = 192, b = 123 } # yellow
+code_c = { r = 86, g = 182, b = 194 }           # cyan
+code_go = { r = 86, g = 182, b = 194 }          # cyan
+code_java = { r = 209, g = 154, b = 102 }       # orange
+code_ruby = { r = 224, g = 108, b = 117 }       # red
+code_php = { r = 198, g = 120, b = 221 }        # purple
+code_lua = { r = 97, g = 175, b = 239 }         # blue
+
+# Web File Type Colours
+web_html = { r = 224, g = 108, b = 117 }        # red
+web_css = { r = 198, g = 120, b = 221 }         # purple
+web_json = { r = 229, g = 192, b = 123 }        # yellow
+web_xml = { r = 171, g = 178, b = 191 }         # fg
+web_yaml = { r = 86, g = 182, b = 194 }         # cyan
+
+# Document Type Colours
+doc_text = { r = 171, g = 178, b = 191 }        # fg
+doc_markdown = { r = 171, g = 178, b = 191 }    # fg
+doc_pdf = { r = 224, g = 108, b = 117 }         # red
+
+# Media File Type Colours
+media_image = { r = 198, g = 120, b = 221 }     # purple
+media_video = { r = 209, g = 154, b = 102 }     # orange
+media_audio = { r = 152, g = 195, b = 121 }     # green
+
+# Archive Type Colours
+archive = { r = 229, g = 192, b = 123 }         # yellow
+
+# UI Element Colours
+tree_connector = { r = 92, g = 99, b = 112 }    # comment
+table_header = { r = 229, g = 192, b = 123 }    # yellow
+path_display = { r = 97, g = 175, b = 239 }     # blue
+checksum = { r = 86, g = 182, b = 194 }         # cyan
+magic = { r = 198, g = 120, b = 221 }           # purple
+xattr = { r = 86, g = 182, b = 194 }            # cyan
+acl = { r = 152, g = 195, b = 121 }             # green
+mountpoint = { r = 198, g = 120, b = 221 }      # purple
+numeric = { r = 86, g = 182, b = 194 }          # cyan
+placeholder = { r = 92, g = 99, b = 112 }       # comment
+
+# CLI Help Colours
+cli_help_header = { r = 229, g = 192, b = 123 }      # yellow
+cli_help_usage = { r = 152, g = 195, b = 121 }       # green
+cli_help_literal = { r = 86, g = 182, b = 194 }      # cyan
+cli_help_placeholder = { r = 209, g = 154, b = 102 } # orange
+
+# Banner Gradient Colours
+banner_gradient_1 = { r = 86, g = 182, b = 194 }     # cyan
+banner_gradient_2 = { r = 152, g = 195, b = 121 }    # green
+banner_gradient_3 = { r = 229, g = 192, b = 123 }    # yellow
+banner_gradient_4 = { r = 209, g = 154, b = 102 }    # orange
+banner_gradient_5 = { r = 224, g = 108, b = 117 }    # red
+banner_gradient_6 = { r = 190, g = 80, b = 70 }      # dark red
+banner_gradient_7 = { r = 198, g = 120, b = 221 }    # purple

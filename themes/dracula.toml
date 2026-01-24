@@ -1,0 +1,95 @@
+# Dracula Theme for Cerium
+# Official Dracula colour palette by Zeno Rocha
+# https://draculatheme.com
+#
+# Usage: Copy this file to ~/.config/cerium.toml
+
+
+# Size Gradients (green tones)
+size_bytes = { r = 80, g = 250, b = 123 }       # green
+size_kb = { r = 80, g = 250, b = 123 }          # green
+size_mb = { r = 139, g = 233, b = 253 }         # cyan
+size_gb = { r = 241, g = 250, b = 140 }         # yellow
+
+# Date Gradients (purple/blue tones - recent to old)
+date_recent = { r = 139, g = 233, b = 253 }     # cyan
+date_hours = { r = 139, g = 233, b = 253 }      # cyan
+date_days = { r = 189, g = 147, b = 249 }       # purple
+date_weeks = { r = 189, g = 147, b = 249 }      # purple
+date_months = { r = 98, g = 114, b = 164 }      # comment
+date_old = { r = 98, g = 114, b = 164 }         # comment
+
+# Permission Colours
+perm_read = { r = 241, g = 250, b = 140 }       # yellow
+perm_write = { r = 255, g = 85, b = 85 }        # red
+perm_execute = { r = 80, g = 250, b = 123 }     # green
+perm_none = { r = 98, g = 114, b = 164 }        # comment
+perm_special = { r = 255, g = 121, b = 198 }    # pink
+perm_filetype = { r = 189, g = 147, b = 249 }   # purple
+
+# Entry Type Colours
+entry_directory = { r = 189, g = 147, b = 249 } # purple
+entry_symlink = { r = 139, g = 233, b = 253 }   # cyan
+entry_file = { r = 248, g = 248, b = 242 }      # foreground
+
+# User and Group Colours
+user = { r = 241, g = 250, b = 140 }            # yellow
+group = { r = 255, g = 184, b = 108 }           # orange
+
+# Code File Type Colours
+code_rust = { r = 255, g = 184, b = 108 }       # orange
+code_python = { r = 139, g = 233, b = 253 }     # cyan
+code_javascript = { r = 241, g = 250, b = 140 } # yellow
+code_c = { r = 139, g = 233, b = 253 }          # cyan
+code_go = { r = 139, g = 233, b = 253 }         # cyan
+code_java = { r = 255, g = 184, b = 108 }       # orange
+code_ruby = { r = 255, g = 85, b = 85 }         # red
+code_php = { r = 189, g = 147, b = 249 }        # purple
+code_lua = { r = 189, g = 147, b = 249 }        # purple
+
+# Web File Type Colours
+web_html = { r = 255, g = 85, b = 85 }          # red
+web_css = { r = 189, g = 147, b = 249 }         # purple
+web_json = { r = 255, g = 121, b = 198 }        # pink
+web_xml = { r = 248, g = 248, b = 242 }         # foreground
+web_yaml = { r = 139, g = 233, b = 253 }        # cyan
+
+# Document Type Colours
+doc_text = { r = 248, g = 248, b = 242 }        # foreground
+doc_markdown = { r = 248, g = 248, b = 242 }    # foreground
+doc_pdf = { r = 255, g = 85, b = 85 }           # red
+
+# Media File Type Colours
+media_image = { r = 255, g = 121, b = 198 }     # pink
+media_video = { r = 255, g = 184, b = 108 }     # orange
+media_audio = { r = 80, g = 250, b = 123 }      # green
+
+# Archive Type Colours
+archive = { r = 241, g = 250, b = 140 }         # yellow
+
+# UI Element Colours
+tree_connector = { r = 98, g = 114, b = 164 }   # comment
+table_header = { r = 241, g = 250, b = 140 }    # yellow
+path_display = { r = 189, g = 147, b = 249 }    # purple
+checksum = { r = 139, g = 233, b = 253 }        # cyan
+magic = { r = 255, g = 121, b = 198 }           # pink
+xattr = { r = 139, g = 233, b = 253 }           # cyan
+acl = { r = 80, g = 250, b = 123 }              # green
+mountpoint = { r = 255, g = 121, b = 198 }      # pink
+numeric = { r = 139, g = 233, b = 253 }         # cyan
+placeholder = { r = 98, g = 114, b = 164 }      # comment
+
+# CLI Help Colours
+cli_help_header = { r = 241, g = 250, b = 140 }      # yellow
+cli_help_usage = { r = 80, g = 250, b = 123 }        # green
+cli_help_literal = { r = 139, g = 233, b = 253 }     # cyan
+cli_help_placeholder = { r = 255, g = 184, b = 108 } # orange
+
+# Banner Gradient Colours
+banner_gradient_1 = { r = 139, g = 233, b = 253 }    # cyan
+banner_gradient_2 = { r = 80, g = 250, b = 123 }     # green
+banner_gradient_3 = { r = 241, g = 250, b = 140 }    # yellow
+banner_gradient_4 = { r = 255, g = 184, b = 108 }    # orange
+banner_gradient_5 = { r = 255, g = 85, b = 85 }      # red
+banner_gradient_6 = { r = 255, g = 121, b = 198 }    # pink
+banner_gradient_7 = { r = 189, g = 147, b = 249 }    # purple

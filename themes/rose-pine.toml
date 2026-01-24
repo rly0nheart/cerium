@@ -1,0 +1,95 @@
+# Rosé Pine Theme for Cerium
+# All natural pine, faux fur and a bit of soho vibes
+# https://rosepinetheme.com
+#
+# Usage: Copy this file to ~/.config/cerium.toml
+
+
+# Size Gradients (green/foam tones)
+size_bytes = { r = 156, g = 207, b = 216 }      # foam
+size_kb = { r = 156, g = 207, b = 216 }         # foam
+size_mb = { r = 49, g = 116, b = 143 }          # pine
+size_gb = { r = 246, g = 193, b = 119 }         # gold
+
+# Date Gradients (iris/purple tones - recent to old)
+date_recent = { r = 156, g = 207, b = 216 }     # foam
+date_hours = { r = 196, g = 167, b = 231 }      # iris
+date_days = { r = 196, g = 167, b = 231 }       # iris
+date_weeks = { r = 144, g = 122, b = 169 }      # subtle iris
+date_months = { r = 110, g = 106, b = 134 }     # muted
+date_old = { r = 82, g = 79, b = 103 }          # overlay
+
+# Permission Colours
+perm_read = { r = 246, g = 193, b = 119 }       # gold
+perm_write = { r = 235, g = 111, b = 146 }      # love
+perm_execute = { r = 156, g = 207, b = 216 }    # foam
+perm_none = { r = 110, g = 106, b = 134 }       # muted
+perm_special = { r = 196, g = 167, b = 231 }    # iris
+perm_filetype = { r = 49, g = 116, b = 143 }    # pine
+
+# Entry Type Colours
+entry_directory = { r = 49, g = 116, b = 143 }  # pine
+entry_symlink = { r = 156, g = 207, b = 216 }   # foam
+entry_file = { r = 224, g = 222, b = 244 }      # text
+
+# User and Group Colours
+user = { r = 246, g = 193, b = 119 }            # gold
+group = { r = 234, g = 154, b = 151 }           # rose
+
+# Code File Type Colours
+code_rust = { r = 234, g = 154, b = 151 }       # rose
+code_python = { r = 49, g = 116, b = 143 }      # pine
+code_javascript = { r = 246, g = 193, b = 119 } # gold
+code_c = { r = 156, g = 207, b = 216 }          # foam
+code_go = { r = 156, g = 207, b = 216 }         # foam
+code_java = { r = 234, g = 154, b = 151 }       # rose
+code_ruby = { r = 235, g = 111, b = 146 }       # love
+code_php = { r = 196, g = 167, b = 231 }        # iris
+code_lua = { r = 49, g = 116, b = 143 }         # pine
+
+# Web File Type Colours
+web_html = { r = 235, g = 111, b = 146 }        # love
+web_css = { r = 196, g = 167, b = 231 }         # iris
+web_json = { r = 234, g = 154, b = 151 }        # rose
+web_xml = { r = 224, g = 222, b = 244 }         # text
+web_yaml = { r = 156, g = 207, b = 216 }        # foam
+
+# Document Type Colours
+doc_text = { r = 224, g = 222, b = 244 }        # text
+doc_markdown = { r = 224, g = 222, b = 244 }    # text
+doc_pdf = { r = 235, g = 111, b = 146 }         # love
+
+# Media File Type Colours
+media_image = { r = 196, g = 167, b = 231 }     # iris
+media_video = { r = 234, g = 154, b = 151 }     # rose
+media_audio = { r = 156, g = 207, b = 216 }     # foam
+
+# Archive Type Colours
+archive = { r = 246, g = 193, b = 119 }         # gold
+
+# UI Element Colours
+tree_connector = { r = 110, g = 106, b = 134 }  # muted
+table_header = { r = 246, g = 193, b = 119 }    # gold
+path_display = { r = 49, g = 116, b = 143 }     # pine
+checksum = { r = 156, g = 207, b = 216 }        # foam
+magic = { r = 196, g = 167, b = 231 }           # iris
+xattr = { r = 156, g = 207, b = 216 }           # foam
+acl = { r = 156, g = 207, b = 216 }             # foam
+mountpoint = { r = 196, g = 167, b = 231 }      # iris
+numeric = { r = 156, g = 207, b = 216 }         # foam
+placeholder = { r = 110, g = 106, b = 134 }     # muted
+
+# CLI Help Colours
+cli_help_header = { r = 246, g = 193, b = 119 }      # gold
+cli_help_usage = { r = 156, g = 207, b = 216 }       # foam
+cli_help_literal = { r = 49, g = 116, b = 143 }      # pine
+cli_help_placeholder = { r = 234, g = 154, b = 151 } # rose
+
+# Banner Gradient Colours
+banner_gradient_1 = { r = 156, g = 207, b = 216 }    # foam
+banner_gradient_2 = { r = 49, g = 116, b = 143 }     # pine
+banner_gradient_3 = { r = 246, g = 193, b = 119 }    # gold
+banner_gradient_4 = { r = 234, g = 154, b = 151 }    # rose
+banner_gradient_5 = { r = 235, g = 111, b = 146 }    # love
+banner_gradient_6 = { r = 196, g = 167, b = 231 }    # iris
+banner_gradient_7 = { r = 144, g = 122, b = 169 }    # subtle iris

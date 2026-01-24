@@ -1,0 +1,95 @@
+# Nord Theme for Cerium
+# Official Nord colour palette by Arctic Ice Studio
+# https://www.nordtheme.com
+#
+# Usage: Copy this file to ~/.config/cerium.toml
+
+
+# Size Gradients (green/cyan tones)
+size_bytes = { r = 143, g = 188, b = 187 }      # nord7 (frost)
+size_kb = { r = 143, g = 188, b = 187 }         # nord7
+size_mb = { r = 136, g = 192, b = 208 }         # nord8 (frost)
+size_gb = { r = 163, g = 190, b = 140 }         # nord14 (aurora green)
+
+# Date Gradients (blue tones - recent to old)
+date_recent = { r = 136, g = 192, b = 208 }     # nord8
+date_hours = { r = 129, g = 161, b = 193 }      # nord9
+date_days = { r = 94, g = 129, b = 172 }        # nord10
+date_weeks = { r = 94, g = 129, b = 172 }       # nord10
+date_months = { r = 76, g = 86, b = 106 }       # nord3
+date_old = { r = 59, g = 66, b = 82 }           # nord1
+
+# Permission Colours
+perm_read = { r = 235, g = 203, b = 139 }       # nord13 (aurora yellow)
+perm_write = { r = 191, g = 97, b = 106 }       # nord11 (aurora red)
+perm_execute = { r = 163, g = 190, b = 140 }    # nord14 (aurora green)
+perm_none = { r = 76, g = 86, b = 106 }         # nord3
+perm_special = { r = 180, g = 142, b = 173 }    # nord15 (aurora purple)
+perm_filetype = { r = 94, g = 129, b = 172 }    # nord10
+
+# Entry Type Colours
+entry_directory = { r = 136, g = 192, b = 208 } # nord8 (frost)
+entry_symlink = { r = 143, g = 188, b = 187 }   # nord7 (frost)
+entry_file = { r = 216, g = 222, b = 233 }      # nord4 (snow)
+
+# User and Group Colours
+user = { r = 235, g = 203, b = 139 }            # nord13
+group = { r = 208, g = 135, b = 112 }           # nord12 (aurora orange)
+
+# Code File Type Colours
+code_rust = { r = 208, g = 135, b = 112 }       # nord12
+code_python = { r = 136, g = 192, b = 208 }     # nord8
+code_javascript = { r = 235, g = 203, b = 139 } # nord13
+code_c = { r = 143, g = 188, b = 187 }          # nord7
+code_go = { r = 136, g = 192, b = 208 }         # nord8
+code_java = { r = 208, g = 135, b = 112 }       # nord12
+code_ruby = { r = 191, g = 97, b = 106 }        # nord11
+code_php = { r = 180, g = 142, b = 173 }        # nord15
+code_lua = { r = 94, g = 129, b = 172 }         # nord10
+
+# Web File Type Colours
+web_html = { r = 191, g = 97, b = 106 }         # nord11
+web_css = { r = 180, g = 142, b = 173 }         # nord15
+web_json = { r = 235, g = 203, b = 139 }        # nord13
+web_xml = { r = 216, g = 222, b = 233 }         # nord4
+web_yaml = { r = 143, g = 188, b = 187 }        # nord7
+
+# Document Type Colours
+doc_text = { r = 216, g = 222, b = 233 }        # nord4
+doc_markdown = { r = 216, g = 222, b = 233 }    # nord4
+doc_pdf = { r = 191, g = 97, b = 106 }          # nord11
+
+# Media File Type Colours
+media_image = { r = 180, g = 142, b = 173 }     # nord15
+media_video = { r = 208, g = 135, b = 112 }     # nord12
+media_audio = { r = 163, g = 190, b = 140 }     # nord14
+
+# Archive Type Colours
+archive = { r = 235, g = 203, b = 139 }         # nord13
+
+# UI Element Colours
+tree_connector = { r = 76, g = 86, b = 106 }    # nord3
+table_header = { r = 235, g = 203, b = 139 }    # nord13
+path_display = { r = 136, g = 192, b = 208 }    # nord8
+checksum = { r = 143, g = 188, b = 187 }        # nord7
+magic = { r = 180, g = 142, b = 173 }           # nord15
+xattr = { r = 143, g = 188, b = 187 }           # nord7
+acl = { r = 163, g = 190, b = 140 }             # nord14
+mountpoint = { r = 180, g = 142, b = 173 }      # nord15
+numeric = { r = 136, g = 192, b = 208 }         # nord8
+placeholder = { r = 76, g = 86, b = 106 }       # nord3
+
+# CLI Help Colours
+cli_help_header = { r = 235, g = 203, b = 139 }      # nord13
+cli_help_usage = { r = 163, g = 190, b = 140 }       # nord14
+cli_help_literal = { r = 136, g = 192, b = 208 }     # nord8
+cli_help_placeholder = { r = 208, g = 135, b = 112 } # nord12
+
+# Banner Gradient Colours
+banner_gradient_1 = { r = 143, g = 188, b = 187 }    # nord7 (frost)
+banner_gradient_2 = { r = 163, g = 190, b = 140 }    # nord14 (green)
+banner_gradient_3 = { r = 235, g = 203, b = 139 }    # nord13 (yellow)
+banner_gradient_4 = { r = 208, g = 135, b = 112 }    # nord12 (orange)
+banner_gradient_5 = { r = 191, g = 97, b = 106 }     # nord11 (red)
+banner_gradient_6 = { r = 180, g = 142, b = 173 }    # nord15 (purple)
+banner_gradient_7 = { r = 94, g = 129, b = 172 }     # nord10 (blue)

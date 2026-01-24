@@ -1,0 +1,95 @@
+# Catppuccin Mocha Theme for Cerium
+# Soothing pastel theme for the high-spirited!
+# https://github.com/catppuccin/catppuccin
+#
+# Usage: Copy this file to ~/.config/cerium.toml
+
+
+# Size Gradients (green tones)
+size_bytes = { r = 166, g = 227, b = 161 }      # green
+size_kb = { r = 166, g = 227, b = 161 }         # green
+size_mb = { r = 148, g = 226, b = 213 }         # teal
+size_gb = { r = 249, g = 226, b = 175 }         # yellow
+
+# Date Gradients (blue tones - recent to old)
+date_recent = { r = 137, g = 220, b = 235 }     # sky
+date_hours = { r = 116, g = 199, b = 236 }      # sapphire
+date_days = { r = 137, g = 180, b = 250 }       # lavender
+date_weeks = { r = 180, g = 190, b = 254 }      # lavender
+date_months = { r = 108, g = 112, b = 134 }     # overlay0
+date_old = { r = 88, g = 91, b = 112 }          # surface2
+
+# Permission Colours
+perm_read = { r = 249, g = 226, b = 175 }       # yellow
+perm_write = { r = 243, g = 139, b = 168 }      # red
+perm_execute = { r = 166, g = 227, b = 161 }    # green
+perm_none = { r = 108, g = 112, b = 134 }       # overlay0
+perm_special = { r = 245, g = 194, b = 231 }    # pink
+perm_filetype = { r = 137, g = 180, b = 250 }   # lavender
+
+# Entry Type Colours
+entry_directory = { r = 137, g = 180, b = 250 } # lavender
+entry_symlink = { r = 137, g = 220, b = 235 }   # sky
+entry_file = { r = 205, g = 214, b = 244 }      # text
+
+# User and Group Colours
+user = { r = 249, g = 226, b = 175 }            # yellow
+group = { r = 250, g = 179, b = 135 }           # peach
+
+# Code File Type Colours
+code_rust = { r = 250, g = 179, b = 135 }       # peach
+code_python = { r = 116, g = 199, b = 236 }     # sapphire
+code_javascript = { r = 249, g = 226, b = 175 } # yellow
+code_c = { r = 148, g = 226, b = 213 }          # teal
+code_go = { r = 137, g = 220, b = 235 }         # sky
+code_java = { r = 250, g = 179, b = 135 }       # peach
+code_ruby = { r = 243, g = 139, b = 168 }       # red
+code_php = { r = 203, g = 166, b = 247 }        # mauve
+code_lua = { r = 137, g = 180, b = 250 }        # lavender
+
+# Web File Type Colours
+web_html = { r = 235, g = 160, b = 172 }        # maroon
+web_css = { r = 203, g = 166, b = 247 }         # mauve
+web_json = { r = 245, g = 194, b = 231 }        # pink
+web_xml = { r = 205, g = 214, b = 244 }         # text
+web_yaml = { r = 148, g = 226, b = 213 }        # teal
+
+# Document Type Colours
+doc_text = { r = 205, g = 214, b = 244 }        # text
+doc_markdown = { r = 205, g = 214, b = 244 }    # text
+doc_pdf = { r = 243, g = 139, b = 168 }         # red
+
+# Media File Type Colours
+media_image = { r = 245, g = 194, b = 231 }     # pink
+media_video = { r = 250, g = 179, b = 135 }     # peach
+media_audio = { r = 166, g = 227, b = 161 }     # green
+
+# Archive Type Colours
+archive = { r = 249, g = 226, b = 175 }         # yellow
+
+# UI Element Colours
+tree_connector = { r = 108, g = 112, b = 134 }  # overlay0
+table_header = { r = 249, g = 226, b = 175 }    # yellow
+path_display = { r = 137, g = 180, b = 250 }    # lavender
+checksum = { r = 148, g = 226, b = 213 }        # teal
+magic = { r = 245, g = 194, b = 231 }           # pink
+xattr = { r = 137, g = 220, b = 235 }           # sky
+acl = { r = 166, g = 227, b = 161 }             # green
+mountpoint = { r = 203, g = 166, b = 247 }      # mauve
+numeric = { r = 137, g = 220, b = 235 }         # sky
+placeholder = { r = 108, g = 112, b = 134 }     # overlay0
+
+# CLI Help Colours
+cli_help_header = { r = 249, g = 226, b = 175 }      # yellow
+cli_help_usage = { r = 166, g = 227, b = 161 }       # green
+cli_help_literal = { r = 137, g = 220, b = 235 }     # sky
+cli_help_placeholder = { r = 250, g = 179, b = 135 } # peach
+
+# Banner Gradient Colours
+banner_gradient_1 = { r = 137, g = 220, b = 235 }    # sky
+banner_gradient_2 = { r = 166, g = 227, b = 161 }    # green
+banner_gradient_3 = { r = 249, g = 226, b = 175 }    # yellow
+banner_gradient_4 = { r = 250, g = 179, b = 135 }    # peach
+banner_gradient_5 = { r = 243, g = 139, b = 168 }    # red
+banner_gradient_6 = { r = 245, g = 194, b = 231 }    # pink
+banner_gradient_7 = { r = 203, g = 166, b = 247 }    # mauve

@@ -1,0 +1,39 @@
+[package]
+name = "cerium"
+description = "A ls-like utility that is NOT trying to replace ls"
+version = "0.1.4-alpha.1"
+edition = "2024"
+authors = ["Ritchie Mwewa <hi@ly0nheart.com>"]
+repository = "https://codeberg.org/rly0nheart/cerium"
+license = "MIT"
+
+[dependencies]
+chrono = "0.4"
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+phf = { version = "0.13.1", features = ["macros"] }
+humanly = "0.1"
+nu-ansi-term = "0.50"
+libc = "*"
+toml = "0.9.11"
+
+crc32fast = { version = "1.5.0", optional = true }
+filemagic = { version = "0.13", optional = true }
+md5 = { version = "0.8.0", optional = true}
+sha2 = { version = "0.10.9", optional = true }
+
+[features]
+magic = ["dep:filemagic"]
+checksum = ["dep:md5", "dep:sha2", "dep:crc32fast"]
+
+[dev-dependencies]
+tempfile = "3.23.0"
+
+[[bin]]
+name = "ce"
+path = "src/main.rs"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
