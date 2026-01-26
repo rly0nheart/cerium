@@ -1,13 +1,10 @@
 ![logo](img/logo.png)
 
-<table>
-  <tr>
-    <td><img src="img/ce_human.png" alt="ce human"></td>
-    <td><img src="img/ce_regular.png" alt="ce regular"></td>
-  </tr>
-</table>
+<p align="center">
+ <img src="img/intro.png" alt="ce human">
+</p>
 
-Yet another ls-like util that is **not** trying to replace `ls`.
+Yet, another ls-like util that is **not** trying to replace `ls`.
 
 Cerium aims to stay small by avoiding features that introduce heavy dependencies while doing what a tool of its kind is supposed to do... list files and directories.
 
