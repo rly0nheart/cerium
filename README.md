@@ -1,8 +1,7 @@
-## Cerium
+![intro](img/intro.png)
 Yet, another ls-like util that is **not** trying to replace `ls`.
 
 Cerium gets inspiration from similar tools such as lsd and eza, but with a small difference: It aims to stay small by avoiding features that introduce heavy dependencies while doing what a tool of its kind is supposed to do... list files and directories.
-![intro](img/intro.png)
 
 ## Table of Contents
 - [Installation](#installation-)
