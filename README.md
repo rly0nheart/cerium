@@ -35,21 +35,26 @@ Cerium gets inspiration from similar tools such as lsd and eza, but with a small
 
 ```shell
 # Standard installation with all features
-cargo install --git https://github.com/rly0nheart/cerium.git --all-features
+cargo install cerium --all-features
 
 # Minimal installation
-cargo install --git https://github.com/rly0nheart/cerium.git
+cargo install cerium
 
 # Specific features
-cargo install --git https://github.com/rly0nheart/cerium.git --features magic
-cargo install --git https://github.com/rly0nheart/cerium.git --features checksum
+cargo install cerium --features magic
+cargo install cerium --features checksum
 ```
 
 ### Build from Source
 
 ```bash
-git clone https://github.com/rly0nheart/cerium.git
+# Clone the repo
+git clone https://codeberg.org/rly0nheart/cerium.git
+
+# Move to cerium directory
 cd cerium
+
+# Build and install: This will build cerium with all its features
 make install
 ```
 
