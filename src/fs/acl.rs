@@ -65,13 +65,7 @@ impl Acl {
         let result = unsafe {
             libc::listxattr(
                 path_c.as_ptr(),
-
-                #[cfg(target_os = "android")]
-                buffer.as_mut_ptr() as *mut u8,
-
-                #[cfg(not(target_os = "android"))]
-                buffer.as_mut_ptr() as *mut i8,
-                
+                buffer.as_mut_ptr() as *mut libc::c_char,
                 size as usize,
             )
         };
