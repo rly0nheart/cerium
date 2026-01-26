@@ -99,10 +99,12 @@ impl Glob {
     }
 
     fn error_message(regex: &libc::regex_t, error_code: i32) -> String {
-        let mut buffer = [0i8; 256];
+        // c_char is i8 on most platforms but u8 on Android
+        let mut buffer = [0 as libc::c_char; 256];
         unsafe {
             libc::regerror(error_code, regex, buffer.as_mut_ptr(), buffer.len());
         }
+
         let c_str = unsafe { std::ffi::CStr::from_ptr(buffer.as_ptr()) };
         c_str.to_string_lossy().into_owned()
     }

@@ -63,10 +63,11 @@ impl Xattr {
 
         // Second call to get actual data
         let mut buffer = vec![0u8; size as usize];
+        // c_char is i8 on most platforms but u8 on Android
         let result = unsafe {
             libc::listxattr(
                 path_c.as_ptr(),
-                buffer.as_mut_ptr() as *mut i8,
+                buffer.as_mut_ptr() as *mut libc::c_char,
                 size as usize,
             )
         };
