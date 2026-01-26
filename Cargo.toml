@@ -1,9 +1,9 @@
 [package]
 name = "cerium"
-description = "A ls-like utility that is NOT trying to replace ls"
-version = "0.1.4-alpha.1"
+description = "Yet, another ls-like util that is not trying to replace ls"
+version = "0.1.0"
 edition = "2024"
-authors = ["Ritchie Mwewa <hi@ly0nheart.com>"]
+authors = ["Ritchie Mwewa <hi@rly0nheart.com>"]
 repository = "https://codeberg.org/rly0nheart/cerium"
 license = "MIT"
 
