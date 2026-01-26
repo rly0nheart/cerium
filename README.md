@@ -1,4 +1,4 @@
-![intro](img/intro.png)
+![intro](https://raw.githubusercontent.com/rly0nheart/cerium/refs/heads/master/img/intro.png)
 
 Yet, another ls-like util that is **not** trying to replace `ls`.
 
