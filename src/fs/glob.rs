@@ -99,6 +99,7 @@ impl Glob {
     }
 
     fn error_message(regex: &libc::regex_t, error_code: i32) -> String {
+        // c_char is i8 on most platforms but u8 on Android
         let mut buffer = [0 as libc::c_char; 256];
         unsafe {
             libc::regerror(error_code, regex, buffer.as_mut_ptr(), buffer.len());

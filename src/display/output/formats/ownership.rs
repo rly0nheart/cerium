@@ -58,6 +58,7 @@ impl Ownership {
             let mut passwd_result: *mut passwd = ptr::null_mut();
             let mut buffer = vec![0u8; 16 * 1024];
 
+            // c_char is i8 on most platforms but u8 on Android
             let status = getpwuid_r(
                 user_id,
                 &mut passwd_entry,
@@ -90,6 +91,7 @@ impl Ownership {
             let mut group_result: *mut group = ptr::null_mut();
             let mut buffer = vec![0u8; 16 * 1024];
 
+            // c_char is i8 on most platforms but u8 on Android
             let status = getgrgid_r(
                 group_id,
                 &mut group_entry,
