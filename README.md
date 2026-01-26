@@ -1,18 +1,17 @@
-![logo](img/logo.png)
-
-<p align="center">
- <img src="img/intro.png" alt="ce human">
-</p>
-
+## Cerium
 Yet, another ls-like util that is **not** trying to replace `ls`.
 
-Cerium aims to stay small by avoiding features that introduce heavy dependencies while doing what a tool of its kind is supposed to do... list files and directories.
+Cerium gets inspiration from similar tools such as lsd and eza, but with a small difference: It aims to stay small by avoiding features that introduce heavy dependencies while doing what a tool of its kind is supposed to do... list files and directories.
+![intro](img/intro.png)
 
 ## Installation
 
+<details>
+  <summary>Click here</summary>
+
 ### Quick Install (with Cargo)
 
-```bash
+```shell
 # Standard installation with all features
 cargo install --git https://github.com/rly0nheart/cerium.git --all-features
 
@@ -31,11 +30,12 @@ git clone https://github.com/rly0nheart/cerium.git
 cd cerium
 make install
 ```
+</details>
 
-## Optional Features
+## Features (optional)
 
 <details>
-  <summary><strong>Click</strong></summary>
+  <summary>Click here</summary>
 
 ### Magic
 
@@ -62,7 +62,7 @@ ce --checksum sha256
 ## Usage
 
 <details>
-  <summary><strong>Click</strong></summary>
+  <summary>Click here</summary>
 
 ```
 ce [OPTIONS] [PATH]
@@ -118,11 +118,11 @@ ce [OPTIONS] [PATH]
 ### Formatting
 
 ```bash
---date-fmt <FMT>         locale, human, timestamp
---number-fmt <FMT>       human, natural
---passwd-fmt <FMT>       name, id
---permission-fmt <FMT>   symbolic, octal, hex
---size-fmt <FMT>         bytes, binary, decimal
+--date-format <FMT>            locale, human, timestamp
+--number-format <FMT>          human, natural
+--ownership-format <FMT>       name, id
+--permission-format <FMT>      symbolic, octal, hex
+--size-format <FMT>            bytes, binary, decimal
 ```
 
 ### Appearance
@@ -138,7 +138,7 @@ ce [OPTIONS] [PATH]
 ## Examples
 
 <details>
-  <summary><strong>Click</strong></summary>
+  <summary>Click here</summary>
 
 ### Basic Operations
 
@@ -152,7 +152,7 @@ ce --find=.rs --sort=size -r              # Find Rust files, sort by size
 ### Metadata Inspection
 
 ```bash
-ce -lpug --date-fmt=human                 # Permissions, ownership, human dates
+ce -pugm --date-format=humanly            # Permissions, ownership, modified date, human dates
 ce -i --hard-links --sort=inode           # Inodes and hard links
 ce --acl -x                               # ACLs and extended attributes
 ce -lb --block-size                       # Block usage
@@ -164,26 +164,26 @@ ce -lb --block-size                       # Block usage
 ce --magic --checksum sha256              # Type detection + checksums
 ce -RS --true-size                        # Recursive with actual directory sizes
 ce --hide=target,node_modules -t          # Tree excluding build artifacts
-ce --permission-fmt=octal -p              # Octal permissions
-ce --passwd-fmt=id -ug                    # Numeric UIDs/GIDs
+ce --permission-format=octal -p           # Octal permissions
+ce --ownership-format=id -ug              # Numeric UIDs/GIDs
 ```
 
 ### Combined Operations
 
 ```bash
-ce -laH --date-fmt=human --size-fmt=binary
+ce -laH --date-format=humanly --size-format=binary
 ce --find=.pdf --checksum md5 --sort=modified -r
 ce -t --prune --hide=.git,target --icons=always
 ```
 
 </details>
 
-## Theme Hacking
+## Themes
 
 <details>
-  <summary><strong>Click</strong></summary>
+  <summary>Click here</summary>
 
-Cerium supports customisable themes via a TOML configuration file. By default, Cerium uses the Gruvbox colour palette.
+Cerium supports customisable themes via a TOML configuration file. By default, it uses the Gruvbox colour palette.
 
 ### Quick Start
 
@@ -198,10 +198,8 @@ See [`themes/README.md`](themes/README.md) for the full list of pre-made themes,
 
 </details>
 
-## License
-### MIT License
-
-See [license details](https://choosealicense.com/licenses/mit/) for more information.
+## Licence
+MIT Licence. See [LICENSE](https://choosealicense.com/licenses/mit/) file for more information.
 
 ## Credits
 - My mentor, [Ned Williamson](https://github.com/nedwill), for his guidance and ongoing feedback on the project
