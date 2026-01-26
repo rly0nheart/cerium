@@ -4,10 +4,32 @@ Yet, another ls-like util that is **not** trying to replace `ls`.
 Cerium gets inspiration from similar tools such as lsd and eza, but with a small difference: It aims to stay small by avoiding features that introduce heavy dependencies while doing what a tool of its kind is supposed to do... list files and directories.
 ![intro](img/intro.png)
 
-## Installation
+## Table of Contents
+- [Installation](#installation-)
+  - [With Cargo](#quick-install-with-cargo)
+  - [Build from Source](#build-from-source)
+- [Features (optional)](#features-optional)
+  - [Magic](#magic)
+  - [Checksum](#checksum)
+- [Usage](#usage)
+  - [Display Options](#display-options)
+  - [Filtering](#filtering)
+  - [Metadata Display](#metadata-display)
+  - [Sorting & Traversal](#sorting--traversal)
+  - [Formatting](#formatting)
+  - [Appearance](#appearance)
+- [Examples](#examples)
+  - [Basic Operation](#basic-operations)
+  - [Metadata Inspection](#metadata-inspection)
+  - [Advanced Usage](#advanced-usage)
+  - [Combined Operations](#combined-operations)
+- [Themes](#themes)
+  - [Quick Start](#quick-start)
+  - [Available Themes](#available-themes)
+- [License](#licence)
+- [Credits](#credits)
 
-<details>
-  <summary>Click here</summary>
+## Installation 
 
 ### Quick Install (with Cargo)
 
@@ -30,12 +52,8 @@ git clone https://github.com/rly0nheart/cerium.git
 cd cerium
 make install
 ```
-</details>
 
 ## Features (optional)
-
-<details>
-  <summary>Click here</summary>
 
 ### Magic
 
@@ -57,12 +75,7 @@ Calculate file checksums with multiple algorithms.
 ce --checksum sha256
 ```
 
-</details>
-
 ## Usage
-
-<details>
-  <summary>Click here</summary>
 
 ```
 ce [OPTIONS] [PATH]
@@ -133,12 +146,7 @@ ce [OPTIONS] [PATH]
 -Q, --quote-name         auto, double, single, never
 ```
 
-</details>
-
 ## Examples
-
-<details>
-  <summary>Click here</summary>
 
 ### Basic Operations
 
@@ -176,12 +184,7 @@ ce --find=.pdf --checksum md5 --sort=modified -r
 ce -t --prune --hide=.git,target --icons=always
 ```
 
-</details>
-
 ## Themes
-
-<details>
-  <summary>Click here</summary>
 
 Cerium supports customisable themes via a TOML configuration file. By default, it uses the Gruvbox colour palette.
 
@@ -195,8 +198,6 @@ cp themes/dracula.toml ~/.config/cerium.toml
 ### Available Themes
 
 See [`themes/README.md`](themes/README.md) for the full list of pre-made themes, installation instructions, and customisation guide.
-
-</details>
 
 ## Licence
 MIT Licence. See [LICENSE](https://choosealicense.com/licenses/mit/) file for more information.
