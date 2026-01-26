@@ -200,7 +200,7 @@ cp themes/dracula.toml ~/.config/cerium.toml
 See [`themes/README.md`](themes/README.md) for the full list of pre-made themes, installation instructions, and customisation guide.
 
 ## Licence
-MIT Licence. See [LICENSE](https://choosealicense.com/licenses/mit/) file for more information.
+MIT Licence. [Read more](https://choosealicense.com/licenses/mit/) for details.
 
 ## Credits
 - My mentor, [Ned Williamson](https://github.com/nedwill), for his guidance and ongoing feedback on the project
