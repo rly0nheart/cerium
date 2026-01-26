@@ -23,18 +23,18 @@ SOFTWARE.
 */
 
 mod cli;
+mod display;
 mod fs;
-mod output;
 
 use crate::cli::args::Args;
+use crate::display::factory::DisplayFactory;
+use crate::display::output::banner;
+use crate::display::theme::colours::{ColourSettings, RgbColours};
+use crate::display::theme::config;
+use crate::display::theme::icons::IconSettings;
 use crate::fs::dir::DirReader;
 use crate::fs::hyperlink::HyperlinkSettings;
-use crate::output::banner;
-use crate::output::display::factory::DisplayFactory;
-use crate::output::theme::colours::{ColourSettings, RgbColours};
-use crate::output::theme::icons::IconSettings;
 use clap::{CommandFactory, FromArgMatches};
-use output::theme::config;
 use std::process;
 
 /// Application entry point.
@@ -68,7 +68,6 @@ fn main() {
 
     // Convert input path to PathBuf
     let path = &args.path;
-
     let dir_reader = DirReader::from(path.to_path_buf());
 
     // Validate that the path exists (use lstat to handle broken symlinks)

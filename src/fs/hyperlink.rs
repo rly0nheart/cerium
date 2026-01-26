@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 use crate::cli::flags::ShowHyperlink;
-use crate::output::terminal::is_tty;
+use crate::display::output::terminal::is_tty;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 

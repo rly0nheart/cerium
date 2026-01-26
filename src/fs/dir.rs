@@ -24,9 +24,9 @@ SOFTWARE.
 
 use crate::cli::args::Args;
 use crate::cli::flags::SortBy;
+use crate::display::theme::icons::IconSettings;
 use crate::fs::entry::Entry;
 use crate::fs::glob::Glob;
-use crate::output::theme::icons::IconSettings;
 use std::fs;
 use std::path::PathBuf;
 

@@ -274,7 +274,7 @@ pub(crate) fn args_need_metadata(args: &Args) -> bool {
 
 /// Extracts banner gradient colours from theme as RGB tuples
 pub(crate) fn banner_gradient_from_theme(
-    theme: &crate::output::theme::config::Theme,
+    theme: &crate::display::theme::config::Theme,
 ) -> Vec<(u8, u8, u8)> {
     use nu_ansi_term::Color as Colour;
 
@@ -298,7 +298,7 @@ pub(crate) fn banner_gradient_from_theme(
 }
 
 /// Creates clap Styles from a theme's CLI colours
-pub(crate) fn styles_from_theme(theme: &crate::output::theme::config::Theme) -> Styles {
+pub(crate) fn styles_from_theme(theme: &crate::display::theme::config::Theme) -> Styles {
     use nu_ansi_term::Color as Colour;
 
     // Convert nu_ansi_term::Color to clap::builder::styling::Color

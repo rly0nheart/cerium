@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Cerium (`ce`) is a Rust-based ls-like utility for listing directory contents with rich formatting options. It's explicitly NOT trying to replace ls, but provides a modern alternative with features like tree view, file type detection, checksum calculation status, and customizable display formats.
+Cerium (`ce`) is a Rust-based ls-like utility for listing directory contents with rich formatting options. It provides a modern alternative with features like tree view, file type detection (via libmagic), checksum calculation status, and customizable display formats.
 
 ## Build and Development Commands
 
@@ -316,6 +316,8 @@ The `colours_enabled()` function in `lib.rs` implements this logic. The system i
 ## Source Map Generation
 
 The project auto-generates a source map (`src/README.md`) via `scripts/generate_source_map.py`. This is run automatically during `make setup` and `make build`. Don't edit `src/README.md` manually.
+
+Cerium uses British spellings, so any changes you make, should be in British spellings.
 
 ## Testing Notes
 
