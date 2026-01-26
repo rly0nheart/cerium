@@ -61,7 +61,13 @@ impl Ownership {
             let status = getpwuid_r(
                 user_id,
                 &mut passwd_entry,
+
+                #[cfg(target_os = "android")]
+                buffer.as_mut_ptr() as *mut u8,
+
+                #[cfg(not(target_os = "android"))]
                 buffer.as_mut_ptr() as *mut i8,
+
                 buffer.len(),
                 &mut passwd_result,
             );
@@ -93,7 +99,13 @@ impl Ownership {
             let status = getgrgid_r(
                 group_id,
                 &mut group_entry,
+
+                #[cfg(target_os = "android")]
+                buffer.as_mut_ptr() as *mut u8,
+
+                #[cfg(not(target_os = "android"))]
                 buffer.as_mut_ptr() as *mut i8,
+
                 buffer.len(),
                 &mut group_result,
             );

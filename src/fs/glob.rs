@@ -103,7 +103,14 @@ impl Glob {
         unsafe {
             libc::regerror(error_code, regex, buffer.as_mut_ptr(), buffer.len());
         }
+
+        #[cfg(target_os = "android")]
+        #[allow(cast)]
+        let c_str = unsafe { std::ffi::CStr::from_ptr(buffer.as_ptr() as *const u8) };
+
+        #[cfg(not(target_os = "android"))]
         let c_str = unsafe { std::ffi::CStr::from_ptr(buffer.as_ptr()) };
+
         c_str.to_string_lossy().into_owned()
     }
 }
