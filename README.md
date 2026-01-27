@@ -206,8 +206,3 @@ See [`themes/README.md`](themes/README.md) for the full list of pre-made themes,
 
 ## Licence
 MIT Licence. [Read more](https://choosealicense.com/licenses/mit/) for details.
-
-## Credits
-- My mentor, [Ned Williamson](https://github.com/nedwill), for his guidance and ongoing feedback on the project
-- Borrowed icon constants from [eza-community/eza](https://github.com/eza-community/eza) (I'm sure they don't mind... right?)
-- Nerd Font icons courtesy of [ryanoasis/nerd-fonts](https://github.com/ryanoasis/nerd-fonts) (Where would we be without symbols?)
