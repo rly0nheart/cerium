@@ -27,7 +27,6 @@ Cerium gets inspiration from similar tools such as lsd and eza, but with a small
   - [Quick Start](#quick-start)
   - [Available Themes](#available-themes)
 - [License](#licence)
-- [Credits](#credits)
 
 ## Installation 
 
