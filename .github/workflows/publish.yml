@@ -51,7 +51,31 @@ jobs:
             echo "publish=false" >> $GITHUB_OUTPUT
           fi
 
-      # Step 6: Tag the commit with the version if publishing
+      # Step 6: Extract changelog for this version
+      - name: Extract changelog
+        if: steps.check_crates.outputs.publish == 'true'
+        id: changelog
+        run: |
+          VERSION=${{ steps.crate.outputs.version }}
+          
+          # Extract content between this version header and the next version header
+          NOTES=$(awk "
+            /^## \[${VERSION}\]/ { found=1; next }
+            /^## \[/ { if(found) exit }
+            found { print }
+          " CHANGELOG.md)
+          
+          # Fallback if no changelog entry found
+          if [ -z "$NOTES" ]; then
+            NOTES="Released version ${VERSION}"
+          fi
+          
+          # Handle multi-line output for GitHub Actions
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # Step 7: Tag the commit with the version if publishing
       - name: Tag version
         if: steps.check_crates.outputs.publish == 'true'
         run: |
@@ -63,20 +87,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 7: Publish to crates.io if version is new
+      # Step 8: Publish to crates.io if version is new
       - name: Publish to crates.io
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
-      # Step 8: Create GitHub release if version is new
+      # Step 9: Create GitHub release if version is new
       - name: Create GitHub release
         if: steps.check_crates.outputs.publish == 'true'
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.crate.outputs.version }}
-          name: Release ${{ steps.crate.outputs.version }}
-          body: "Published version ${{ steps.crate.outputs.version }} to crates.io"
+          name: v${{ steps.crate.outputs.version }}
+          body: ${{ steps.changelog.outputs.notes }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
