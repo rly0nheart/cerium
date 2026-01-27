@@ -158,7 +158,7 @@ ce [OPTIONS] [PATH]
 ce -la                                    # Long format, all files
 ce -t                                     # Tree view
 ce -lt --icons=always                     # Tree with metadata and icons
-ce --find=.rs --sort=size -r              # Find Rust files, sort by size
+ce --find=*.rs --sort=size -r              # Find Rust files, sort by size
 ```
 
 ### Metadata Inspection
