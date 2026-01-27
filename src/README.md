@@ -145,7 +145,7 @@ src/
 - **[mod.rs](display/output/formats/mod.rs)** – `25 LoEC (Lines of Executable Code)` – Format module exports.
 - **[number.rs](display/output/formats/number.rs)** – `42 LoEC (Lines of Executable Code)` – Number formats (human-readable, metric, etc.).
 - **[ownership.rs](display/output/formats/ownership.rs)** – `109 LoEC (Lines of Executable Code)` – User/group name resolution and formats.
-- **[permissions.rs](display/output/formats/permissions.rs)** – `316 LoEC (Lines of Executable Code)` – File permissions formats (symbolic/octal).
+- **[permissions.rs](display/output/formats/permission.rs)** – `316 LoEC (Lines of Executable Code)` – File permissions formats (symbolic/octal).
 - **[size.rs](display/output/formats/size.rs)** – `43 LoEC (Lines of Executable Code)` – File size formats (bytes, KB, MB, etc.).
 
 #### styles/ – Styling system for cells, columns, and entries.

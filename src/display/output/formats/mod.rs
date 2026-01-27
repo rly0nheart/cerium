@@ -26,5 +26,5 @@ pub(crate) mod date;
 pub(crate) mod format;
 pub(crate) mod number;
 pub(crate) mod ownership;
-pub(crate) mod permissions;
+pub(crate) mod permission;
 pub(crate) mod size;

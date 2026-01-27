@@ -245,7 +245,7 @@ mod tests {
     use super::*;
     use crate::cli::args::Args;
     use crate::cli::flags::{
-        DateFormat, NumberFormat, OwnershipFormat, PermissionsFormat, QuoteStyle, ShowColour,
+        DateFormat, NumberFormat, OwnershipFormat, PermissionFormat, QuoteStyle, ShowColour,
         ShowHyperlink, ShowIcons, SizeFormat, SortBy,
     };
     use std::fs::{self, File};
@@ -311,7 +311,7 @@ mod tests {
             date_format: DateFormat::Locale,
             number_format: NumberFormat::Humanly,
             ownership_format: OwnershipFormat::Name,
-            permission_format: PermissionsFormat::Symbolic,
+            permission_format: PermissionFormat::Symbolic,
             created: false,
             hard_links: false,
             quote_name: QuoteStyle::Auto,

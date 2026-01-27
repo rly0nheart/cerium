@@ -40,7 +40,7 @@ use crate::display::output::formats::date::Date;
 use crate::display::output::formats::format::Format;
 use crate::display::output::formats::number::Number;
 use crate::display::output::formats::ownership::Ownership;
-use crate::display::output::formats::permissions::Permissions;
+use crate::display::output::formats::permission::Permission;
 use crate::display::output::formats::size::Size;
 use crate::fs::mountpoint::Mountpoint;
 use crate::fs::xattr::Xattr;
@@ -65,11 +65,11 @@ impl<'a> Populate<'a> {
     pub(crate) fn value(&self) -> Arc<str> {
         let path = self.entry.path();
 
-        let date_formatter = Date::new(self.args.date_format);
-        let permissions_formatter = Permissions::new(self.args.permission_format, path.to_owned());
-        let number_formatter = Number::new(self.args.number_format);
-        let size_formatter = Size::new(self.args.size_format);
-        let ownership_formatter = Ownership::new(self.args.ownership_format);
+        let date = Date::new(self.args.date_format);
+        let permission = Permission::new(self.args.permission_format, path.to_owned());
+        let number = Number::new(self.args.number_format);
+        let size = Size::new(self.args.size_format);
+        let ownership = Ownership::new(self.args.ownership_format);
         let metadata = self.entry.metadata();
 
         match self.column {
@@ -91,32 +91,32 @@ impl<'a> Populate<'a> {
                 .into(),
             Column::Permissions => {
                 Cache::permissions(metadata.map(|meta| meta.mode).unwrap_or_default(), |meta| {
-                    permissions_formatter.format(meta)
+                    permission.format(meta)
                 })
             }
             Column::HardLinks => {
                 Cache::number(metadata.map(|meta| meta.nlink).unwrap_or_default(), |n| {
-                    number_formatter.format(n)
+                    number.format(n)
                 })
             }
             Column::User => {
                 Cache::owner(metadata.map(|meta| meta.uid).unwrap_or_default(), |uid| {
-                    ownership_formatter.format_user(uid)
+                    ownership.format_user(uid)
                 })
             }
             Column::Group => {
                 Cache::group(metadata.map(|meta| meta.gid).unwrap_or_default(), |gid| {
-                    ownership_formatter.format_group(gid)
+                    ownership.format_group(gid)
                 })
             }
             Column::Blocks => {
                 Cache::number(metadata.map(|meta| meta.blocks).unwrap_or_default(), |b| {
-                    number_formatter.format(b)
+                    number.format(b)
                 })
             }
             Column::BlockSize => {
                 Cache::size(metadata.map(|meta| meta.blksize).unwrap_or_default(), |b| {
-                    size_formatter.format(b)
+                    size.format(b)
                 })
             }
             Column::Size => {
@@ -127,22 +127,22 @@ impl<'a> Populate<'a> {
                 } else {
                     metadata.map(|meta| meta.size).unwrap_or_default()
                 };
-                Cache::size(size_bytes, |s| size_formatter.format(s))
+                Cache::size(size_bytes, |s| size.format(s))
             }
             Column::Created => Cache::date(
                 metadata
                     .map(|meta| time::UNIX_EPOCH + time::Duration::from_secs(meta.ctime as u64)),
-                |ts| date_formatter.format(ts),
+                |ts| date.format(ts),
             ),
             Column::Accessed => Cache::date(
                 metadata
                     .map(|meta| time::UNIX_EPOCH + time::Duration::from_secs(meta.atime as u64)),
-                |ts| date_formatter.format(ts),
+                |ts| date.format(ts),
             ),
             Column::Modified => Cache::date(
                 metadata
                     .map(|meta| time::UNIX_EPOCH + time::Duration::from_secs(meta.mtime as u64)),
-                |ts| date_formatter.format(ts),
+                |ts| date.format(ts),
             ),
         }
     }
