@@ -29,17 +29,23 @@ use humanly::HumanDuration;
 use std::sync::Arc;
 use std::time::SystemTime;
 
+impl Format<Option<SystemTime>> for Date {
+    fn format(&self, input: Option<SystemTime>) -> Arc<str> {
+        self.format_date(input)
+    }
+}
+
 pub(crate) struct Date {
-    date_mode: DateFormat,
+    date_format: DateFormat,
 }
 
 impl Date {
-    pub(crate) fn new(date_mode: DateFormat) -> Self {
-        Self { date_mode }
+    pub(crate) fn new(date_format: DateFormat) -> Self {
+        Self { date_format }
     }
 
     fn format_date(&self, system_time: Option<SystemTime>) -> Arc<str> {
-        match self.date_mode {
+        match self.date_format {
             DateFormat::Humanly => self.humanised(system_time),
             DateFormat::Locale => Self::locale(system_time),
             DateFormat::Timestamp => match system_time {
@@ -64,11 +70,5 @@ impl Date {
             }
             None => "-".into(),
         }
-    }
-}
-
-impl Format<Option<SystemTime>> for Date {
-    fn format(&self, input: Option<SystemTime>) -> Arc<str> {
-        self.format_date(input)
     }
 }

@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.5] - 2026-01-27
+### Changed
+- refactor: Extract unix permissions logic into separate module 
+- chore: Bump version to 0.1.5
+- docs: Minor update in README.md
+- docs: Regenerated source map: src/README.md
+
+
 ## [0.1.4] - 2026-01-27
 
 ### Changed

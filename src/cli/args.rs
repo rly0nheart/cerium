@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 use crate::cli::flags::{
-    DateFormat, NumberFormat, OwnershipFormat, PermissionsFormat, QuoteStyle, ShowColour,
+    DateFormat, NumberFormat, OwnershipFormat, PermissionFormat, QuoteStyle, ShowColour,
     ShowHyperlink, ShowIcons, SizeFormat, SortBy,
 };
 
@@ -234,7 +234,7 @@ pub(crate) struct Args {
         default_value = "symbolic",
         help_heading = "Formatting"
     )]
-    pub(crate) permission_format: PermissionsFormat,
+    pub(crate) permission_format: PermissionFormat,
 
     /// How to display sizes (affects the output of --block-size, and --size)
     #[arg(

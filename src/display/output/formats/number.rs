@@ -27,25 +27,25 @@ use crate::display::output::formats::format::Format;
 use humanly::HumanNumber;
 use std::sync::Arc;
 
-pub(crate) struct Number {
-    number_mode: NumberFormat,
-}
-
-impl Number {
-    pub(crate) fn new(number_mode: NumberFormat) -> Self {
-        Self { number_mode }
-    }
-
-    fn format_number(&self, number: u64) -> Arc<str> {
-        match self.number_mode {
-            NumberFormat::Humanly => HumanNumber::from(number as f64).concise().into(),
-            NumberFormat::Natural => number.to_string().into(),
-        }
-    }
-}
-
 impl Format<u64> for Number {
     fn format(&self, input: u64) -> Arc<str> {
         self.format_number(input)
+    }
+}
+
+pub(crate) struct Number {
+    number_format: NumberFormat,
+}
+
+impl Number {
+    pub(crate) fn new(number_format: NumberFormat) -> Self {
+        Self { number_format }
+    }
+
+    fn format_number(&self, number: u64) -> Arc<str> {
+        match self.number_format {
+            NumberFormat::Humanly => HumanNumber::from(number as f64).concise().into(),
+            NumberFormat::Natural => number.to_string().into(),
+        }
     }
 }

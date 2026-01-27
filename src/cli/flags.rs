@@ -51,7 +51,7 @@ pub(crate) enum ShowIcons {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum PermissionsFormat {
+pub(crate) enum PermissionFormat {
     Symbolic,
     Octal,
     Hex,

@@ -125,7 +125,7 @@ mod tests {
             date_format: DateFormat::Locale,
             number_format: NumberFormat::Humanly,
             ownership_format: OwnershipFormat::Name,
-            permission_format: PermissionsFormat::Symbolic,
+            permission_format: PermissionFormat::Symbolic,
             created: false,
             hard_links: false,
             quote_name: QuoteStyle::Auto,

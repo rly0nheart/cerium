@@ -31,6 +31,7 @@ DESCRIPTIONS = {
     "fs/feature/checksum.rs": "Entry checksum calculation.",
     "fs/feature/magic.rs": "File magic type detection via libmagic.",
     "fs/metadata.rs": "File metadata extraction and handling.",
+    "fs/permissions.rs": "Entry permissions extraction and handling.",
     "fs/hyperlink.rs": "Terminal hyperlinks (OSC 8) for filesystem entries.",
     "fs/symlink.rs": "Symlink utilities (reading targets, formats display).",
     "fs/acl.rs": "ACL (Access Control List) detection and handling.",
@@ -62,7 +63,7 @@ DESCRIPTIONS = {
     "display/output/formats/number.rs": "Number formats (human-readable, metric, etc.).",
     "display/output/formats/date.rs": "Date and time formats.",
     "display/output/formats/ownership.rs": "User/group name resolution and formats.",
-    "display/output/formats/permissions.rs": "File permissions formats (symbolic/octal).",
+    "display/output/formats/permission.rs": "File permissions formats (symbolic/octal).",
     "display/output/formats/size.rs": "File size formats (bytes, KB, MB, etc.).",
     # Display layout submodule
     "display/layout": "Column and row data structures, width calculation, and alignment.",

@@ -32,6 +32,7 @@ pub(crate) mod glob;
 pub(crate) mod hyperlink;
 pub(crate) mod metadata;
 pub(crate) mod mountpoint;
+pub(crate) mod permissions;
 pub(crate) mod search;
 pub(crate) mod symlink;
 pub(crate) mod tree;
