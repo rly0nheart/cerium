@@ -1,5 +1,9 @@
 name: Auto Publish Rust Package
 
+permissions:
+  contents: write
+  packages: write
+
 on:
   push:
     branches:
@@ -8,8 +12,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout
+      # Step 1: Checkout the repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -17,45 +22,59 @@ jobs:
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      # Step 3: Install toml-cli
+      # Step 3: Install toml-cli to read Cargo.toml
       - name: Install toml-cli
         run: cargo install toml-cli
 
-      # Step 4: Get version from Cargo.toml
-      - name: Get version
-        id: get_version
+      # Step 4: Get version and crate name from Cargo.toml
+      - name: Get crate info
+        id: crate
         run: |
           VERSION=$(toml get -r Cargo.toml package.version)
+          NAME=$(toml get -r Cargo.toml package.name)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "Found crate $NAME version $VERSION"
 
       # Step 5: Check if version is already published on crates.io
       - name: Check crates.io
         id: check_crates
         run: |
-          VERSION=${{ steps.get_version.outputs.version }}
-          CRATE_NAME=$(toml get -r Cargo.toml package.name)
-          if curl -s "https://crates.io/api/v1/crates/$CRATE_NAME/$VERSION" | grep -q '"errors":'; then
+          VERSION=${{ steps.crate.outputs.version }}
+          NAME=${{ steps.crate.outputs.name }}
+          if curl -s "https://crates.io/api/v1/crates/$NAME/$VERSION" | grep -q '"errors":'; then
             echo "Version $VERSION not found on crates.io, will publish"
             echo "publish=true" >> $GITHUB_OUTPUT
           else
             echo "Version $VERSION already exists on crates.io, skipping publish"
             echo "publish=false" >> $GITHUB_OUTPUT
-          fi
 
-      # Step 6: Publish to crates.io if new version
+      # Step 6: Create git tag for the version (if new)
+      - name: Tag version
+        if: steps.check_crates.outputs.publish == 'true'
+        run: |
+          VERSION=${{ steps.crate.outputs.version }}
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag $VERSION
+          git push origin $VERSION
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Publish to crates.io
       - name: Publish to crates.io
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
-      # Step 7: Create GitHub release if new version
+      # Step 8: Create GitHub release
       - name: Create GitHub release
         if: steps.check_crates.outputs.publish == 'true'
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.get_version.outputs.version }}
-          name: Release ${{ steps.get_version.outputs.version }}
-          body: "Published version ${{ steps.get_version.outputs.version }} to crates.io"
+          tag: ${{ steps.crate.outputs.version }}
+          name: Release ${{ steps.crate.outputs.version }}
+          body: "Published version ${{ steps.crate.outputs.version }} to crates.io"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
