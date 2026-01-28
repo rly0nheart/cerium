@@ -1,4 +1,4 @@
-![intro](https://raw.githubusercontent.com/rly0nheart/cerium/refs/heads/master/img/intro.png)
+![intro](https://codeberg.org/rly0nheart/cerium/raw/branch/master/img/intro.png)
 
 Yet, another ls-like util that is **not** trying to replace `ls`.
 
