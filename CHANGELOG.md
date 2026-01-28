@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
-## [0.1.6]
+## [0.1.6] - 2026-01-27
 ### Changed
 - Migrated back to Codeberg as the source of truth (GitHub was used temporarily during a Codeberg outage)
 - docs(intro): Update intro image url to point to the Codeberg repo

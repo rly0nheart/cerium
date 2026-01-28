@@ -4,6 +4,9 @@ Yet, another ls-like util that is **not** trying to replace `ls`.
 
 Cerium gets inspiration from similar tools such as lsd and eza, but with a small difference: It aims to stay small by avoiding features that introduce heavy dependencies while doing what a tool of its kind is supposed to do... list files and directories.
 
+## Development
+Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The GitHub repository is a read-only mirror used solely for crates.io deployments. Please open issues and pull requests on Codeberg instead.
+
 ## Table of Contents
 - [Installation](#installation-)
   - [With Cargo](#quick-install-with-cargo)
