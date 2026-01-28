@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.10] - 2026-01-28
+### Changed
+- docs(readme): add GitHub mirror link
+- chore(readme): new mockup image in README.md
+
 ## [0.1.9] - 2026-01-28
 ### Changed
 - docs(readme): Add an availability table showcasing which platforms cerium is available and tested on
