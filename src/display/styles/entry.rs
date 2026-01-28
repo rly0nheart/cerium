@@ -87,7 +87,7 @@ impl<'a> StyledEntry<'a> {
     pub(crate) fn load(&self, args: &Args, add_alignment_space: bool) -> EntryView {
         let mut name = String::new();
 
-        // Add styled icon if enabled (styled separately to avoid symlink background bleeding)
+        // Add styled icon if enabled
         if IconSettings::enabled() {
             let styled_icon = self.style.colour.bold().apply_to_char(self.style.icon);
             name.push_str(&styled_icon);
