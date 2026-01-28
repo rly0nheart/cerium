@@ -66,6 +66,7 @@ impl ColourSettings {
 
 pub(crate) trait ColourPaint {
     fn apply_to(&self, text: &str) -> String;
+    fn apply_to_char(&self, c: char) -> String;
 }
 
 impl ColourPaint for Style {
@@ -74,6 +75,14 @@ impl ColourPaint for Style {
             self.paint(text).to_string()
         } else {
             text.to_string()
+        }
+    }
+
+    fn apply_to_char(&self, c: char) -> String {
+        if ColourSettings::is_enabled() {
+            self.paint(c.to_string()).to_string()
+        } else {
+            c.to_string()
         }
     }
 }

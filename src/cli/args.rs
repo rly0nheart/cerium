@@ -199,7 +199,7 @@ pub(crate) struct Args {
     #[arg(long, value_name = "ALGORITHM", help_heading = "Features")]
     pub(crate) checksum: Option<HashAlgorithm>,
 
-    #[cfg(feature = "magic")]
+    #[cfg(all(feature = "magic", not(target_os = "android")))]
     /// File magic type
     #[arg(long, help_heading = "Features")]
     pub(crate) magic: bool,

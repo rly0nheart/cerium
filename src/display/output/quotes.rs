@@ -174,6 +174,9 @@ impl<'a> Quotes<'a> {
 
     /// Checks if text needs shell quoting (contains special characters or whitespace).
     ///
+    /// For symlinks (indicated by the ⇒ arrow), each part is checked separately,
+    /// matching the behaviour of `single_quote_conditional()`.
+    ///
     /// # Parameters
     ///
     /// * `text` - The text to check
@@ -182,6 +185,16 @@ impl<'a> Quotes<'a> {
     ///
     /// `true` if the text needs quoting, `false` otherwise
     pub(crate) fn is_quotable(text: &str) -> bool {
+        // Handle symlinks by checking each part separately
+        if let Some((left, right)) = split_symlink(text) {
+            Self::has_special_chars(left.trim_end()) || Self::has_special_chars(right.trim_start())
+        } else {
+            Self::has_special_chars(text)
+        }
+    }
+
+    /// Checks if a string contains characters that require shell quoting.
+    fn has_special_chars(text: &str) -> bool {
         text.chars().any(|c| {
             c.is_whitespace()
                 || matches!(
@@ -224,7 +237,7 @@ impl<'a> Quotes<'a> {
     /// or the original text if no quoting is necessary. Single quotes within
     /// the text are escaped as `\'`.
     fn quote_if_quotable(text: &str) -> String {
-        if Self::is_quotable(text) {
+        if Self::has_special_chars(text) {
             Self::add_single_quotes(text)
         } else {
             text.to_string()

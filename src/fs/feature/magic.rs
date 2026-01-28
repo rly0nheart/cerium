@@ -1,19 +1,19 @@
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 use std::fs::read_link;
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 use std::path::PathBuf;
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 use std::sync::Arc;
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 use crate::fs::cache::Cache;
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 use filemagic::Magic as FileMagic;
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 /// Truncates a string to include only content up to and including the second comma.
 ///
 /// Primarily used to simplify libmagic output for display in tables,
@@ -50,12 +50,12 @@ fn clip_2nd_comma(text: String) -> Arc<str> {
     }
 }
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 pub(crate) struct Magic;
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 impl Magic {
-    // #[cfg(feature = "magic")]
+    // #[cfg(all(feature = "magic", not(target_os = "android")))]
     pub(crate) fn file(path: &PathBuf) -> Arc<str> {
         if path.is_dir() {
             return "".into();

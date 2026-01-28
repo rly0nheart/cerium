@@ -25,7 +25,7 @@ SOFTWARE.
 use crate::cli::args::Args;
 use crate::display::output::quotes::Quotes;
 use crate::display::styles::text::TextStyle;
-use crate::display::theme::colours::Colour;
+use crate::display::theme::colours::{Colour, ColourPaint};
 use crate::display::theme::icons::{self, IconSettings};
 use crate::fs::entry::Entry;
 use crate::fs::hyperlink::{self, HyperlinkSettings};
@@ -87,9 +87,10 @@ impl<'a> StyledEntry<'a> {
     pub(crate) fn load(&self, args: &Args, add_alignment_space: bool) -> EntryView {
         let mut name = String::new();
 
-        // Add icon if enabled
+        // Add styled icon if enabled (styled separately to avoid symlink background bleeding)
         if IconSettings::enabled() {
-            name.push(self.style.icon);
+            let styled_icon = self.style.colour.bold().apply_to_char(self.style.icon);
+            name.push_str(&styled_icon);
             name.push(' ');
         }
 
@@ -117,13 +118,12 @@ impl<'a> StyledEntry<'a> {
             }
         };
 
-        name.push_str(&entry_name);
-
-        // Apply text style with colour
-        let styled_name = TextStyle::name(&name, self.style.colour);
+        // Apply text style to the entry name (without icon)
+        let styled_entry_name = TextStyle::name(&entry_name, self.style.colour);
+        name.push_str(&styled_entry_name);
 
         EntryView {
-            name: Arc::from(styled_name.as_str()),
+            name: Arc::from(name.as_str()),
             colour: self.style.colour,
         }
     }

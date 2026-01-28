@@ -239,7 +239,7 @@ impl Tree {
         }
 
         // Table-specific columns
-        #[cfg(feature = "magic")]
+        #[cfg(all(feature = "magic", not(target_os = "android")))]
         if args.magic {
             return true;
         }

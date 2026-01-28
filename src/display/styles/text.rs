@@ -105,16 +105,15 @@ impl TextStyle {
         // Symlink case
         if let Some((link_part, target)) = symlink::split_symlink(name) {
             // Style the link name
-            let styled_link = colour
-                .on(Colour::Black)
-                .bold()
+            let styled_link = Colour::Blue
+                .italic()
+                .underline()
                 .apply_to(link_part.trim_end())
                 .to_string();
 
             // Style the target name
-            let styled_target = Colour::White
+            let styled_target = colour
                 .bold()
-                .on(Colour::Blue)
                 .apply_to(target.trim_start())
                 .to_string();
 

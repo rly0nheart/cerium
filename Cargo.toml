@@ -6,6 +6,7 @@ edition = "2024"
 authors = ["Ritchie Mwewa <hi@rly0nheart.com>"]
 repository = "https://codeberg.org/rly0nheart/cerium"
 license = "MIT"
+readme = "README.md"
 
 [dependencies]
 chrono = "0.4"
@@ -32,6 +33,10 @@ tempfile = "3.23.0"
 [[bin]]
 name = "ce"
 path = "src/main.rs"
+
+[package.metadata.docs.rs]
+# This is a binary crate, no library documentation to generate
+targets = []
 
 [profile.release]
 lto = true
