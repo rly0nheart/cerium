@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.7] - 2026-01-27
+### Changed
+- docs(development): Add a development section to README.md. This urges new issues, and pull requests to be opened on Codeberg
+- chore(version): Bump version to 0.1.7
+
 ## [0.1.6] - 2026-01-27
 ### Changed
 - Migrated back to Codeberg as the source of truth (GitHub was used temporarily during a Codeberg outage)
