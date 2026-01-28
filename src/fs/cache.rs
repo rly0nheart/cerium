@@ -32,7 +32,7 @@ use std::time::SystemTime;
 static TRUE_SIZE_CACHE: OnceLock<Mutex<HashMap<(PathBuf, bool), u64>>> = OnceLock::new();
 static SIZE_DISPLAY_CACHE: OnceLock<Mutex<HashMap<u64, Arc<str>>>> = OnceLock::new();
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 static MAGIC_CACHE: OnceLock<Mutex<HashMap<PathBuf, Arc<str>>>> = OnceLock::new();
 
 static NUMBER_DISPLAY_CACHE: OnceLock<Mutex<HashMap<u64, Arc<str>>>> = OnceLock::new();
@@ -128,7 +128,7 @@ impl Cache {
         formatted
     }
 
-    #[cfg(feature = "magic")]
+    #[cfg(all(feature = "magic", not(target_os = "android")))]
     pub(crate) fn magic(path: &PathBuf, compute: impl FnOnce() -> Arc<str>) -> Arc<str> {
         let cache = MAGIC_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 

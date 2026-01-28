@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.8] - 2026-01-28
+### Changed
+- fix: Uneven styling for symlinks
+- feat: Unconditionally disable filemagic on Android/Termux
+- docs(readme): Added an availability table in README.md showcasing which platforms cerium is available and tested on
+- docs(readme): Added mockup image of Cerium output
+- docs(crates.io): Disable generation of docs.rs page
+- chore(version): Bump version to 0.1.8
+
 ## [0.1.7] - 2026-01-27
 ### Changed
 - docs(development): Add a development section to README.md. This urges new issues, and pull requests to be opened on Codeberg

@@ -34,7 +34,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) enum Column {
-    #[cfg(feature = "magic")]
+    #[cfg(all(feature = "magic", not(target_os = "android")))]
     Magic,
 
     #[cfg(feature = "checksum")]
@@ -63,7 +63,7 @@ impl Column {
         match self {
             Self::Name => "Name",
 
-            #[cfg(feature = "magic")]
+            #[cfg(all(feature = "magic", not(target_os = "android")))]
             Self::Magic => "Magic",
 
             #[cfg(feature = "checksum")]
@@ -165,7 +165,7 @@ impl Selector {
             }
         }
 
-        #[cfg(feature = "magic")]
+        #[cfg(all(feature = "magic", not(target_os = "android")))]
         if args.magic && !columns.contains(&Column::Magic) {
             columns.push(Column::Magic);
         }

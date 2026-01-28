@@ -151,7 +151,7 @@ mod tests {
             icons: ShowIcons::Auto,
             hyperlink: ShowHyperlink::Never,
             find: "".to_string(),
-            #[cfg(feature = "magic")]
+            #[cfg(all(feature = "magic", not(target_os = "android")))]
             magic: false,
             #[cfg(feature = "checksum")]
             checksum: None,

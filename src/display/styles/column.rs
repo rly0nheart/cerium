@@ -76,17 +76,17 @@ impl ColumnStyle {
     /// * Symlinks (containing `⇒`) → Dual-coloured with arrow
     fn column_value(column: &Column, value: String, colour: Colour) -> String {
         if value == "-" {
-            Colour::DarkGray.normal().apply_to(&value)
-        } else if value.parse::<f64>().is_ok() {
+            Colour::DarkGray.normal().apply_to(&value) // DarkGray for values that are "-"
+        } else if value.parse::<f64>().is_ok() { // Cyan for numeric values
             Colour::Cyan.bold().apply_to(&value)
         } else {
             match column {
                 Column::Name => TextStyle::name(&value, colour),
-                #[cfg(feature = "magic")]
+                #[cfg(all(feature = "magic", not(target_os = "android")))]
                 Column::Magic => colour.bold().apply_to(&value),
 
                 #[cfg(feature = "checksum")]
-                Column::Checksum(_) => Colour::White.bold().on(Colour::Blue).apply_to(&value),
+                Column::Checksum(_) => Colour::White.italic().apply_to(&value),
 
                 Column::Xattr => Colour::Cyan.normal().apply_to(&value),
                 Column::Acl => Colour::Green.normal().apply_to(&value),
@@ -98,7 +98,7 @@ impl ColumnStyle {
                 Column::Created | Column::Modified | Column::Accessed => {
                     TextStyle::datetime(&value)
                 }
-                _ => Colour::White.bold().apply_to(&value), // Column::HardLinks | Column::Blocks,
+                _ => Colour::White.normal().apply_to(&value), // Anything else is white
             }
         }
     }

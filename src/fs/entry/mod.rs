@@ -329,7 +329,7 @@ mod tests {
             width: None,
             prune: false,
             find: "".to_string(),
-            #[cfg(feature = "magic")]
+            #[cfg(all(feature = "magic", not(target_os = "android")))]
             magic: false,
             #[cfg(feature = "checksum")]
             checksum: None,

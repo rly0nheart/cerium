@@ -186,9 +186,9 @@ impl DisplayFactory {
     ///
     /// `true` if any table-specific columns are requested
     fn needs_table_columns(args: &Args) -> bool {
-        #[cfg(feature = "magic")]
+        #[cfg(all(feature = "magic", not(target_os = "android")))]
         let magic = args.magic;
-        #[cfg(not(feature = "magic"))]
+        #[cfg(any(not(feature = "magic"), target_os = "android"))]
         let magic = false;
 
         #[cfg(feature = "checksum")]

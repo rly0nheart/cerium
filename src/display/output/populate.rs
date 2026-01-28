@@ -32,7 +32,7 @@ use crate::fs::entry::Entry;
 #[cfg(feature = "checksum")]
 use crate::fs::feature::checksum::Checksum;
 
-#[cfg(feature = "magic")]
+#[cfg(all(feature = "magic", not(target_os = "android")))]
 use crate::fs::feature::magic::Magic;
 
 use crate::display::layout::column::Column;
@@ -75,7 +75,7 @@ impl<'a> Populate<'a> {
         match self.column {
             Column::Name => self.entry.name().clone(),
 
-            #[cfg(feature = "magic")]
+            #[cfg(all(feature = "magic", not(target_os = "android")))]
             Column::Magic => Magic::file(path),
 
             #[cfg(feature = "checksum")]
