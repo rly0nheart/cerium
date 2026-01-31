@@ -25,7 +25,7 @@ SOFTWARE.
 use crate::fs::metadata::Metadata;
 use std::collections::HashMap;
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::SystemTime;
 
@@ -45,7 +45,7 @@ pub(crate) struct Cache;
 
 impl Cache {
     /// Loads metadata for a path using lstat.
-    pub(crate) fn metadata(path: &PathBuf) -> io::Result<Metadata> {
+    pub(crate) fn metadata(path: &Path) -> io::Result<Metadata> {
         Metadata::load(path)
     }
 
@@ -86,18 +86,18 @@ impl Cache {
     }
 
     pub(crate) fn true_size(
-        path: &PathBuf,
+        path: &Path,
         include_hidden: bool,
         compute: impl FnOnce() -> u64,
     ) -> u64 {
         let cache = TRUE_SIZE_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
-        if let Some(cached) = Self::getter(cache, &(path.clone(), include_hidden)) {
+        if let Some(cached) = Self::getter(cache, &(path.to_path_buf(), include_hidden)) {
             return cached;
         }
 
         let size = compute();
-        Self::setter(cache, (path.clone(), include_hidden), size);
+        Self::setter(cache, (path.to_path_buf(), include_hidden), size);
         size
     }
 

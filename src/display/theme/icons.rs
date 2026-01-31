@@ -65,7 +65,6 @@ pub(crate) struct Icons;
 
 #[rustfmt::skip]
 #[allow(dead_code)]
-#[rustfmt::skip]
 impl Icons {
     const AUDIO: char           = '\u{f001}';  // 
     const ANACONDA: char        = '\u{e715}';  // 
@@ -139,6 +138,7 @@ impl Icons {
     const INFO: char            = '\u{f129}';  // 
     const INTELLIJ: char        = '\u{e7b5}';  // 
     const JSON: char            = '\u{e60b}';  // 
+    const JSONL: char           = '\u{f0626}'; // 󰘦
     const KEY: char             = '\u{eb11}';  // 
     const KDENLIVE: char        = '\u{f33c}';  // 
     const KEYPASS: char         = '\u{f23e}';  // 
@@ -507,6 +507,7 @@ const EXTENSION_ICONS: Map<&'static str, char> = phf_map! {
     "app" | "bin" | "elf" | "hi" | "o" => Icons::BINARY,
     // JSON
     "avro" | "json" | "json5" | "jsonc" | "properties" | "webmanifest" => Icons::JSON,
+    "jsonl" => Icons::JSONL,
     // HTML
     "htm" | "html" | "shtml" | "xhtml" => Icons::HTML5,
     // Graph
@@ -769,10 +770,10 @@ pub(crate) fn icon_for_entry(
     }
 
     // Then check extension
-    if !extension.is_empty() {
-        if let Some(icon) = EXTENSION_ICONS.get(extension) {
-            return *icon;
-        }
+    if !extension.is_empty()
+        && let Some(icon) = EXTENSION_ICONS.get(extension)
+    {
+        return *icon;
     }
 
     DEFAULT_FILE_ICON

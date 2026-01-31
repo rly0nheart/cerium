@@ -71,9 +71,7 @@ impl Search {
             let is_dir_like = entry.is_dir_like();
 
             // Check if entry matches (respecting --dirs/--files filters)
-            let dominated_match = if args.dirs && !is_dir_like {
-                false
-            } else if args.files && is_dir_like {
+            let dominated_match = if (args.dirs && !is_dir_like) || (args.files && is_dir_like) {
                 false
             } else {
                 self.glob.is_match(entry.name())

@@ -233,10 +233,10 @@ impl Entry {
     /// needs metadata even when display flags don't request it.
     pub(crate) fn unconditional_metadata(&mut self) {
         // Skip if already loaded (check both size and ino for robustness)
-        if let Some(meta) = self.metadata() {
-            if meta.size != 0 || meta.ino != 0 {
-                return;
-            }
+        if let Some(meta) = self.metadata()
+            && (meta.size != 0 || meta.ino != 0)
+        {
+            return;
         }
 
         let path = self.path().clone();
@@ -594,7 +594,7 @@ mod tests {
         assert!(result.is_ok());
         let meta = result.unwrap();
         // Directories have S_IFDIR bit set in mode
-        assert_ne!(meta.mode & libc::S_IFDIR as u32, 0);
+        assert_ne!(meta.mode & libc::S_IFDIR, 0);
     }
 
     #[test]
@@ -611,7 +611,7 @@ mod tests {
         assert!(result.is_ok());
         let meta = result.unwrap();
         // Symlinks have S_IFLNK bit set in mode (lstat doesn't follow symlinks)
-        assert_ne!(meta.mode & libc::S_IFLNK as u32, 0);
+        assert_ne!(meta.mode & libc::S_IFLNK, 0);
     }
 
     #[test]

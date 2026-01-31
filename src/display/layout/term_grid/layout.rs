@@ -97,7 +97,7 @@ impl TermGrid {
         }
 
         // Calculate number of rows needed
-        let num_rows = (self.cells.len() + num_columns - 1) / num_columns;
+        let num_rows = self.cells.len().div_ceil(num_columns);
 
         // Calculate column widths based on direction
         let column_widths = self.calculate_column_widths(num_columns, num_rows);
@@ -163,7 +163,7 @@ impl GridDisplay {
     /// Returns the cell at the given row and column position, if any.
     fn cell_at(&self, row: usize, col: usize) -> Option<&Cell> {
         let num_rows = if self.num_columns > 0 {
-            (self.cells.len() + self.num_columns - 1) / self.num_columns
+            self.cells.len().div_ceil(self.num_columns)
         } else {
             return None;
         };
@@ -193,7 +193,7 @@ impl Display for GridDisplay {
             return Ok(());
         }
 
-        let num_rows = (self.cells.len() + self.num_columns - 1) / self.num_columns;
+        let num_rows = self.cells.len().div_ceil(self.num_columns);
         let separator = " ".repeat(self.separator_width);
 
         for row in 0..num_rows {

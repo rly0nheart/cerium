@@ -154,15 +154,11 @@ impl Selector {
         if args.permission && !columns.contains(&Column::Permissions) {
             columns.push(Column::Permissions);
         }
-        if args.user {
-            if !columns.contains(&Column::User) {
-                columns.push(Column::User);
-            }
+        if args.user && !columns.contains(&Column::User) {
+            columns.push(Column::User);
         }
-        if args.group {
-            if !columns.contains(&Column::Group) {
-                columns.push(Column::Group);
-            }
+        if args.group && !columns.contains(&Column::Group) {
+            columns.push(Column::Group);
         }
 
         #[cfg(all(feature = "magic", not(target_os = "android")))]

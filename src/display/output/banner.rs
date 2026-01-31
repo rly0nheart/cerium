@@ -27,11 +27,7 @@ pub fn get_banner(gradient: &[(u8, u8, u8)]) -> String {
         "░░██████ ░░██████  █████     █████ ░░████████ █████░███ █████",
         " ░░░░░░   ░░░░░░  ░░░░░     ░░░░░   ░░░░░░░░ ░░░░░ ░░░ ░░░░░ ",
     ];
-    let show_colour = if colours_enabled() && is_tty() {
-        true
-    } else {
-        false
-    };
+    let show_colour = colours_enabled() && is_tty();
 
     let mut banner = String::from("\n");
     let total_lines = lines.len();

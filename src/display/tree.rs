@@ -276,7 +276,7 @@ impl Tree {
     /// - No width calculations across all entries
     /// - Output appears immediately as filesystem is traversed
     /// - Directories are only read when needed
-    fn traverse_and_print(entry: Entry, parents_last: &Vec<bool>, args: &Args) {
+    fn traverse_and_print(entry: Entry, parents_last: &[bool], args: &Args) {
         let connector = Self::draw_connector(parents_last);
 
         // Get styled entry for name display (no alignment space for tree)
@@ -298,7 +298,7 @@ impl Tree {
             let count = children.len();
             for (i, mut child_entry) in children.into_iter().enumerate() {
                 child_entry.conditional_metadata(args);
-                let mut new_parents = parents_last.clone();
+                let mut new_parents = parents_last.to_owned();
                 new_parents.push(i == count - 1);
                 Self::traverse_and_print(child_entry, &new_parents, args);
             }
@@ -359,7 +359,7 @@ impl Tree {
     fn add_node(
         node: &TreeNode,
         widths: &HashMap<Column, usize>,
-        parents_last: &Vec<bool>,
+        parents_last: &[bool],
         args: &Args,
         add_alignment_space: bool,
     ) {
@@ -371,7 +371,7 @@ impl Tree {
 
         let count = node.children.len();
         for (i, child) in node.children.iter().enumerate() {
-            let mut new_parents = parents_last.clone();
+            let mut new_parents = parents_last.to_owned();
             new_parents.push(i == count - 1);
             Self::add_node(child, widths, &new_parents, args, add_alignment_space);
         }
@@ -464,7 +464,7 @@ impl Tree {
     /// │   ╰── file3           depth: 2, parents_last: [false, true], connector: "│   ╰── "
     /// ╰── file4               depth: 1, parents_last: [true], connector: "╰── "
     /// ```
-    fn draw_connector(parents_last: &Vec<bool>) -> String {
+    fn draw_connector(parents_last: &[bool]) -> String {
         let mut connector = String::new();
         let depth = parents_last.len();
         if depth > 0 {

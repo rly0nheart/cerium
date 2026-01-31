@@ -25,7 +25,7 @@ SOFTWARE.
 use std::ffi::CString;
 use std::io;
 use std::os::unix::ffi::OsStrExt;
-use std::path::PathBuf;
+use std::path::Path;
 
 /// Minimal POSIX-like metadata struct loaded via libc::lstat
 #[derive(Clone, Debug)]
@@ -46,7 +46,7 @@ pub(crate) struct Metadata {
 impl Metadata {
     /// Load metadata using libc::lstat (does not follow symlinks).
     /// Returns io::Error from errno on failure, or Ok(LibcMetadata).
-    pub(crate) fn load(path: &PathBuf) -> io::Result<Self> {
+    pub(crate) fn load(path: &Path) -> io::Result<Self> {
         let c_path = CString::new(path.as_os_str().as_bytes()).map_err(|_| {
             io::Error::new(io::ErrorKind::InvalidInput, "path contains interior nul")
         })?;

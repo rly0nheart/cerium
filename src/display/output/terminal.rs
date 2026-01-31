@@ -65,24 +65,25 @@ pub fn colours_enabled() -> bool {
     }
 
     // Check if colours are explicitly forced
-    if let Ok(force_color) = env::var("FORCE_COLOR") {
-        if !force_color.is_empty() && force_color != "0" {
-            return true;
-        }
+    if let Ok(force_color) = env::var("FORCE_COLOR")
+        && !force_color.is_empty()
+        && force_color != "0"
+    {
+        return true;
     }
 
     // Check CLICOLOR_FORCE
-    if let Ok(val) = env::var("CLICOLOR_FORCE") {
-        if val != "0" {
-            return true;
-        }
+    if let Ok(val) = env::var("CLICOLOR_FORCE")
+        && val != "0"
+    {
+        return true;
     }
 
     // Check if CLICOLOR is set to 0 (disable colours)
-    if let Ok(val) = env::var("CLICOLOR") {
-        if val == "0" {
-            return false;
-        }
+    if let Ok(val) = env::var("CLICOLOR")
+        && val == "0"
+    {
+        return false;
     }
 
     // Check TERM environment variable

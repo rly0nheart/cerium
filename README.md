@@ -169,7 +169,7 @@ ce [OPTIONS] [PATH]
 ce -la                                    # Long format, all files
 ce -t                                     # Tree view
 ce -lt --icons=always                     # Tree with metadata and icons
-ce --find=*.rs --sort=size -r              # Find Rust files, sort by size
+ce --find=*.rs --sort=size -r             # Find Rust files, sort by size
 ```
 
 ### Metadata Inspection
@@ -215,4 +215,4 @@ cp themes/dracula.toml ~/.config/cerium.toml
 See [`themes/README.md`](themes/README.md) for the full list of pre-made themes, installation instructions, and customisation guide.
 
 ## Licence
-MIT Licence. [Read more](https://choosealicense.com/licenses/mit/) for details.
+MIT Licence. See [choosealicense](https://choosealicense.com/licenses/mit/) for more details.
