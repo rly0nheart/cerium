@@ -45,7 +45,7 @@ impl ColumnStyle {
         if *column == Column::Name {
             style.name.to_string()
         } else {
-            let row = Row::new(&entry, args);
+            let row = Row::new(entry, args);
             let row_value = row.value(column);
             Self::column_value(column, row_value.to_string(), style.colour)
         }
@@ -77,7 +77,8 @@ impl ColumnStyle {
     fn column_value(column: &Column, value: String, colour: Colour) -> String {
         if value == "-" {
             Colour::DarkGray.normal().apply_to(&value) // DarkGray for values that are "-"
-        } else if value.parse::<f64>().is_ok() { // Cyan for numeric values
+        } else if value.parse::<f64>().is_ok() {
+            // Cyan for numeric values
             Colour::Cyan.bold().apply_to(&value)
         } else {
             match column {

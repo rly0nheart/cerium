@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.12] - 2026-01-31
+### Changed
+- chore(icons): add icon for jsonl files
+- fix(linting): fix clippy errors and warnings
+
 ## [0.1.11] - 2026-01-28
 ### Changed
 - chore(readme): okay, now i've finally found the perfect mockup

@@ -71,10 +71,8 @@ impl DirReader {
                     continue;
                 }
 
-                if args.prune && entry.is_dir() {
-                    if !entry.compute_has_children() {
-                        continue;
-                    }
+                if args.prune && entry.is_dir() && !entry.compute_has_children() {
+                    continue;
                 }
 
                 entry.conditional_metadata(args);
@@ -115,12 +113,11 @@ impl DirReader {
                     let path = entry.path();
 
                     // Skip hidden files if not including them
-                    if !include_hidden {
-                        if let Some(name) = path.file_name() {
-                            if name.to_string_lossy().starts_with('.') {
-                                continue;
-                            }
-                        }
+                    if !include_hidden
+                        && let Some(name) = path.file_name()
+                        && name.to_string_lossy().starts_with('.')
+                    {
+                        continue;
                     }
 
                     if let Ok(metadata) = entry.metadata() {
@@ -197,7 +194,7 @@ impl DirReader {
         removed
     }
 
-    fn sort(&self, entries: &mut Vec<Entry>, args: &Args) {
+    fn sort(&self, entries: &mut [Entry], args: &Args) {
         // Load metadata for all entries if we're sorting by metadata fields
         let needs_metadata = matches!(
             args.sort,

@@ -229,7 +229,7 @@ impl Grid {
             let max_line_width = fitted
                 .to_string()
                 .lines()
-                .map(|line| Width::measure_ansi_text(line))
+                .map(Width::measure_ansi_text)
                 .max()
                 .unwrap_or(0);
 

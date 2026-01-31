@@ -119,11 +119,8 @@ impl Permission {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use libc::{S_IFDIR, S_IFREG, S_ISGID, S_ISUID, S_ISVTX};
     use std::path::PathBuf;
-    use libc::{
-        S_IFDIR, S_IFREG, S_ISGID, S_ISUID,
-        S_ISVTX,
-    };
 
     #[test]
     fn test_format_symbolic_regular_file() {
@@ -149,7 +146,7 @@ mod tests {
     fn test_format_symbolic_with_setuid() {
         let path = PathBuf::from("/tmp/test");
         let formatter = Permission::new(PermissionFormat::Symbolic, path);
-        let mode = S_IFREG | S_ISUID as u32 | 0o755;
+        let mode = S_IFREG | S_ISUID | 0o755;
         let result = formatter.format(mode);
 
         assert!(result.starts_with(".rwsr-xr-x"));
@@ -159,7 +156,7 @@ mod tests {
     fn test_format_symbolic_with_setgid() {
         let path = PathBuf::from("/tmp/test");
         let formatter = Permission::new(PermissionFormat::Symbolic, path);
-        let mode = S_IFREG | S_ISGID as u32 | 0o755;
+        let mode = S_IFREG | S_ISGID | 0o755;
         let result = formatter.format(mode);
 
         assert!(result.starts_with(".rwxr-sr-x"));
@@ -169,7 +166,7 @@ mod tests {
     fn test_format_symbolic_with_sticky() {
         let path = PathBuf::from("/tmp");
         let formatter = Permission::new(PermissionFormat::Symbolic, path);
-        let mode = S_IFDIR | S_ISVTX as u32 | 0o755;
+        let mode = S_IFDIR | S_ISVTX | 0o755;
         let result = formatter.format(mode);
 
         assert!(result.starts_with("drwxr-xr-t"));
@@ -179,7 +176,7 @@ mod tests {
     fn test_format_symbolic_sticky_no_execute() {
         let path = PathBuf::from("/tmp");
         let formatter = Permission::new(PermissionFormat::Symbolic, path);
-        let mode = S_IFDIR | S_ISVTX as u32 | 0o644;
+        let mode = S_IFDIR | S_ISVTX | 0o644;
         let result = formatter.format(mode);
 
         assert!(result.starts_with("drw-r--r-T"));
@@ -199,7 +196,7 @@ mod tests {
     fn test_format_octal_with_special_bits() {
         let path = PathBuf::from("/tmp/test");
         let formatter = Permission::new(PermissionFormat::Octal, path);
-        let mode = S_IFREG | S_ISUID as u32 | 0o755;
+        let mode = S_IFREG | S_ISUID | 0o755;
         let result = formatter.format(mode);
 
         assert!(result.starts_with(".4755"));

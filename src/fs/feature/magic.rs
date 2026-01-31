@@ -64,24 +64,24 @@ impl Magic {
         if path.is_symlink() {
             return format!(
                 "Symbolic link, to {:?}",
-                read_link(&path).unwrap_or_default()
+                read_link(path).unwrap_or_default()
             )
             .into();
         }
 
-        Cache::magic(&path, || {
+        Cache::magic(path, || {
             thread_local! {
-                static MAGIC: std::cell::RefCell<Option<FileMagic>> = std::cell::RefCell::new(None);
+                static MAGIC: std::cell::RefCell<Option<FileMagic>> = const { std::cell::RefCell::new(None) };
             }
 
             MAGIC.with(|cell| {
                 let mut maybe_magic = cell.borrow_mut();
 
-                if maybe_magic.is_none() {
-                    if let Ok(magic) = FileMagic::open(Default::default()) {
-                        let _ = magic.load::<String>(&[]);
-                        *maybe_magic = Some(magic);
-                    }
+                if maybe_magic.is_none()
+                    && let Ok(magic) = FileMagic::open(Default::default())
+                {
+                    let _ = magic.load::<String>(&[]);
+                    *maybe_magic = Some(magic);
                 }
 
                 if let Some(magic) = maybe_magic.as_ref() {

@@ -34,7 +34,7 @@ pub(crate) struct Align;
 
 impl Align {
     pub(crate) fn pad(value: &String, width: usize, alignment: Alignment) -> String {
-        let visible = Width::measure_ansi_text(&value);
+        let visible = Width::measure_ansi_text(value);
         let padding = width.saturating_sub(visible);
         match alignment {
             Alignment::Right => format!("{}{}", " ".repeat(padding), value),

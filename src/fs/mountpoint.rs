@@ -121,11 +121,11 @@ impl Mountpoint {
             if ch == '\\' {
                 // Try to read next 3 characters as octal
                 let octal: String = chars.by_ref().take(3).collect();
-                if octal.len() == 3 {
-                    if let Ok(code) = u8::from_str_radix(&octal, 8) {
-                        result.push(code as char);
-                        continue;
-                    }
+                if octal.len() == 3
+                    && let Ok(code) = u8::from_str_radix(&octal, 8)
+                {
+                    result.push(code as char);
+                    continue;
                 }
                 // If parsing failed, just add the backslash and what we read
                 result.push('\\');

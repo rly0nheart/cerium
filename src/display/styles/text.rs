@@ -112,10 +112,7 @@ impl TextStyle {
                 .to_string();
 
             // Style the target name
-            let styled_target = colour
-                .bold()
-                .apply_to(target.trim_start())
-                .to_string();
+            let styled_target = colour.bold().apply_to(target.trim_start()).to_string();
 
             return format!(
                 "{}{}{}",
@@ -265,7 +262,7 @@ impl TextStyle {
     ///
     /// Styled header text in white, bold, and underlined
     pub(crate) fn table_header(name: &str) -> String {
-        Colour::White.underline().bold().apply_to(&name)
+        Colour::White.underline().bold().apply_to(name)
     }
 
     /// Styles directory path titles for recursive mode output.
