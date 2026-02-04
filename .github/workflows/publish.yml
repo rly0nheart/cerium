@@ -80,6 +80,11 @@ jobs:
         if: steps.check_crates.outputs.publish == 'true'
         run: |
           VERSION=${{ steps.crate.outputs.version }}
+          # Check if tag already exists locally or remotely
+          if git rev-parse "$VERSION" >/dev/null 2>&1 || git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
+            echo "Tag $VERSION already exists, skipping"
+            exit 0
+          fi
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git tag $VERSION
