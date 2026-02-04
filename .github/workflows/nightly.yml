@@ -23,8 +23,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     outputs:
-      test_results: ${{ steps.test.outputs.results }}
-      test_passed: ${{ steps.test.outputs.passed }}
+      test_results: ${{ steps.test.outputs.results || steps.skip_test.outputs.results }}
+      test_passed: ${{ steps.test.outputs.passed || steps.skip_test.outputs.passed }}
     steps:
       - uses: actions/checkout@v4
 
@@ -65,37 +65,17 @@ jobs:
           echo -e "$RESULTS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Skip tests placeholder
+      - name: Set skipped test results
         id: skip_test
         if: ${{ github.event.inputs.skip_tests == 'true' }}
         run: |
           echo "results=**Tests skipped**" >> $GITHUB_OUTPUT
           echo "passed=true" >> $GITHUB_OUTPUT
 
-  # Build for multiple platforms
+  # Build for Linux
   build:
     needs: test
-    strategy:
-      matrix:
-        include:
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-            name: linux-x86_64
-            ext: ""
-          - target: x86_64-apple-darwin
-            os: macos-latest
-            name: macos-x86_64
-            ext: ""
-          - target: aarch64-apple-darwin
-            os: macos-latest
-            name: macos-aarch64
-            ext: ""
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-            name: windows-x86_64
-            ext: ".exe"
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -103,38 +83,26 @@ jobs:
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          target: ${{ matrix.target }}
+          target: x86_64-unknown-linux-gnu
 
-      - name: Install libmagic (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Install libmagic
         run: |
           chmod +x scripts/install-libmagic.sh
           ./scripts/install-libmagic.sh
 
-      - name: Install libmagic (macOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install libmagic
-
-      # Windows doesn't support libmagic feature
-      - name: Build (Linux/macOS with all features)
-        if: matrix.os != 'windows-latest'
-        run: cargo build --release --all-features --target ${{ matrix.target }}
-
-      - name: Build (Windows without magic feature)
-        if: matrix.os == 'windows-latest'
-        run: cargo build --release --features checksum --target ${{ matrix.target }}
+      - name: Build
+        run: cargo build --release --all-features --target x86_64-unknown-linux-gnu
 
       - name: Prepare artifact
-        shell: bash
         run: |
           mkdir -p dist
-          cp target/${{ matrix.target }}/release/ce${{ matrix.ext }} dist/ce-${{ matrix.name }}${{ matrix.ext }}
+          cp target/x86_64-unknown-linux-gnu/release/ce dist/ce-linux-x86_64
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ce-${{ matrix.name }}
-          path: dist/ce-${{ matrix.name }}${{ matrix.ext }}
+          name: ce-linux-x86_64
+          path: dist/ce-linux-x86_64
 
   # Create nightly release
   release:
@@ -228,9 +196,6 @@ jobs:
             | Platform | Architecture | File |
             |----------|--------------|------|
             | Linux | x86_64 | `ce-linux-x86_64` |
-            | macOS | x86_64 | `ce-macos-x86_64` |
-            | macOS | ARM64 | `ce-macos-aarch64` |
-            | Windows | x86_64 | `ce-windows-x86_64.exe` |
 
             ---
 
