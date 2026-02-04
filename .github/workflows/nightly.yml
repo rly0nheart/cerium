@@ -1,0 +1,243 @@
+name: Nightly Build
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    # Run at midnight UTC every day
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip running tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Run tests and capture results
+  test:
+    runs-on: ubuntu-latest
+    outputs:
+      test_results: ${{ steps.test.outputs.results }}
+      test_passed: ${{ steps.test.outputs.passed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Install libmagic
+        run: |
+          chmod +x scripts/install-libmagic.sh
+          ./scripts/install-libmagic.sh
+
+      - name: Run tests
+        id: test
+        if: ${{ github.event.inputs.skip_tests != 'true' }}
+        run: |
+          # Run tests and capture output
+          set +e
+          TEST_OUTPUT=$(cargo test --all-features 2>&1)
+          TEST_EXIT_CODE=$?
+          set -e
+
+          # Parse test results
+          PASSED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= passed)' | tail -1 || echo "0")
+          FAILED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= failed)' | tail -1 || echo "0")
+          IGNORED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= ignored)' | tail -1 || echo "0")
+
+          # Build results summary
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            RESULTS="**All tests passed**\n- Passed: $PASSED\n- Ignored: $IGNORED"
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            RESULTS="**Some tests failed**\n- Passed: $PASSED\n- Failed: $FAILED\n- Ignored: $IGNORED"
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Handle multi-line output
+          echo "results<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$RESULTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Skip tests placeholder
+        id: skip_test
+        if: ${{ github.event.inputs.skip_tests == 'true' }}
+        run: |
+          echo "results=**Tests skipped**" >> $GITHUB_OUTPUT
+          echo "passed=true" >> $GITHUB_OUTPUT
+
+  # Build for multiple platforms
+  build:
+    needs: test
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: linux-x86_64
+            ext: ""
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            name: macos-x86_64
+            ext: ""
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            name: macos-aarch64
+            ext: ""
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: windows-x86_64
+            ext: ".exe"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.target }}
+
+      - name: Install libmagic (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          chmod +x scripts/install-libmagic.sh
+          ./scripts/install-libmagic.sh
+
+      - name: Install libmagic (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install libmagic
+
+      # Windows doesn't support libmagic feature
+      - name: Build (Linux/macOS with all features)
+        if: matrix.os != 'windows-latest'
+        run: cargo build --release --all-features --target ${{ matrix.target }}
+
+      - name: Build (Windows without magic feature)
+        if: matrix.os == 'windows-latest'
+        run: cargo build --release --features checksum --target ${{ matrix.target }}
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/${{ matrix.target }}/release/ce${{ matrix.ext }} dist/ce-${{ matrix.name }}${{ matrix.ext }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ce-${{ matrix.name }}
+          path: dist/ce-${{ matrix.name }}${{ matrix.ext }}
+
+  # Create nightly release
+  release:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          find artifacts -type f -exec cp {} release/ \;
+          ls -la release/
+
+      - name: Get version and date info
+        id: info
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+          DATE=$(date -u +%Y-%m-%d)
+          DATE_COMPACT=$(date -u +%Y%m%d)
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          TAG="v${VERSION}-nightly.${DATE_COMPACT}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "commit=$COMMIT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Get commits since last nightly
+        id: changelog
+        run: |
+          # Find the most recent nightly tag
+          LAST_NIGHTLY=$(git tag -l 'v*-nightly.*' --sort=-version:refname | head -1)
+
+          if [ -z "$LAST_NIGHTLY" ]; then
+            # No previous nightly, get recent commits (limit to 20)
+            COMMITS=$(git log --oneline -20 --format="- %h %s")
+            HEADER="### Recent Commits (last 20)"
+          else
+            # Get commits since last nightly
+            COMMITS=$(git log --oneline "${LAST_NIGHTLY}..HEAD" --format="- %h %s")
+            HEADER="### Changes since ${LAST_NIGHTLY}"
+          fi
+
+          # Handle empty commits
+          if [ -z "$COMMITS" ]; then
+            COMMITS="No new commits"
+          fi
+
+          # Handle multi-line output
+          echo "header=$HEADER" >> $GITHUB_OUTPUT
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create nightly release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.info.outputs.tag }}
+          name: ${{ steps.info.outputs.tag }}
+          body: |
+            ## Nightly Build
+
+            **Date:** ${{ steps.info.outputs.date }}
+            **Version:** ${{ steps.info.outputs.version }}
+            **Commit:** ${{ steps.info.outputs.commit }}
+
+            ---
+
+            ${{ steps.changelog.outputs.header }}
+
+            ${{ steps.changelog.outputs.commits }}
+
+            ---
+
+            ### Test Results
+
+            ${{ needs.test.outputs.test_results }}
+
+            ---
+
+            ### Downloads
+
+            | Platform | Architecture | File |
+            |----------|--------------|------|
+            | Linux | x86_64 | `ce-linux-x86_64` |
+            | macOS | x86_64 | `ce-macos-x86_64` |
+            | macOS | ARM64 | `ce-macos-aarch64` |
+            | Windows | x86_64 | `ce-windows-x86_64.exe` |
+
+            ---
+
+            > **Warning:** This is an automated nightly build and may be unstable.
+            > For stable releases, please use the [latest stable release](../../releases/latest).
+          artifacts: release/*
+          prerelease: true
+          makeLatest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

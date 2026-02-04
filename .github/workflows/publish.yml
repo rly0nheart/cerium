@@ -102,5 +102,6 @@ jobs:
           tag: ${{ steps.crate.outputs.version }}
           name: v${{ steps.crate.outputs.version }}
           body: ${{ steps.changelog.outputs.notes }}
+          makeLatest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
