@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.13] - 2026-02-04
+### Added
+- `nightly.yml` file for nightly builds/releases
+
 ## [0.1.12] - 2026-01-31
 ### Changed
 - chore(icons): add icon for jsonl files
