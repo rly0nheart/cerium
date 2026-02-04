@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.14] - 2026-02-05
+### Changed
+- Simplified nightly build workflow (Linux only)
+- Fixed skip_tests output not being captured in nightly workflow
+- Fixed publish workflow to skip tag creation silently if tag already exists
+
 ## [0.1.13] - 2026-02-04
 ### Added
 - `nightly.yml` file for nightly builds/releases
