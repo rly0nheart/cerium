@@ -145,9 +145,9 @@ jobs:
           LAST_NIGHTLY=$(git tag -l 'v*-nightly.*' --sort=-version:refname | head -1)
 
           if [ -z "$LAST_NIGHTLY" ]; then
-            # No previous nightly, get recent commits (limit to 20)
-            COMMITS=$(git log --oneline -20 --format="- %h %s")
-            HEADER="### Recent Commits (last 20)"
+            # No previous nightly, get recent commits (limit to 5)
+            COMMITS=$(git log --oneline -5 --format="- %h %s")
+            HEADER="### Recent Commits (last 5)"
           else
             # Get commits since last nightly
             COMMITS=$(git log --oneline "${LAST_NIGHTLY}..HEAD" --format="- %h %s")
