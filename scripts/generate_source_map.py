@@ -52,7 +52,6 @@ DESCRIPTIONS = {
     # Display output submodule
     "display/output": "Output formatting (banners, formats, population, quotes, terminal).",
     "display/output/mod.rs": "Output module exports.",
-    "display/output/banner.rs": "ASCII art banner generation with gradient colours.",
     "display/output/populate.rs": "Populates table rows with formatted entry data.",
     "display/output/quotes.rs": "Shell-safe text quoting utilities (single, double, auto).",
     "display/output/terminal.rs": "Terminal capabilities detection and configuration.",
