@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
-## [0.1.16] - YYYY-MM-DD
+## [0.1.16] - 2026-02-06
 ### Added
 - Icon for directories created by coding agents: `.claude`, `.cursor`, `.codex`, `.aider`, `.autogpt`, `.devin`, `.copilot`, `openai`
 - `lib.rs` file for package info constants
@@ -27,9 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Removed
 - `banner.rs` file
 - Cerium banner from CLI help message
+- "empty directory" message when listing an empty directory
 
 ### Changed
 - Extracted CLI help styling to a separate module: [display/styles/help.rs](src/display/styles/help.rs)
+- `--prune` option also omits empty files from output
 
 ## [0.1.15] - 2026-02-05
 ### Changed

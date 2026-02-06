@@ -118,6 +118,7 @@ impl Entry {
         matches!(self, Entry::Symlink(_))
     }
 
+    #[allow(dead_code)]
     /// Returns true only for regular files.
     pub(crate) fn is_file(&self) -> bool {
         matches!(self, Entry::File(_))
