@@ -30,14 +30,11 @@ use crate::cli::flags::{
 #[cfg(feature = "checksum")]
 use crate::cli::flags::HashAlgorithm;
 
-use clap::{
-    Parser, ValueHint,
-    builder::styling::{Color, RgbColor, Style, Styles},
-};
+use clap::{Parser, ValueHint};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug, Clone)]
-#[command(name = "ce", author = "Ritchie Mwewa", version)]
+#[command(name = cerium::NAME, author = cerium::AUTHORS, version)]
 pub(crate) struct Args {
     #[arg(default_value = ".", value_hint = ValueHint::AnyPath)]
     pub(crate) path: PathBuf,
@@ -83,7 +80,8 @@ pub(crate) struct Args {
         long,
         value_name = "QUERY",
         default_value = "",
-        conflicts_with = "tree"
+        conflicts_with = "tree",
+        visible_alias = "search"
     )]
     pub(crate) find: String,
 
@@ -95,6 +93,10 @@ pub(crate) struct Args {
     #[arg(long)]
     pub(crate) hard_links: bool,
 
+    /// Show column headers, works with metadata flags and options
+    #[arg(short = 'H', long)]
+    pub(crate) headers: bool,
+
     /// Omit (a comma-separated list of) implied entries from output
     #[arg(long, value_name = "ENTRIES", value_delimiter = ',')]
     pub(crate) hide: Vec<String>,
@@ -102,10 +104,6 @@ pub(crate) struct Args {
     /// Hyperlink entry names WHEN
     #[arg(long, value_enum, default_value = "never", value_name = "WHEN")]
     pub(crate) hyperlink: ShowHyperlink,
-
-    /// Show column headers, works with metadata flags and options
-    #[arg(short = 'H', long)]
-    pub(crate) column_headers: bool,
 
     /// Display inode number
     #[arg(short, long)]
@@ -246,18 +244,26 @@ pub(crate) struct Args {
     pub(crate) size_format: SizeFormat,
 }
 
-pub(crate) fn args_need_metadata(args: &Args) -> bool {
-    // 2. Anything that reads size
+/// Determines whether specified args requests entry metadata
+///
+/// # Parameters
+///
+/// * `args` Parsed command-line args
+/// # Returns
+///
+/// True if any of the passed args request metadata, otherwise False.
+pub(crate) fn is_metadata_args(args: &Args) -> bool {
+    // 1. Anything that reads size
     if args.size || args.long {
         return true;
     }
 
-    // 3. Any date information
+    // 2. Any date information
     if args.created || args.modified || args.accessed || args.long {
         return true;
     }
 
-    // 4. Permissions / owner / group / hard_links / blocks / inode
+    // 3. Permissions / owner / group / hard_links / blocks / inode
     if args.permission
         || args.hard_links
         || args.blocks
@@ -270,69 +276,4 @@ pub(crate) fn args_need_metadata(args: &Args) -> bool {
         return true;
     }
     false
-}
-
-/// Extracts banner gradient colours from theme as RGB tuples
-pub(crate) fn banner_gradient_from_theme(
-    theme: &crate::display::theme::config::Theme,
-) -> Vec<(u8, u8, u8)> {
-    use nu_ansi_term::Color as Colour;
-
-    let extract_rgb = |colour: &Colour| -> (u8, u8, u8) {
-        match colour {
-            Colour::Rgb(r, g, b) => (*r, *g, *b),
-            // Fallback for non-RGB colours (shouldn't happen with proper theme)
-            _ => (255, 255, 255),
-        }
-    };
-
-    vec![
-        extract_rgb(&theme.banner_gradient_1.colour),
-        extract_rgb(&theme.banner_gradient_2.colour),
-        extract_rgb(&theme.banner_gradient_3.colour),
-        extract_rgb(&theme.banner_gradient_4.colour),
-        extract_rgb(&theme.banner_gradient_5.colour),
-        extract_rgb(&theme.banner_gradient_6.colour),
-        extract_rgb(&theme.banner_gradient_7.colour),
-    ]
-}
-
-/// Creates clap Styles from a theme's CLI colours
-pub(crate) fn styles_from_theme(theme: &crate::display::theme::config::Theme) -> Styles {
-    use nu_ansi_term::Color as Colour;
-
-    // Convert nu_ansi_term::Color to clap::builder::styling::Color
-    let to_clap_color = |colour: &Colour| -> Color {
-        match colour {
-            Colour::Rgb(r, g, b) => Color::Rgb(RgbColor(*r, *g, *b)),
-            Colour::Black => Color::Ansi(clap::builder::styling::AnsiColor::Black),
-            Colour::Red => Color::Ansi(clap::builder::styling::AnsiColor::Red),
-            Colour::Green => Color::Ansi(clap::builder::styling::AnsiColor::Green),
-            Colour::Yellow => Color::Ansi(clap::builder::styling::AnsiColor::Yellow),
-            Colour::Blue => Color::Ansi(clap::builder::styling::AnsiColor::Blue),
-            Colour::Purple => Color::Ansi(clap::builder::styling::AnsiColor::Magenta),
-            Colour::Cyan => Color::Ansi(clap::builder::styling::AnsiColor::Cyan),
-            Colour::White => Color::Ansi(clap::builder::styling::AnsiColor::White),
-            Colour::DarkGray => Color::Ansi(clap::builder::styling::AnsiColor::BrightBlack),
-            Colour::LightRed => Color::Ansi(clap::builder::styling::AnsiColor::BrightRed),
-            Colour::LightGreen => Color::Ansi(clap::builder::styling::AnsiColor::BrightGreen),
-            Colour::LightYellow => Color::Ansi(clap::builder::styling::AnsiColor::BrightYellow),
-            Colour::LightBlue => Color::Ansi(clap::builder::styling::AnsiColor::BrightBlue),
-            Colour::LightPurple => Color::Ansi(clap::builder::styling::AnsiColor::BrightMagenta),
-            Colour::LightCyan => Color::Ansi(clap::builder::styling::AnsiColor::BrightCyan),
-            Colour::LightGray => Color::Ansi(clap::builder::styling::AnsiColor::BrightWhite),
-            _ => Color::Ansi(clap::builder::styling::AnsiColor::White),
-        }
-    };
-
-    Styles::styled()
-        .header(
-            Style::new()
-                .fg_color(Some(to_clap_color(&theme.cli_help_header.colour)))
-                .bold()
-                .underline(),
-        )
-        .usage(Style::new().fg_color(Some(to_clap_color(&theme.cli_help_usage.colour))))
-        .literal(Style::new().fg_color(Some(to_clap_color(&theme.cli_help_literal.colour))))
-        .placeholder(Style::new().fg_color(Some(to_clap_color(&theme.cli_help_placeholder.colour))))
 }

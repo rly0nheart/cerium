@@ -156,7 +156,7 @@ impl List {
             .iter()
             .any(|entry| Quotes::is_quotable(entry.name()));
 
-        if args.column_headers {
+        if args.headers {
             Column::headers(&widths, args);
         }
 

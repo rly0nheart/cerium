@@ -82,7 +82,7 @@ impl DisplayMode for Tree {
                 let mut width_calc = Width::new();
                 let widths = width_calc.calculate(&entries, &columns, &self.args);
 
-                if self.args.column_headers {
+                if self.args.headers {
                     Column::headers(&widths, &self.args);
                 }
 

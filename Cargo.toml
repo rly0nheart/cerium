@@ -34,10 +34,6 @@ tempfile = "3.24"
 name = "ce"
 path = "src/main.rs"
 
-[package.metadata.docs.rs]
-# This is a binary crate, no library documentation to generate
-targets = []
-
 [profile.release]
 lto = true
 codegen-units = 1

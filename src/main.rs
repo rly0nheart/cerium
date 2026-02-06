@@ -28,7 +28,6 @@ mod fs;
 
 use crate::cli::args::Args;
 use crate::display::factory::DisplayFactory;
-use crate::display::output::banner;
 use crate::display::theme::colours::{ColourSettings, RgbColours};
 use crate::display::theme::config;
 use crate::display::theme::icons::IconSettings;
@@ -36,6 +35,7 @@ use crate::fs::dir::DirReader;
 use crate::fs::hyperlink::HyperlinkSettings;
 use clap::{CommandFactory, FromArgMatches};
 use std::process;
+use crate::display::styles::help;
 
 /// Application entry point.
 ///
@@ -47,16 +47,12 @@ fn main() {
     // Load theme from config file (or use built-in Gruvbox) BEFORE parsing args
     let theme = config::load_theme();
 
-    // Generate banner with theme colours
-    let banner_gradient = cli::args::banner_gradient_from_theme(&theme);
-    let banner = banner::get_banner(&banner_gradient);
+    // Initialise theme system for cli help
+    let help_style = help::HelpStyle::new(&theme);
 
     // Apply theme colours to CLI and parse arguments
-    let args = Args::command()
-        .about(banner)
-        .styles(cli::args::styles_from_theme(&theme))
-        .get_matches();
-    let args = Args::from_arg_matches(&args).expect("Failed to parse arguments");
+    let arg_matches = Args::command().styles(help_style.get_styles()).get_matches();
+    let args = Args::from_arg_matches(&arg_matches).expect("Failed to parse arguments");
 
     // Initialise theme system for output
     RgbColours::init(theme);

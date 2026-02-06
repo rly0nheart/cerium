@@ -117,15 +117,6 @@ pub(crate) struct Theme {
     pub(crate) cli_help_usage: ThemeColour,
     pub(crate) cli_help_literal: ThemeColour,
     pub(crate) cli_help_placeholder: ThemeColour,
-
-    // Banner gradient colours (7 colours for the ASCII art banner)
-    pub(crate) banner_gradient_1: ThemeColour,
-    pub(crate) banner_gradient_2: ThemeColour,
-    pub(crate) banner_gradient_3: ThemeColour,
-    pub(crate) banner_gradient_4: ThemeColour,
-    pub(crate) banner_gradient_5: ThemeColour,
-    pub(crate) banner_gradient_6: ThemeColour,
-    pub(crate) banner_gradient_7: ThemeColour,
 }
 
 impl Theme {
@@ -232,15 +223,6 @@ impl Theme {
             cli_help_usage: bright_green.clone(),
             cli_help_literal: bright_aqua.clone(),
             cli_help_placeholder: yellow.clone(),
-
-            // Banner gradient colours (authentic Gruvbox gradient)
-            banner_gradient_1: aqua.clone(),   // aqua
-            banner_gradient_2: green.clone(),  // green
-            banner_gradient_3: yellow.clone(), // yellow
-            banner_gradient_4: orange.clone(), // orange
-            banner_gradient_5: red.clone(),    // red
-            banner_gradient_6: purple.clone(), // purple
-            banner_gradient_7: blue.clone(),   // blue
         }
     }
 }
@@ -332,13 +314,6 @@ mod tests {
             cli_help_usage = "green"
             cli_help_literal = "cyan"
             cli_help_placeholder = "yellow"
-            banner_gradient_1 = "cyan"
-            banner_gradient_2 = "green"
-            banner_gradient_3 = "yellow"
-            banner_gradient_4 = "red"
-            banner_gradient_5 = "red"
-            banner_gradient_6 = "magenta"
-            banner_gradient_7 = "blue"
         "#;
 
         let theme: Theme = toml::from_str(toml).unwrap();

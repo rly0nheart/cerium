@@ -109,7 +109,7 @@ impl Column {
     }
 
     pub(crate) fn headers(widths: &HashMap<Column, usize>, args: &Args) {
-        if !args.column_headers {
+        if !args.headers {
             return;
         }
         let columns = Selector::select(args);

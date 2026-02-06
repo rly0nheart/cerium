@@ -208,6 +208,7 @@ impl Icons {
     const RAZOR: char           = '\u{f1fa}';  // 
     const REACT: char           = '\u{e7ba}';  // 
     const README: char          = '\u{f00ba}'; // 󰂺
+    const ROBOT: char           = '\u{f06a9}'; // 󰚩
     const SHEET: char           = '\u{f021b}'; // 󰈛
     const SHELL: char           = '\u{f1183}'; // 󱆃
     const SHELL_CMD: char       = '\u{e795}';  // 
@@ -270,6 +271,7 @@ const DIRECTORY_ICONS: Map<&'static str, char> = phf_map! {
     "pictures" | "img"    => Icons::FOLDER_IMAGE,
     "src"                 => Icons::FOLDER_SRC,
     "videos"              => Icons::VIDEO,
+    ".claude" | ".cursor" | ".codex" | ".aider" | ".autogpt" | ".devin" | ".copilot" | ".openai" => Icons::ROBOT,
 };
 
 /// PHF map for directory colour lookups (non-themed directories only)

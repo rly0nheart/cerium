@@ -27,11 +27,12 @@ use crate::display::output::terminal;
 use nu_ansi_term::{Color, Style};
 use std::sync::OnceLock;
 use std::sync::atomic::{AtomicBool, Ordering};
+use crate::display::theme::config::Theme;
 
 pub(crate) type Colour = Color;
 
 static COLOURS_ENABLED: AtomicBool = AtomicBool::new(true);
-static THEME: OnceLock<crate::config::Theme> = OnceLock::new();
+static THEME: OnceLock<Theme> = OnceLock::new();
 
 pub(crate) struct ColourSettings;
 
@@ -93,12 +94,12 @@ pub struct RgbColours;
 #[allow(dead_code)]
 impl RgbColours {
     /// Initialise the theme system (called once at startup)
-    pub(crate) fn init(theme: crate::config::Theme) {
+    pub(crate) fn init(theme: Theme) {
         THEME.set(theme).ok();
     }
 
     /// Get the current theme
-    pub(crate) fn theme() -> &'static crate::config::Theme {
+    pub(crate) fn theme() -> &'static Theme {
         THEME.get().expect("Theme not initialised - call RgbColours::init() first")
     }
 

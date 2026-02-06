@@ -83,7 +83,7 @@ impl Width {
         let mut widths: HashMap<Column, usize> = HashMap::new();
 
         // Initialise with header widths if enabled
-        if args.column_headers {
+        if args.headers {
             for column in columns {
                 let header_width = self.measure_text_cached(column.header());
                 widths.insert(*column, header_width);

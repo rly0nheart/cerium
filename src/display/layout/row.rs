@@ -52,7 +52,7 @@ pub(crate) struct Row<'a> {
     pub(crate) args: &'a Args,
 }
 
-impl<'a> Row<'a> {
+impl <'a>Row<'a> {
     /// Creates a new `Row` wrapping the given filesystem entry.
     ///
     /// # Parameters

@@ -22,7 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-pub(crate) mod help;
-pub(crate) mod column;
-pub(crate) mod entry;
-pub(crate) mod text;
+use std::env;
+
+/// Package authors
+pub const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+
+/// Package version
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Package name
+pub const NAME: &str = env!("CARGO_PKG_NAME");

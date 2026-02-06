@@ -139,7 +139,7 @@ mod tests {
             dirs: false,
             files: false,
             group: false,
-            column_headers: false,
+            headers: false,
             hide: Vec::new(),
             inode: false,
             verbose: false,

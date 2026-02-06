@@ -19,6 +19,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.16] - YYYY-MM-DD
+### Added
+- Icon for directories created by coding agents: `.claude`, `.cursor`, `.codex`, `.aider`, `.autogpt`, `.devin`, `.copilot`, `openai`
+- `lib.rs` file for package info constants
+
+### Removed
+- `banner.rs` file
+- Cerium banner from CLI help message
+
+### Changed
+- Extracted CLI help styling to a separate module: [display/styles/help.rs](src/display/styles/help.rs)
+
 ## [0.1.15] - 2026-02-05
 ### Changed
 - Simplified nightly build workflow (Linux only)

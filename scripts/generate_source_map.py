@@ -90,6 +90,7 @@ DESCRIPTIONS = {
     # Display styles submodule
     "display/styles": "Styling system for cells, columns, and entries.",
     "display/styles/mod.rs": "Styles module exports.",
+    "display/styles/help.rs": "CLI help styling rules.",
     "display/styles/text.rs": "Individual text styles logic.",
     "display/styles/column.rs": "Column-specific styling rules.",
     "display/styles/entry.rs": "Entry-specific styling and colourisation.",
