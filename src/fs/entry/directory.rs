@@ -25,6 +25,7 @@ SOFTWARE.
 //! Directory entry type for directories.
 
 use crate::fs::metadata::Metadata;
+use std::cell::Cell;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -38,7 +39,7 @@ pub(crate) struct DirectoryEntry {
     /// Optional metadata (lazily loaded).
     pub(crate) metadata: Option<Metadata>,
     /// Lazily computed - None means not yet checked.
-    has_children: Option<bool>,
+    has_children: Cell<Option<bool>>,
 }
 
 impl DirectoryEntry {
@@ -53,33 +54,24 @@ impl DirectoryEntry {
             name,
             path,
             metadata: None,
-            has_children: None,
+            has_children: Cell::new(None),
         }
     }
 
-    /// Returns whether this directory has children (for icon display).
-    /// Returns true by default if not yet computed, to avoid syscalls during display.
-    /// Use `compute_has_children()` if you need the accurate value.
+    /// Returns whether this directory has children.
+    /// Computes and caches the result on first call.
     pub(crate) fn has_children(&self) -> bool {
-        // Default to true (assume has children) if not computed - avoids syscall
-        self.has_children.unwrap_or(true)
-    }
-
-    /// Computes and caches whether this directory has children.
-    /// Use this when you need the accurate value (e.g., for tree pruning).
-    pub(crate) fn compute_has_children(&mut self) -> bool {
-        if let Some(has) = self.has_children {
+        if let Some(has) = self.has_children.get() {
             return has;
         }
 
-        // Compute and cache the result
         let has = if let Ok(mut entries) = std::fs::read_dir(&self.path) {
             entries.next().is_some()
         } else {
             false
         };
 
-        self.has_children = Some(has);
+        self.has_children.set(Some(has));
         has
     }
 }

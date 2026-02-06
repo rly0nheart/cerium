@@ -30,7 +30,7 @@ pub(crate) struct HelpStyle<'a> {
     theme: &'a Theme,
 }
 
-impl <'a>HelpStyle<'a> {
+impl<'a> HelpStyle<'a> {
     pub(crate) fn new(theme: &'a Theme) -> Self {
         Self { theme }
     }

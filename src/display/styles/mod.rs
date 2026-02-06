@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-pub(crate) mod help;
 pub(crate) mod column;
 pub(crate) mod entry;
+pub(crate) mod help;
 pub(crate) mod text;

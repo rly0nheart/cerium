@@ -125,7 +125,7 @@ pub(crate) struct Args {
     #[arg(short, long)]
     pub(crate) permission: bool,
 
-    /// Omit empty directories from output
+    /// Omit empty files and directories from output
     #[arg(long)]
     pub(crate) prune: bool,
 

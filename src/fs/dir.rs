@@ -24,7 +24,6 @@ SOFTWARE.
 
 use crate::cli::args::Args;
 use crate::cli::flags::SortBy;
-use crate::display::theme::icons::IconSettings;
 use crate::fs::entry::Entry;
 use crate::fs::glob::Glob;
 use std::fs;
@@ -71,17 +70,12 @@ impl DirReader {
                     continue;
                 }
 
-                if args.prune && entry.is_dir() && !entry.compute_has_children() {
+                // Omit empty entries (childless directories and 0-byte files)
+                if args.prune && entry.is_empty() {
                     continue;
                 }
 
                 entry.conditional_metadata(args);
-
-                // Compute has_children for directories when icons are enabled
-                // (needed to show empty folder icon)
-                if entry.is_dir() && IconSettings::enabled() {
-                    entry.compute_has_children();
-                }
 
                 entries.push(entry);
             }
@@ -93,10 +87,6 @@ impl DirReader {
             // lstat() handles all file types including broken symlinks
             let mut entry = Entry::from_path(self.path.to_path_buf(), args.long);
             entry.conditional_metadata(args);
-            // Compute has_children for directories when icons are enabled
-            if entry.is_dir() && IconSettings::enabled() {
-                entry.compute_has_children();
-            }
             entries.push(entry);
         }
 
@@ -138,17 +128,6 @@ impl DirReader {
             0
         } else {
             dir_size(&self.path, include_hidden)
-        }
-    }
-
-    /// Returns true if this directory is empty.
-    /// Callers should ensure the path is a directory before calling.
-    pub(crate) fn is_empty(&self) -> bool {
-        // read_dir will fail if not a directory, which is fine - return false
-        if let Ok(mut entries) = fs::read_dir(&self.path) {
-            entries.next().is_none()
-        } else {
-            false
         }
     }
 
@@ -509,33 +488,6 @@ mod tests {
         let size = dir_reader.true_size(true);
 
         assert_eq!(size, 0); // Non-directories return 0
-    }
-
-    #[test]
-    fn test_is_empty_true() {
-        let temp_dir = TempDir::new().unwrap();
-        let empty_dir = temp_dir.path().join("empty");
-        fs::create_dir(&empty_dir).unwrap();
-
-        let dir_reader = DirReader::from(empty_dir);
-        assert!(dir_reader.is_empty());
-    }
-
-    #[test]
-    fn test_is_empty_false() {
-        let temp_dir = setup_test_dir();
-        let dir_reader = DirReader::from(temp_dir.path().to_path_buf());
-
-        assert!(!dir_reader.is_empty());
-    }
-
-    #[test]
-    fn test_is_empty_non_directory() {
-        let temp_dir = setup_test_dir();
-        let file_path = temp_dir.path().join("file1.txt");
-
-        let dir_reader = DirReader::from(file_path);
-        assert!(!dir_reader.is_empty()); // Non-directories return false
     }
 
     #[cfg(unix)]

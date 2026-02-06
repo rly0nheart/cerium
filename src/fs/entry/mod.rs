@@ -118,10 +118,22 @@ impl Entry {
         matches!(self, Entry::Symlink(_))
     }
 
-    #[allow(dead_code)]
     /// Returns true only for regular files.
     pub(crate) fn is_file(&self) -> bool {
         matches!(self, Entry::File(_))
+    }
+
+    /// Returns true if this entry is empty.
+    /// For directories, checks whether the directory has no children.
+    /// For files, checks whether the file is 0 bytes via a lightweight stat call.
+    pub(crate) fn is_empty(&self) -> bool {
+        match self {
+            Entry::Directory(directory) => !directory.has_children(),
+            Entry::File(file) => std::fs::symlink_metadata(&file.path)
+                .map(|metadata| metadata.len() == 0)
+                .unwrap_or(false),
+            _ => false,
+        }
     }
 
     /// Returns true for directories AND symlinks pointing to directories.
@@ -190,15 +202,6 @@ impl Entry {
         match self {
             Entry::Directory(directory) => directory.has_children(),
             Entry::Symlink(symlink) if symlink.target_is_dir => true, // Assume symlinks to dirs have children
-            _ => false,
-        }
-    }
-
-    /// Computes and caches whether this directory has children.
-    /// Returns false for non-directories.
-    pub(crate) fn compute_has_children(&mut self) -> bool {
-        match self {
-            Entry::Directory(directory) => directory.compute_has_children(),
             _ => false,
         }
     }

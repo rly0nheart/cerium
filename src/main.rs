@@ -28,6 +28,7 @@ mod fs;
 
 use crate::cli::args::Args;
 use crate::display::factory::DisplayFactory;
+use crate::display::styles::help;
 use crate::display::theme::colours::{ColourSettings, RgbColours};
 use crate::display::theme::config;
 use crate::display::theme::icons::IconSettings;
@@ -35,11 +36,11 @@ use crate::fs::dir::DirReader;
 use crate::fs::hyperlink::HyperlinkSettings;
 use clap::{CommandFactory, FromArgMatches};
 use std::process;
-use crate::display::styles::help;
 
 /// Application entry point.
 ///
 /// # Description
+///
 /// Parses CLI arguments, validates the target directory, prepares display options,
 /// and invokes the appropriate display mode. Handles warnings and errors for invalid
 /// paths, non-directory paths, or empty directories.
@@ -51,7 +52,9 @@ fn main() {
     let help_style = help::HelpStyle::new(&theme);
 
     // Apply theme colours to CLI and parse arguments
-    let arg_matches = Args::command().styles(help_style.get_styles()).get_matches();
+    let arg_matches = Args::command()
+        .styles(help_style.get_styles())
+        .get_matches();
     let args = Args::from_arg_matches(&arg_matches).expect("Failed to parse arguments");
 
     // Initialise theme system for output
@@ -69,11 +72,6 @@ fn main() {
     // Validate that the path exists (use lstat to handle broken symlinks)
     if std::fs::symlink_metadata(path).is_err() {
         println!("file or directory not found: {}", &path.display());
-        process::exit(1);
-    }
-
-    if path.is_dir() && dir_reader.is_empty() {
-        println!("empty directory: {}", &path.display());
         process::exit(1);
     }
 

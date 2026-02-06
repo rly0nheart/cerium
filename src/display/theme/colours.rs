@@ -24,10 +24,10 @@ SOFTWARE.
 
 use crate::cli::flags::ShowColour;
 use crate::display::output::terminal;
+use crate::display::theme::config::Theme;
 use nu_ansi_term::{Color, Style};
 use std::sync::OnceLock;
 use std::sync::atomic::{AtomicBool, Ordering};
-use crate::display::theme::config::Theme;
 
 pub(crate) type Colour = Color;
 
