@@ -84,12 +84,3 @@ cli_help_header = { r = 181, g = 137, b = 0 }        # yellow
 cli_help_usage = { r = 133, g = 153, b = 0 }         # green
 cli_help_literal = { r = 42, g = 161, b = 152 }      # cyan
 cli_help_placeholder = { r = 203, g = 75, b = 22 }   # orange
-
-# Banner Gradient Colours
-banner_gradient_1 = { r = 42, g = 161, b = 152 }     # cyan
-banner_gradient_2 = { r = 133, g = 153, b = 0 }      # green
-banner_gradient_3 = { r = 181, g = 137, b = 0 }      # yellow
-banner_gradient_4 = { r = 203, g = 75, b = 22 }      # orange
-banner_gradient_5 = { r = 220, g = 50, b = 47 }      # red
-banner_gradient_6 = { r = 211, g = 54, b = 130 }     # magenta
-banner_gradient_7 = { r = 38, g = 139, b = 210 }     # blue

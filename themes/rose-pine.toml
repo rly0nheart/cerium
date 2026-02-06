@@ -84,12 +84,3 @@ cli_help_header = { r = 246, g = 193, b = 119 }      # gold
 cli_help_usage = { r = 156, g = 207, b = 216 }       # foam
 cli_help_literal = { r = 49, g = 116, b = 143 }      # pine
 cli_help_placeholder = { r = 234, g = 154, b = 151 } # rose
-
-# Banner Gradient Colours
-banner_gradient_1 = { r = 156, g = 207, b = 216 }    # foam
-banner_gradient_2 = { r = 49, g = 116, b = 143 }     # pine
-banner_gradient_3 = { r = 246, g = 193, b = 119 }    # gold
-banner_gradient_4 = { r = 234, g = 154, b = 151 }    # rose
-banner_gradient_5 = { r = 235, g = 111, b = 146 }    # love
-banner_gradient_6 = { r = 196, g = 167, b = 231 }    # iris
-banner_gradient_7 = { r = 144, g = 122, b = 169 }    # subtle iris

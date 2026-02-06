@@ -84,12 +84,3 @@ cli_help_header = { r = 235, g = 203, b = 139 }      # nord13
 cli_help_usage = { r = 163, g = 190, b = 140 }       # nord14
 cli_help_literal = { r = 136, g = 192, b = 208 }     # nord8
 cli_help_placeholder = { r = 208, g = 135, b = 112 } # nord12
-
-# Banner Gradient Colours
-banner_gradient_1 = { r = 143, g = 188, b = 187 }    # nord7 (frost)
-banner_gradient_2 = { r = 163, g = 190, b = 140 }    # nord14 (green)
-banner_gradient_3 = { r = 235, g = 203, b = 139 }    # nord13 (yellow)
-banner_gradient_4 = { r = 208, g = 135, b = 112 }    # nord12 (orange)
-banner_gradient_5 = { r = 191, g = 97, b = 106 }     # nord11 (red)
-banner_gradient_6 = { r = 180, g = 142, b = 173 }    # nord15 (purple)
-banner_gradient_7 = { r = 94, g = 129, b = 172 }     # nord10 (blue)

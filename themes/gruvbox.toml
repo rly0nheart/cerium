@@ -84,12 +84,3 @@ cli_help_header = { r = 250, g = 189, b = 47 }       # bright_yellow
 cli_help_usage = { r = 184, g = 187, b = 38 }        # bright_green
 cli_help_literal = { r = 142, g = 192, b = 124 }     # bright_aqua
 cli_help_placeholder = { r = 215, g = 153, b = 33 }  # yellow
-
-# Banner Gradient Colours
-banner_gradient_1 = { r = 104, g = 157, b = 106 }    # aqua
-banner_gradient_2 = { r = 152, g = 151, b = 26 }     # green
-banner_gradient_3 = { r = 215, g = 153, b = 33 }     # yellow
-banner_gradient_4 = { r = 214, g = 93, b = 14 }      # orange
-banner_gradient_5 = { r = 204, g = 36, b = 29 }      # red
-banner_gradient_6 = { r = 177, g = 98, b = 134 }     # purple
-banner_gradient_7 = { r = 69, g = 133, b = 136 }     # blue

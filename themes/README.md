@@ -72,4 +72,3 @@ Each theme defines colours for:
 - **Media**: `media_image`, `media_video`, `media_audio`
 - **UI elements**: `tree_connector`, `table_header`, `path_display`, etc.
 - **CLI help**: `cli_help_header`, `cli_help_usage`, etc.
-- **Banner**: `banner_gradient_1` through `banner_gradient_7`
