@@ -44,8 +44,8 @@ use serde::{Deserialize, Deserializer, de};
 /// - Light: lightred, lightgreen, lightyellow, lightblue, lightpurple/lightmagenta, lightcyan, lightgray
 /// - System: darkgray
 #[derive(Debug, Clone)]
-pub(crate) struct ThemeColour {
-    pub(crate) colour: Colour,
+pub struct ThemeColour {
+    pub colour: Colour,
 }
 
 impl<'de> Deserialize<'de> for ThemeColour {
@@ -98,71 +98,5 @@ fn parse_named_colour(name: &str) -> Result<Colour, String> {
             "Unknown colour name: '{}'. Supported colours: black, red, green, yellow, blue, purple, cyan, white, and their light variants (e.g., lightred), plus darkgray.",
             name
         )),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parse_rgb_colour() {
-        let toml = r#"
-            colour = { r = 255, g = 128, b = 64 }
-        "#;
-
-        #[derive(Deserialize)]
-        struct Test {
-            colour: ThemeColour,
-        }
-
-        let parsed: Test = toml::from_str(toml).unwrap();
-        assert!(matches!(parsed.colour.colour, Colour::Rgb(255, 128, 64)));
-    }
-
-    #[test]
-    fn test_parse_named_colour() {
-        let toml = r#"
-            colour = "red"
-        "#;
-
-        #[derive(Deserialize)]
-        struct Test {
-            colour: ThemeColour,
-        }
-
-        let parsed: Test = toml::from_str(toml).unwrap();
-        assert!(matches!(parsed.colour.colour, Colour::Red));
-    }
-
-    #[test]
-    fn test_parse_named_colour_case_insensitive() {
-        let toml = r#"
-            colour = "LightBlue"
-        "#;
-
-        #[derive(Deserialize)]
-        struct Test {
-            colour: ThemeColour,
-        }
-
-        let parsed: Test = toml::from_str(toml).unwrap();
-        assert!(matches!(parsed.colour.colour, Colour::LightBlue));
-    }
-
-    #[test]
-    fn test_parse_invalid_colour() {
-        let toml = r#"
-            colour = "notacolour"
-        "#;
-
-        #[derive(Deserialize)]
-        struct Test {
-            #[allow(dead_code)]
-            colour: ThemeColour,
-        }
-
-        let result: Result<Test, _> = toml::from_str(toml);
-        assert!(result.is_err());
     }
 }

@@ -24,6 +24,6 @@ SOFTWARE.
 
 use std::sync::Arc;
 
-pub(crate) trait Format<I> {
+pub trait Format<I> {
     fn format(&self, input: I) -> Arc<str>;
 }

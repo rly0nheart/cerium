@@ -23,8 +23,8 @@ SOFTWARE.
 */
 
 pub(crate) mod date;
-pub(crate) mod format;
+pub mod format;
 pub(crate) mod number;
 pub(crate) mod ownership;
-pub(crate) mod permission;
+pub mod permission;
 pub(crate) mod size;

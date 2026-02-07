@@ -22,5 +22,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-pub(crate) mod args;
-pub(crate) mod flags;
+pub mod args;
+pub mod flags;

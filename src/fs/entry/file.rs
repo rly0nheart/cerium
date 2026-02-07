@@ -30,15 +30,15 @@ use std::sync::Arc;
 
 /// Represents a regular file in the filesystem.
 #[derive(Clone, Debug)]
-pub(crate) struct FileEntry {
+pub struct FileEntry {
     /// The display name of the file.
-    pub(crate) name: Arc<str>,
+    pub name: Arc<str>,
     /// The full path to the file.
-    pub(crate) path: PathBuf,
+    pub path: PathBuf,
     /// The file extension in lowercase, or empty if none.
-    pub(crate) extension: Arc<str>,
+    pub extension: Arc<str>,
     /// Optional metadata (lazily loaded).
-    pub(crate) metadata: Option<Metadata>,
+    pub metadata: Option<Metadata>,
 }
 
 impl FileEntry {
@@ -48,7 +48,7 @@ impl FileEntry {
     ///
     /// * `name` - The display name of the file
     /// * `path` - The full path to the file
-    pub(crate) fn new(name: Arc<str>, path: PathBuf) -> Self {
+    pub fn new(name: Arc<str>, path: PathBuf) -> Self {
         let extension = Self::get_extension(&path);
         Self {
             name,

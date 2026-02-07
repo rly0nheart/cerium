@@ -10,7 +10,6 @@ Cerium gets inspiration from similar tools such as lsd and eza, but with a small
 | Android/Termux | `yes`         |       `checksum`        |
 |   Linux/Unix   | `yes`         | `checksum`, `filemagic` |
 |     MacOS      | `no`          |      `not tested`       |
-|    Windows     | `not planned` |      `not planned`      |
 
 ## Development
 Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The [GitHub repository](https://github.com/rly0nheart/cerium) is a read-only mirror used solely for crates.io deployments. Issues should be opened on either GitHub or Codeberg, but pull requests should be opened only on Codeberg.

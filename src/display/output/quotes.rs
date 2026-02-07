@@ -5,7 +5,7 @@ use crate::fs::symlink::{SYMLINK_ARROW_WITH_SPACES, split_symlink};
 ///
 /// This struct provides methods for quoting text in various styles, with special
 /// handling for symlinks (indicated by the ⇒ arrow).
-pub(crate) struct Quotes<'a> {
+pub struct Quotes<'a> {
     text: &'a str,
 }
 
@@ -19,9 +19,11 @@ impl<'a> Quotes<'a> {
     /// # Examples
     ///
     /// ```
+    /// use cerium::display::output::quotes::Quotes;
+    ///
     /// let q = Quotes::new("file name");
     /// ```
-    pub(crate) fn new(text: &'a str) -> Self {
+    pub fn new(text: &'a str) -> Self {
         Self { text }
     }
 
@@ -41,6 +43,9 @@ impl<'a> Quotes<'a> {
     /// # Examples
     ///
     /// ```
+    /// use cerium::display::output::quotes::Quotes;
+    /// use cerium::cli::flags::QuoteStyle;
+    ///
     /// let q = Quotes::new("file name");
     /// assert_eq!(q.apply(QuoteStyle::Single, false), "'file name'");
     /// assert_eq!(q.apply(QuoteStyle::Single, true), "'file name'");  // Alignment ignored
@@ -49,7 +54,7 @@ impl<'a> Quotes<'a> {
     /// assert_eq!(q2.apply(QuoteStyle::Auto, false), "normal");
     /// assert_eq!(q2.apply(QuoteStyle::Auto, true), " normal");  // Space for alignment
     /// ```
-    pub(crate) fn apply(&self, style: QuoteStyle, add_alignment_space: bool) -> String {
+    pub fn apply(&self, style: QuoteStyle, add_alignment_space: bool) -> String {
         match style {
             QuoteStyle::Single => self.single_quote_always(),
             QuoteStyle::Double => self.double_quote_always(),
@@ -87,13 +92,15 @@ impl<'a> Quotes<'a> {
     /// # Examples
     ///
     /// ```
+    /// use cerium::display::output::quotes::Quotes;
+    ///
     /// assert_eq!(Quotes::new("normal").single_quote_conditional(), "normal");
     /// assert_eq!(Quotes::new("file name").single_quote_conditional(), "'file name'");
     /// assert_eq!(Quotes::new("link ⇒ target").single_quote_conditional(), "link ⇒ target");
     /// assert_eq!(Quotes::new("my link ⇒ my target").single_quote_conditional(), "'my link' ⇒ 'my target'");
     /// assert_eq!(Quotes::new("file$name").single_quote_conditional(), "'file$name'");
     /// ```
-    fn single_quote_conditional(&self) -> String {
+    pub fn single_quote_conditional(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
             let quoted_left = Self::quote_if_quotable(left.trim_end());
             let quoted_right = Self::quote_if_quotable(right.trim_start());
@@ -121,12 +128,14 @@ impl<'a> Quotes<'a> {
     /// # Examples
     ///
     /// ```
+    /// use cerium::display::output::quotes::Quotes;
+    ///
     /// assert_eq!(Quotes::new("file").single_quote_always(), "'file'");
     /// assert_eq!(Quotes::new("file name").single_quote_always(), "'file name'");
     /// assert_eq!(Quotes::new("link ⇒ target").single_quote_always(), "'link' ⇒ 'target'");
     /// assert_eq!(Quotes::new("my link ⇒ my target").single_quote_always(), "'my link' ⇒ 'my target'");
     /// ```
-    fn single_quote_always(&self) -> String {
+    pub fn single_quote_always(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
             let quoted_left = Self::add_single_quotes(left.trim_end());
             let quoted_right = Self::add_single_quotes(right.trim_start());
@@ -153,12 +162,14 @@ impl<'a> Quotes<'a> {
     /// # Examples
     ///
     /// ```
+    /// use cerium::display::output::quotes::Quotes;
+    ///
     /// assert_eq!(Quotes::new("file").double_quote_always(), "\"file\"");
     /// assert_eq!(Quotes::new("file name").double_quote_always(), "\"file name\"");
     /// assert_eq!(Quotes::new("link ⇒ target").double_quote_always(), "\"link\" ⇒ \"target\"");
     /// assert_eq!(Quotes::new("my link ⇒ my target").double_quote_always(), "\"my link\" ⇒ \"my target\"");
     /// ```
-    fn double_quote_always(&self) -> String {
+    pub fn double_quote_always(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
             let quoted_left = Self::add_double_quotes(left.trim_end());
             let quoted_right = Self::add_double_quotes(right.trim_start());

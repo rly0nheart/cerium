@@ -25,47 +25,47 @@ SOFTWARE.
 use clap::ValueEnum;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum DateFormat {
+pub enum DateFormat {
     Locale,
     Humanly,
     Timestamp,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum NumberFormat {
+pub enum NumberFormat {
     Humanly,
     Natural,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum OwnershipFormat {
+pub enum OwnershipFormat {
     Name,
     Id,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum ShowIcons {
+pub enum ShowIcons {
     Auto,
     Always,
     Never,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum PermissionFormat {
+pub enum PermissionFormat {
     Symbolic,
     Octal,
     Hex,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum SizeFormat {
+pub enum SizeFormat {
     Bytes,
     Binary,
     Decimal,
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
-pub(crate) enum SortBy {
+pub enum SortBy {
     Name,
     Size,
     Created,
@@ -76,21 +76,21 @@ pub(crate) enum SortBy {
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
-pub(crate) enum ShowColour {
+pub enum ShowColour {
     Always,
     Auto,
     Never,
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
-pub(crate) enum ShowHyperlink {
+pub enum ShowHyperlink {
     Always,
     Auto,
     Never,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum QuoteStyle {
+pub enum QuoteStyle {
     Auto,
     Double,
     Single,
@@ -100,7 +100,7 @@ pub(crate) enum QuoteStyle {
 #[cfg(feature = "checksum")]
 /// Hash algorithm selection for checksum computation
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ValueEnum)]
-pub(crate) enum HashAlgorithm {
+pub enum HashAlgorithm {
     Crc32,
     Md5,
     Sha224,

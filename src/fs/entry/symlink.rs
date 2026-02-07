@@ -30,20 +30,20 @@ use std::sync::Arc;
 
 /// Represents a symbolic link in the filesystem.
 #[derive(Clone, Debug)]
-pub(crate) struct SymlinkEntry {
+pub struct SymlinkEntry {
     /// The display name of the symlink (may include target if show_link_target is true).
-    pub(crate) name: Arc<str>,
+    pub name: Arc<str>,
     /// The full path to the symlink.
-    pub(crate) path: PathBuf,
+    pub path: PathBuf,
     /// The file extension in lowercase (from the symlink name), or empty if none.
-    pub(crate) extension: Arc<str>,
+    pub extension: Arc<str>,
     /// Optional metadata (lazily loaded).
-    pub(crate) metadata: Option<Metadata>,
+    pub metadata: Option<Metadata>,
     /// Whether the symlink target is a directory.
-    pub(crate) target_is_dir: bool,
+    pub target_is_dir: bool,
     #[allow(dead_code)]
     /// Whether the symlink target exists (false for broken symlinks).
-    pub(crate) target_exists: bool,
+    pub target_exists: bool,
 }
 
 impl SymlinkEntry {
@@ -55,12 +55,7 @@ impl SymlinkEntry {
     /// * `path` - The full path to the symlink
     /// * `target_is_dir` - Whether the symlink points to a directory
     /// * `target_exists` - Whether the symlink target exists
-    pub(crate) fn new(
-        name: Arc<str>,
-        path: PathBuf,
-        target_is_dir: bool,
-        target_exists: bool,
-    ) -> Self {
+    pub fn new(name: Arc<str>, path: PathBuf, target_is_dir: bool, target_exists: bool) -> Self {
         let extension = Self::get_extension(&path);
         Self {
             name,
@@ -83,7 +78,7 @@ impl SymlinkEntry {
 
     #[allow(dead_code)]
     /// Returns whether this symlink is broken (target doesn't exist).
-    pub(crate) fn is_broken(&self) -> bool {
+    pub fn is_broken(&self) -> bool {
         !self.target_exists
     }
 }

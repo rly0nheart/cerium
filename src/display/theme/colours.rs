@@ -34,7 +34,7 @@ pub(crate) type Colour = Color;
 static COLOURS_ENABLED: AtomicBool = AtomicBool::new(true);
 static THEME: OnceLock<Theme> = OnceLock::new();
 
-pub(crate) struct ColourSettings;
+pub struct ColourSettings;
 
 impl ColourSettings {
     pub(crate) fn enable() {
@@ -50,7 +50,7 @@ impl ColourSettings {
     }
 
     /// Setup colours at startup based on CLI flag / terminal detection
-    pub(crate) fn setup(show_colour: ShowColour) {
+    pub fn setup(show_colour: ShowColour) {
         match show_colour {
             ShowColour::Always => Self::enable(),
             ShowColour::Never => Self::disable(),
@@ -94,7 +94,7 @@ pub struct RgbColours;
 #[allow(dead_code)]
 impl RgbColours {
     /// Initialise the theme system (called once at startup)
-    pub(crate) fn init(theme: Theme) {
+    pub fn init(theme: Theme) {
         THEME.set(theme).ok();
     }
 

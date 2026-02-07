@@ -46,7 +46,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-pub(crate) mod formats;
+pub mod formats;
 pub(crate) mod populate;
-pub(crate) mod quotes;
-pub(crate) mod terminal;
+pub mod quotes;
+pub mod terminal;

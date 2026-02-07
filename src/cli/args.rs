@@ -22,10 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::cli::flags::{
-    DateFormat, NumberFormat, OwnershipFormat, PermissionFormat, QuoteStyle, ShowColour,
-    ShowHyperlink, ShowIcons, SizeFormat, SortBy,
-};
+use crate::cli::flags::{DateFormat, NumberFormat, OwnershipFormat, PermissionFormat, QuoteStyle, ShowColour, ShowHyperlink, ShowIcons, SizeFormat, SortBy};
 
 #[cfg(feature = "checksum")]
 use crate::cli::flags::HashAlgorithm;
@@ -34,46 +31,46 @@ use clap::{Parser, ValueHint};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug, Clone)]
-#[command(name = cerium::NAME, author = cerium::AUTHORS, version)]
-pub(crate) struct Args {
+#[command(name = crate::NAME, author = crate::AUTHORS, version, about=crate::DESCRIPTION)]
+pub struct Args {
     #[arg(default_value = ".", value_hint = ValueHint::AnyPath)]
-    pub(crate) path: PathBuf,
+    pub path: PathBuf,
 
     /// Display one entry per line
     #[arg(short = '1', long)]
-    pub(crate) oneline: bool,
+    pub oneline: bool,
 
     /// Don't ignore entries starting with `.`
     #[arg(short, long)]
-    pub(crate) all: bool,
+    pub all: bool,
 
     /// This entry's last accessed date
     #[arg(long)]
-    pub(crate) accessed: bool,
+    pub accessed: bool,
 
     /// Display ACL indicator (+ if file has ACLs)
     #[arg(long)]
-    pub(crate) acl: bool,
+    pub acl: bool,
 
     /// Display number of blocks (format affected by --number-format)
     #[arg(short, long)]
-    pub(crate) blocks: bool,
+    pub blocks: bool,
 
     /// Block size
     #[arg(short = 'B', long)]
-    pub(crate) block_size: bool,
+    pub block_size: bool,
 
     /// This entry's creation date
     #[arg(short, long)]
-    pub(crate) created: bool,
+    pub created: bool,
 
     /// Only show directories
     #[arg(short, long)]
-    pub(crate) dirs: bool,
+    pub dirs: bool,
 
     /// Only show files
     #[arg(short, long)]
-    pub(crate) files: bool,
+    pub files: bool,
 
     /// Find entries that match a query
     #[arg(
@@ -83,103 +80,107 @@ pub(crate) struct Args {
         conflicts_with = "tree",
         visible_alias = "search"
     )]
-    pub(crate) find: String,
+    pub find: String,
 
     /// Display this entry's group
     #[arg(short = 'g', long)]
-    pub(crate) group: bool,
+    pub group: bool,
 
     /// Display number of hard links (format affected by --number-format)
     #[arg(long)]
-    pub(crate) hard_links: bool,
+    pub hard_links: bool,
 
     /// Show column headers, works with metadata flags and options
     #[arg(short = 'H', long)]
-    pub(crate) headers: bool,
+    pub headers: bool,
 
     /// Omit (a comma-separated list of) implied entries from output
     #[arg(long, value_name = "ENTRIES", value_delimiter = ',')]
-    pub(crate) hide: Vec<String>,
+    pub hide: Vec<String>,
 
     /// Hyperlink entry names WHEN
     #[arg(long, value_enum, default_value = "never", value_name = "WHEN")]
-    pub(crate) hyperlink: ShowHyperlink,
+    pub hyperlink: ShowHyperlink,
 
     /// Display inode number
     #[arg(short, long)]
-    pub(crate) inode: bool,
+    pub inode: bool,
+
+    /// When viewing symlinks, show metadata for the link target rather than for the link itself
+    #[arg(short = 'L', long)]
+    pub dereference: bool,
 
     /// Long listing format, show permissions, user, group, size, and modified date
     #[arg(short, long)]
-    pub(crate) long: bool,
+    pub long: bool,
 
     /// This entry's last modification datetime
     #[arg(short, long)]
-    pub(crate) modified: bool,
+    pub modified: bool,
 
     /// Display filesystem mount point
     #[arg(long)]
-    pub(crate) mountpoint: bool,
+    pub mountpoint: bool,
 
     /// This entry's permissions
     #[arg(short, long)]
-    pub(crate) permission: bool,
+    pub permissions: bool,
 
     /// Omit empty files and directories from output
     #[arg(long)]
-    pub(crate) prune: bool,
+    pub prune: bool,
 
     /// How to quote entry names
-    #[arg(short = 'Q', long, value_enum, default_value = "auto")]
-    pub(crate) quote_name: QuoteStyle,
+    #[arg(short = 'q', long, value_enum, default_value = "auto")]
+    pub quote_name: QuoteStyle,
 
     /// Reverse order while sorting
     #[arg(short, long)]
-    pub(crate) reverse: bool,
+    pub reverse: bool,
 
     /// List subdirectories recursively
     #[arg(short = 'R', long, conflicts_with_all = ["tree"])]
-    pub(crate) recursive: bool,
+    pub recursive: bool,
 
     /// Display this entry's size
     #[arg(short, long)]
-    pub(crate) size: bool,
+    pub size: bool,
 
     /// Sort entries by ...
     #[arg(long, value_enum, value_name = "BY", default_value = "name")]
-    pub(crate) sort: SortBy,
+    pub sort: SortBy,
 
     /// Display true size of directories based on their contents
     #[arg(short = 'S', long)]
-    pub(crate) true_size: bool,
+    pub true_size: bool,
 
     /// Display directories hierarchically (tree view)
     #[arg(short, long, conflicts_with = "recursive")]
-    pub(crate) tree: bool,
+    pub tree: bool,
 
     /// Display this entry's user
     #[arg(short, long)]
-    pub(crate) user: bool,
+    pub user: bool,
 
     /// What the heck happened? (this will only make sense when used with --find)
     #[arg(short, long)]
-    pub(crate) verbose: bool,
+    pub verbose: bool,
 
     /// Set output width to COLS (0 = no limit)
     #[arg(short = 'w', long, value_name = "COLS")]
-    pub(crate) width: Option<usize>,
+    pub width: Option<usize>,
 
     /// Display extended attributes (xattr)
     #[arg(short, long)]
-    pub(crate) xattr: bool,
+    pub xattr: bool,
 
     /// Display SELinux security context
     #[arg(short = 'Z', long)]
-    pub(crate) context: bool,
+    pub context: bool,
 
     /// Enable colours WHEN
     #[arg(short = 'C', long, value_enum, default_value = "auto", value_name = "WHEN", visible_aliases = ["colors"], help_heading = "Display")]
-    pub(crate) colours: ShowColour,
+    pub colours: ShowColour,
 
     /// Show icons WHEN
     #[arg(
@@ -190,17 +191,17 @@ pub(crate) struct Args {
         value_name = "WHEN",
         help_heading = "Display"
     )]
-    pub(crate) icons: ShowIcons,
+    pub icons: ShowIcons,
 
     #[cfg(feature = "checksum")]
     /// Checksum!
     #[arg(long, value_name = "ALGORITHM", help_heading = "Features")]
-    pub(crate) checksum: Option<HashAlgorithm>,
+    pub checksum: Option<HashAlgorithm>,
 
     #[cfg(all(feature = "magic", not(target_os = "android")))]
     /// File magic type
     #[arg(long, help_heading = "Features")]
-    pub(crate) magic: bool,
+    pub magic: bool,
 
     // Formatting section
     /// How to display dates (affects the output of --created, --modified, and --accessed)
@@ -210,7 +211,7 @@ pub(crate) struct Args {
         default_value = "locale",
         help_heading = "Formatting"
     )]
-    pub(crate) date_format: DateFormat,
+    pub date_format: DateFormat,
 
     /// How to display numbers (affects the output of --hard-links, and --blocks)
     #[arg(
@@ -219,11 +220,11 @@ pub(crate) struct Args {
         default_value = "humanly",
         help_heading = "Formatting"
     )]
-    pub(crate) number_format: NumberFormat,
+    pub number_format: NumberFormat,
 
     /// How to display users or groups (affects the output of --user, --group, and --long)
     #[arg(long, value_enum, default_value = "name", help_heading = "Formatting")]
-    pub(crate) ownership_format: OwnershipFormat,
+    pub ownership_format: OwnershipFormat,
 
     /// How to display permissions (affects the output of --permission)
     #[arg(
@@ -232,7 +233,7 @@ pub(crate) struct Args {
         default_value = "symbolic",
         help_heading = "Formatting"
     )]
-    pub(crate) permission_format: PermissionFormat,
+    pub permission_format: PermissionFormat,
 
     /// How to display sizes (affects the output of --block-size, and --size)
     #[arg(
@@ -241,7 +242,7 @@ pub(crate) struct Args {
         default_value = "decimal",
         help_heading = "Formatting"
     )]
-    pub(crate) size_format: SizeFormat,
+    pub size_format: SizeFormat,
 }
 
 /// Determines whether specified args requests entry metadata
@@ -252,7 +253,7 @@ pub(crate) struct Args {
 /// # Returns
 ///
 /// True if any of the passed args request metadata, otherwise False.
-pub(crate) fn is_metadata_args(args: &Args) -> bool {
+pub fn is_metadata_args(args: &Args) -> bool {
     // 1. Anything that reads size
     if args.size || args.long {
         return true;
@@ -264,7 +265,7 @@ pub(crate) fn is_metadata_args(args: &Args) -> bool {
     }
 
     // 3. Permissions / owner / group / hard_links / blocks / inode
-    if args.permission
+    if args.permissions
         || args.hard_links
         || args.blocks
         || args.block_size

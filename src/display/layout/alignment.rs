@@ -25,15 +25,15 @@ SOFTWARE.
 use crate::display::layout::width::Width;
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum Alignment {
+pub enum Alignment {
     Left,
     Right,
 }
 
-pub(crate) struct Align;
+pub struct Align;
 
 impl Align {
-    pub(crate) fn pad(value: &String, width: usize, alignment: Alignment) -> String {
+    pub fn pad(value: &String, width: usize, alignment: Alignment) -> String {
         let visible = Width::measure_ansi_text(value);
         let padding = width.saturating_sub(visible);
         match alignment {

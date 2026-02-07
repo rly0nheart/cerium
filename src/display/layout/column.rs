@@ -33,7 +33,7 @@ use crate::display::styles::text::TextStyle;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Column {
+pub enum Column {
     #[cfg(all(feature = "magic", not(target_os = "android")))]
     Magic,
 
@@ -151,7 +151,7 @@ impl Selector {
         if args.size && !columns.contains(&Column::Size) {
             columns.push(Column::Size);
         }
-        if args.permission && !columns.contains(&Column::Permissions) {
+        if args.permissions && !columns.contains(&Column::Permissions) {
             columns.push(Column::Permissions);
         }
         if args.user && !columns.contains(&Column::User) {

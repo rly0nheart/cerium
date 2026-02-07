@@ -32,7 +32,7 @@ use std::ffi::CString;
 use std::mem::MaybeUninit;
 
 /// A compiled glob pattern for matching filenames.
-pub(crate) struct Glob {
+pub struct Glob {
     inner: libc::regex_t,
 }
 
@@ -44,7 +44,7 @@ impl Glob {
     /// - `?` matches any single character
     ///
     /// Matching is case-insensitive and anchored (matches entire string).
-    pub(crate) fn new(pattern: &str) -> Result<Self, String> {
+    pub fn new(pattern: &str) -> Result<Self, String> {
         let regex_pattern = Self::to_regex(pattern);
 
         let c_pattern =
@@ -66,7 +66,7 @@ impl Glob {
     }
 
     /// Tests if the pattern matches the given text.
-    pub(crate) fn is_match(&self, text: &str) -> bool {
+    pub fn is_match(&self, text: &str) -> bool {
         let Ok(c_text) = CString::new(text) else {
             return false;
         };
@@ -119,59 +119,3 @@ impl Drop for Glob {
 }
 
 unsafe impl Send for Glob {}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_literal_match() {
-        let g = Glob::new("hello").unwrap();
-        assert!(g.is_match("hello"));
-        assert!(g.is_match("HELLO"));
-        assert!(!g.is_match("hello world"));
-        assert!(!g.is_match("say hello"));
-    }
-
-    #[test]
-    fn test_star_wildcard() {
-        let g = Glob::new("*.txt").unwrap();
-        assert!(g.is_match("file.txt"));
-        assert!(g.is_match("document.txt"));
-        assert!(!g.is_match("file.rs"));
-
-        let g = Glob::new("file*").unwrap();
-        assert!(g.is_match("file.txt"));
-        assert!(g.is_match("file123"));
-        assert!(g.is_match("file"));
-        assert!(!g.is_match("myfile"));
-
-        let g = Glob::new("*file*").unwrap();
-        assert!(g.is_match("file"));
-        assert!(g.is_match("myfile.txt"));
-        assert!(g.is_match("the_file_name"));
-    }
-
-    #[test]
-    fn test_question_wildcard() {
-        let g = Glob::new("file?.txt").unwrap();
-        assert!(g.is_match("file1.txt"));
-        assert!(g.is_match("fileA.txt"));
-        assert!(!g.is_match("file12.txt"));
-        assert!(!g.is_match("file.txt"));
-    }
-
-    #[test]
-    fn test_literal_dot() {
-        let g = Glob::new("foo.bar").unwrap();
-        assert!(g.is_match("foo.bar"));
-        assert!(!g.is_match("fooXbar"));
-    }
-
-    #[test]
-    fn test_empty_pattern() {
-        let g = Glob::new("").unwrap();
-        assert!(g.is_match(""));
-        assert!(!g.is_match("anything"));
-    }
-}

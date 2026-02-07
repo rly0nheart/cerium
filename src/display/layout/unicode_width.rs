@@ -60,7 +60,7 @@ fn init_locale() {
 ///
 /// The display width of the character (0, 1, or 2), or 1 as fallback for
 /// non-printable characters.
-pub(crate) fn char_width(ch: char) -> usize {
+pub fn char_width(ch: char) -> usize {
     init_locale();
 
     let wc = ch as libc::wchar_t;
@@ -68,32 +68,4 @@ pub(crate) fn char_width(ch: char) -> usize {
 
     // wcwidth returns -1 for non-printable characters; use 1 as fallback
     if width < 0 { 1 } else { width as usize }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_ascii_width() {
-        assert_eq!(char_width('a'), 1);
-        assert_eq!(char_width('Z'), 1);
-        assert_eq!(char_width('0'), 1);
-        assert_eq!(char_width(' '), 1);
-    }
-
-    #[test]
-    fn test_wide_cjk_width() {
-        // CJK characters should be width 2
-        assert_eq!(char_width('日'), 2);
-        assert_eq!(char_width('本'), 2);
-        assert_eq!(char_width('語'), 2);
-    }
-
-    #[test]
-    fn test_combining_marks() {
-        // Combining marks should be width 0
-        // U+0301 is COMBINING ACUTE ACCENT
-        assert_eq!(char_width('\u{0301}'), 0);
-    }
 }

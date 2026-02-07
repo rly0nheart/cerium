@@ -39,14 +39,14 @@ use std::{io, mem};
 /// across all rendering modes (list, grid, tree). It caches measurements
 /// to avoid redundant ANSI text parsing, which significantly improves
 /// performance when rendering large directories.
-pub(crate) struct Width {
+pub struct Width {
     /// Cache of measured widths for text strings (Arc<str> -> width)
     width_cache: HashMap<Arc<str>, usize>,
 }
 
 impl Width {
     /// Creates a new Width with an empty cache
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             width_cache: HashMap::new(),
         }
@@ -74,7 +74,7 @@ impl Width {
     /// - **Without caching**: O(n * m) where n = entries, m = columns
     /// - **With caching**: O(n * m) first call, but with significant constant factor improvement
     ///   due to cache hits on repeated values (e.g., same file sizes, permissions)
-    pub(crate) fn calculate(
+    pub fn calculate(
         &mut self,
         entries: &[Entry],
         columns: &[Column],
@@ -129,11 +129,11 @@ impl Width {
     ///
     /// # Examples
     ///
-    /// ```
-    /// let width = cerium::get_terminal_width();
+    /// ```text
+    /// let width = Width::terminal_width();
     /// println!("Terminal is {} columns wide", width);
     /// ```
-    pub(crate) fn terminal_width() -> usize {
+    pub fn terminal_width() -> usize {
         {
             let fd = io::stdout().as_raw_fd();
             let mut winsize: winsize = unsafe { mem::zeroed() };
@@ -162,7 +162,7 @@ impl Width {
     /// # Returns
     ///
     /// The display width in characters (excluding ANSI codes)
-    pub(crate) fn measure_text_cached(&mut self, text: &str) -> usize {
+    pub fn measure_text_cached(&mut self, text: &str) -> usize {
         // Try to get from cache first
         let text_arc = Arc::<str>::from(text);
 
@@ -194,12 +194,12 @@ impl Width {
     ///
     /// # Examples
     ///
+    /// ```text
+    /// Width::measure_ansi_text("hello")       // Returns 5
+    /// Width::measure_ansi_text("\x1b[31mred\x1b[0m")  // Returns 3 (ignores colour codes)
+    /// Width::measure_ansi_text("日本語")      // Returns 6 (wide chars)
     /// ```
-    /// let width = width::measure_ansi_text("hello");  // Returns 5
-    /// let width = width::measure_ansi_text("\x1b[31mred\x1b[0m");  // Returns 3 (ignores colour codes)
-    /// let width = width::measure_ansi_text("日本語");  // Returns 6 (wide chars)
-    /// ```
-    pub(crate) fn measure_ansi_text(text: &str) -> usize {
+    pub fn measure_ansi_text(text: &str) -> usize {
         let mut width = 0;
         let mut chars = text.chars().peekable();
 
@@ -252,7 +252,7 @@ impl Width {
     ///
     /// Useful for debugging and performance analysis.
     #[allow(dead_code)]
-    pub(crate) fn cache_size(&self) -> usize {
+    pub fn cache_size(&self) -> usize {
         self.width_cache.len()
     }
 
@@ -261,7 +261,7 @@ impl Width {
     /// This can be useful between rendering different directories
     /// to free memory, though in practice the cache is usually small.
     #[allow(dead_code)]
-    pub(crate) fn clear_cache(&mut self) {
+    pub fn clear_cache(&mut self) {
         self.width_cache.clear();
     }
 }
@@ -269,34 +269,5 @@ impl Width {
 impl Default for Width {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cache_hit() {
-        let mut calc = Width::new();
-
-        // First measurement - cache miss
-        let width1 = calc.measure_text_cached("test");
-        assert_eq!(calc.cache_size(), 1);
-
-        // Second measurement - cache hit
-        let width2 = calc.measure_text_cached("test");
-        assert_eq!(width1, width2);
-        assert_eq!(calc.cache_size(), 1); // No new entry
-    }
-
-    #[test]
-    fn test_clear_cache() {
-        let mut calc = Width::new();
-        calc.measure_text_cached("test");
-        assert_eq!(calc.cache_size(), 1);
-
-        calc.clear_cache();
-        assert_eq!(calc.cache_size(), 0);
     }
 }

@@ -31,13 +31,13 @@ use std::sync::Arc;
 
 /// Represents a directory in the filesystem.
 #[derive(Clone, Debug)]
-pub(crate) struct DirectoryEntry {
+pub struct DirectoryEntry {
     /// The display name of the directory.
-    pub(crate) name: Arc<str>,
+    pub name: Arc<str>,
     /// The full path to the directory.
-    pub(crate) path: PathBuf,
+    pub path: PathBuf,
     /// Optional metadata (lazily loaded).
-    pub(crate) metadata: Option<Metadata>,
+    pub metadata: Option<Metadata>,
     /// Lazily computed - None means not yet checked.
     has_children: Cell<Option<bool>>,
 }
@@ -49,7 +49,7 @@ impl DirectoryEntry {
     ///
     /// * `name` - The display name of the directory
     /// * `path` - The full path to the directory
-    pub(crate) fn new(name: Arc<str>, path: PathBuf) -> Self {
+    pub fn new(name: Arc<str>, path: PathBuf) -> Self {
         Self {
             name,
             path,
@@ -60,7 +60,7 @@ impl DirectoryEntry {
 
     /// Returns whether this directory has children.
     /// Computes and caches the result on first call.
-    pub(crate) fn has_children(&self) -> bool {
+    pub fn has_children(&self) -> bool {
         if let Some(has) = self.has_children.get() {
             return has;
         }

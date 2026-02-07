@@ -19,6 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.17] - 2026-02-07
+### Added
+- `-L/--dereference` option to show metadata for the link target rather than the link itself
+- Package description in help message
+
+### Changed
+- Styling in help message for `context` and `context_value`
+
+### Removed
+- Windows column from the availability table in [README](README.md)
+
 ## [0.1.16] - 2026-02-06
 ### Added
 - Icon for directories created by coding agents: `.claude`, `.cursor`, `.codex`, `.aider`, `.autogpt`, `.devin`, `.copilot`, `openai`

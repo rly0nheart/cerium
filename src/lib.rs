@@ -22,6 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+pub mod cli;
+pub mod display;
+pub mod fs;
+
 use std::env;
 
 /// Package authors
@@ -32,3 +36,6 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Package name
 pub const NAME: &str = env!("CARGO_PKG_NAME");
+
+// Package description
+pub const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");

@@ -51,8 +51,10 @@ use std::{env, io};
 ///
 /// # Examples
 ///
-/// ```
-/// if cerium::colours_enabled() {
+/// ```no_run
+/// use cerium::display::output::terminal::colours_enabled;
+///
+/// if colours_enabled() {
 ///     println!("\x1b[31mRed text\x1b[0m");
 /// } else {
 ///     println!("Plain text");
@@ -129,8 +131,10 @@ pub fn colours_enabled() -> bool {
 ///
 /// # Examples
 ///
-/// ```
-/// if cerium::is_tty() {
+/// ```no_run
+/// use cerium::display::output::terminal::is_tty;
+///
+/// if is_tty() {
 ///     println!("Running interactively");
 /// } else {
 ///     println!("Output is redirected");

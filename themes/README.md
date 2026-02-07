@@ -1,19 +1,19 @@
 # Cerium Themes
 
-Pre-made color themes for Cerium. Each file is a complete, ready-to-use configuration.
+Pre-made colour themes for Cerium. Each file is a complete, ready-to-use configuration.
 
 ## Available Themes
 
-| Theme                                          | Description                                       |
-|------------------------------------------------|---------------------------------------------------|
-| [gruvbox.toml](gruvbox.toml)                            | Warm retro palette by Pavel Pertsev (default)     |
+| Theme                                          | Description                                        |
+|------------------------------------------------|----------------------------------------------------|
+| [gruvbox.toml](gruvbox.toml)                            | Warm retro palette by Pavel Pertsev (default)      |
 | [dracula.toml](dracula.toml)                            | Dark theme with vibrant colours by Zeno Rocha      |
-| [nord.toml](nord.toml)                         | Arctic, bluish color palette by Arctic Ice Studio |
+| [nord.toml](nord.toml)                         | Arctic, bluish colour palette by Arctic Ice Studio |
 | [solarized-dark.toml](solarized-dark.toml)                     | Precision colours by Ethan Schoonover              |
-| [catppuccin-mocha.toml](catppuccin-mocha.toml)                   | Soothing pastel theme                             |
-| [tokyo-night.toml](tokyo-night.toml)                        | Inspired by Downtown Tokyo at night               |
-| [one-dark.toml](one-dark.toml)                           | Atom's iconic dark theme                          |
-| [rose-pine.toml](rose-pine.toml)                          | All natural pine with soho vibes                  |
+| [catppuccin-mocha.toml](catppuccin-mocha.toml)                   | Soothing pastel theme                              |
+| [tokyo-night.toml](tokyo-night.toml)                        | Inspired by Downtown Tokyo at night                |
+| [one-dark.toml](one-dark.toml)                           | Atom's iconic dark theme                           |
+| [rose-pine.toml](rose-pine.toml)                          | All natural pine with soho vibes                   |
 
 ## Installation
 
@@ -43,7 +43,7 @@ cp themes/tokyo-night.toml ~/.config/cerium.toml
 Each theme file is a complete configuration. You can:
 
 1. Copy a theme as a starting point
-2. Modify any color values
+2. Modify any colour values
 3. Colours support two formats:
    - RGB: `{ r = 255, g = 128, b = 0 }`
    - Named: `"red"`, `"blue"`, `"cyan"`, etc.
@@ -52,11 +52,11 @@ Each theme file is a complete configuration. You can:
 
 1. Create a new `.toml` file in this directory
 2. Use an existing theme as a template
-3. Update all color values to match your palette
+3. Update all colour values to match your palette
 4. Add a header comment with:
    - Theme name
    - Original author/source
-   - Link to the color palette
+   - Link to the colour palette
 
 ## Color Categories
 

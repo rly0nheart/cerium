@@ -24,5 +24,5 @@ SOFTWARE.
 
 pub(crate) mod column;
 pub(crate) mod entry;
-pub(crate) mod help;
+pub mod help;
 pub(crate) mod text;

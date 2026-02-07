@@ -30,7 +30,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 // Global atomic: are icons enabled?
 static ICONS_ENABLED: AtomicBool = AtomicBool::new(true);
 
-pub(crate) struct IconSettings;
+pub struct IconSettings;
 
 impl IconSettings {
     pub(crate) fn enable() {
@@ -45,7 +45,7 @@ impl IconSettings {
         ICONS_ENABLED.load(Ordering::SeqCst)
     }
 
-    pub(crate) fn setup(show_icons: ShowIcons) {
+    pub fn setup(show_icons: ShowIcons) {
         match show_icons {
             ShowIcons::Always => Self::enable(),
             ShowIcons::Never => Self::disable(),

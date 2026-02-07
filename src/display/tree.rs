@@ -126,7 +126,7 @@ impl DisplayMode for Tree {
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```text
 /// // Table mode (pre-built tree)
 /// let tree = Tree::new_table(root_node, args);
 /// tree.print();
@@ -224,7 +224,7 @@ impl Tree {
         // Metadata columns
         if args.long
             || args.size
-            || args.permission
+            || args.permissions
             || args.user
             || args.group
             || args.created

@@ -97,8 +97,7 @@ impl TextStyle {
     ///
     /// # Special Styling
     ///
-    /// * **Symlinks**: Link name in bold with base colour on black background,
-    ///   arrow in plain text, target in bold white on blue background
+    /// * **Symlinks**: Link name in italic, arrow in plain text, target in base colour
     /// * **Ignored files**: Strikethrough style if name contains "ignore"
     /// * **Normal files**: Bold text in base colour
     pub(crate) fn name(name: &str, colour: Colour) -> String {
@@ -107,7 +106,6 @@ impl TextStyle {
             // Style the link name
             let styled_link = Colour::Blue
                 .italic()
-                .underline()
                 .apply_to(link_part.trim_end())
                 .to_string();
 

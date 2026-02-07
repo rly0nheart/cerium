@@ -22,6 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-pub(crate) mod colours;
-pub(crate) mod config;
-pub(crate) mod icons;
+pub mod colours;
+pub mod config;
+pub mod icons;

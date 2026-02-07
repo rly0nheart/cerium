@@ -5,8 +5,8 @@
 
 ## Overview
 
-- **Total Files**: 65
-- **Total Lines**: 7,384
+- **Total Files**: 82 (66 source, 16 test)
+- **Total Lines**: 7,153 (5,965 source, 1,188 test)
 - **Language**: Rust, Python, Shell
 
 ## Project Structure
@@ -39,7 +39,6 @@ src/
 │   │   │   ├── ownership.rs
 │   │   │   ├── permission.rs
 │   │   │   ╰── size.rs
-│   │   ├── banner.rs
 │   │   ├── mod.rs
 │   │   ├── populate.rs
 │   │   ├── quotes.rs
@@ -47,6 +46,7 @@ src/
 │   ├── styles/
 │   │   ├── column.rs
 │   │   ├── entry.rs
+│   │   ├── help.rs
 │   │   ├── mod.rs
 │   │   ╰── text.rs
 │   ├── theme/
@@ -89,19 +89,39 @@ src/
 │   ├── tree.rs
 │   ╰── xattr.rs
 ├── README.md
+├── lib.rs
 ╰── main.rs
+
+tests/
+├── common/
+│   ╰── mod.rs
+├── display_permission_format.rs
+├── display_term_grid.rs
+├── display_theme.rs
+├── display_theme_colour.rs
+├── display_theme_config.rs
+├── display_unicode_width.rs
+├── display_width.rs
+├── fs_dir.rs
+├── fs_entry.rs
+├── fs_glob.rs
+├── fs_hyperlink.rs
+├── fs_permissions.rs
+├── fs_search.rs
+├── fs_symlink.rs
+╰── fs_tree.rs
 ```
 
 ## Entry Point
 
-- **[main.rs](main.rs)** – `58 lines` – Application entry point; initialises CLI and main runtime.
+- **[main.rs](main.rs)** – `49 lines` – Application entry point; initialises CLI and main runtime.
 
 ## Modules
 
 
 ### cli/ – Command-line argument parsing and flag structures.
 
-- **[args.rs](cli/args.rs)** – `229 LoEC (Lines of Executable Code)` – CLI argument parser and configuration.
+- **[args.rs](cli/args.rs)** – `171 LoEC (Lines of Executable Code)` – CLI argument parser and configuration.
 - **[flags.rs](cli/flags.rs)** – `93 LoEC (Lines of Executable Code)` – Enums for CLI flags (e.g., `--colours=WHEN`, `--date=TYPE`, etc.).
 - **[mod.rs](cli/mod.rs)** – `21 LoEC (Lines of Executable Code)` – CLI module exports.
 
@@ -121,20 +141,19 @@ src/
 - **[column.rs](display/layout/column.rs)** – `190 LoEC (Lines of Executable Code)` – Column definitions, selectors, and width calculations.
 - **[mod.rs](display/layout/mod.rs)** – `25 LoEC (Lines of Executable Code)` – Layout module exports.
 - **[row.rs](display/layout/row.rs)** – `37 LoEC (Lines of Executable Code)` – Row structure and value resolution for columns.
-- **[unicode_width.rs](display/layout/unicode_width.rs)** – `58 LoEC (Lines of Executable Code)` – Unicode character width calculation via libc wcwidth().
-- **[width.rs](display/layout/width.rs)** – `162 LoEC (Lines of Executable Code)` – Cached width calculator for optimised text measurement.
+- **[unicode_width.rs](display/layout/unicode_width.rs)** – `37 LoEC (Lines of Executable Code)` – Unicode character width calculation via libc wcwidth().
+- **[width.rs](display/layout/width.rs)** – `141 LoEC (Lines of Executable Code)` – Cached width calculator for optimised text measurement.
 
 ##### term_grid/ – Terminal grid layout calculator for multi-column display.
 
 - **[cell.rs](display/layout/term_grid/cell.rs)** – `26 LoEC (Lines of Executable Code)` – Grid cell structure with content, width, and alignment.
-- **[layout.rs](display/layout/term_grid/layout.rs)** – `228 LoEC (Lines of Executable Code)` – Grid layout calculator and display formatter.
+- **[layout.rs](display/layout/term_grid/layout.rs)** – `164 LoEC (Lines of Executable Code)` – Grid layout calculator and display formatter.
 - **[mod.rs](display/layout/term_grid/mod.rs)** – `25 LoEC (Lines of Executable Code)` – Term grid module exports.
 - **[options.rs](display/layout/term_grid/options.rs)** – `34 LoEC (Lines of Executable Code)` – Grid configuration options (direction, column spacing).
 
 #### output/ – Output formatting (banners, formats, population, quotes, terminal).
 
-- **[banner.rs](display/output/banner.rs)** – `31 LoEC (Lines of Executable Code)` – ASCII art banner generation with gradient colours.
-- **[mod.rs](display/output/mod.rs)** – `43 LoEC (Lines of Executable Code)` – Output module exports.
+- **[mod.rs](display/output/mod.rs)** – `42 LoEC (Lines of Executable Code)` – Output module exports.
 - **[populate.rs](display/output/populate.rs)** – `133 LoEC (Lines of Executable Code)` – Populates table rows with formatted entry data.
 - **[quotes.rs](display/output/quotes.rs)** – `133 LoEC (Lines of Executable Code)` – Shell-safe text quoting utilities (single, double, auto).
 - **[terminal.rs](display/output/terminal.rs)** – `66 LoEC (Lines of Executable Code)` – Terminal capabilities detection and configuration.
@@ -146,51 +165,52 @@ src/
 - **[mod.rs](display/output/formats/mod.rs)** – `25 LoEC (Lines of Executable Code)` – Format module exports.
 - **[number.rs](display/output/formats/number.rs)** – `42 LoEC (Lines of Executable Code)` – Number formats (human-readable, metric, etc.).
 - **[ownership.rs](display/output/formats/ownership.rs)** – `109 LoEC (Lines of Executable Code)` – User/group name resolution and formats.
-- **[permission.rs](display/output/formats/permission.rs)** – `171 LoEC (Lines of Executable Code)` – File permissions formats (symbolic/octal).
+- **[permission.rs](display/output/formats/permission.rs)** – `92 LoEC (Lines of Executable Code)` – File permissions formats (symbolic/octal).
 - **[size.rs](display/output/formats/size.rs)** – `43 LoEC (Lines of Executable Code)` – File size formats (bytes, KB, MB, etc.).
 
 #### styles/ – Styling system for cells, columns, and entries.
 
 - **[column.rs](display/styles/column.rs)** – `71 LoEC (Lines of Executable Code)` – Column-specific styling rules.
 - **[entry.rs](display/styles/entry.rs)** – `92 LoEC (Lines of Executable Code)` – Entry-specific styling and colourisation.
-- **[mod.rs](display/styles/mod.rs)** – `22 LoEC (Lines of Executable Code)` – Styles module exports.
-- **[text.rs](display/styles/text.rs)** – `131 LoEC (Lines of Executable Code)` – Individual text styles logic.
+- **[help.rs](display/styles/help.rs)** – `74 LoEC (Lines of Executable Code)` – CLI help styling rules.
+- **[mod.rs](display/styles/mod.rs)** – `23 LoEC (Lines of Executable Code)` – Styles module exports.
+- **[text.rs](display/styles/text.rs)** – `130 LoEC (Lines of Executable Code)` – Individual text styles logic.
 
 #### theme/ – UI theme, icons, colours, and styling system.
 
-- **[colours.rs](display/theme/colours.rs)** – `184 LoEC (Lines of Executable Code)` – Colour palette and RGB colour definitions.
-- **[icons.rs](display/theme/icons.rs)** – `802 LoEC (Lines of Executable Code)` – Icons for file types, folders, and extensions.
+- **[colours.rs](display/theme/colours.rs)** – `185 LoEC (Lines of Executable Code)` – Colour palette and RGB colour definitions.
+- **[icons.rs](display/theme/icons.rs)** – `804 LoEC (Lines of Executable Code)` – Icons for file types, folders, and extensions.
 - **[mod.rs](display/theme/mod.rs)** – `22 LoEC (Lines of Executable Code)` – Theme module exports.
 
 ##### config/ – TOML-based theme configuration system.
 
-- **[colour.rs](display/theme/config/colour.rs)** – `121 LoEC (Lines of Executable Code)` – Colour deserialisation (RGB and named colours).
-- **[mod.rs](display/theme/config/mod.rs)** – `125 LoEC (Lines of Executable Code)` – Config module exports and theme loader.
-- **[theme.rs](display/theme/config/theme.rs)** – `269 LoEC (Lines of Executable Code)` – Theme struct with semantic colour categories and Gruvbox default.
+- **[colour.rs](display/theme/config/colour.rs)** – `68 LoEC (Lines of Executable Code)` – Colour deserialisation (RGB and named colours).
+- **[mod.rs](display/theme/config/mod.rs)** – `49 LoEC (Lines of Executable Code)` – Config module exports and theme loader.
+- **[theme.rs](display/theme/config/theme.rs)** – `165 LoEC (Lines of Executable Code)` – Theme struct with semantic colour categories and Gruvbox default.
 
 ### fs/ – Filesystem management (entries, directories, metadata).
 
 - **[acl.rs](fs/acl.rs)** – `55 LoEC (Lines of Executable Code)` – ACL (Access Control List) detection and handling.
 - **[cache.rs](fs/cache.rs)** – `135 LoEC (Lines of Executable Code)` – In-memory caching of entry data for performance.
 - **[context.rs](fs/context.rs)** – `61 LoEC (Lines of Executable Code)` – Filesystem context for directory traversal and entry collection.
-- **[dir.rs](fs/dir.rs)** – `434 LoEC (Lines of Executable Code)` – Directory traversal and filesystem operations.
-- **[glob.rs](fs/glob.rs)** – `131 LoEC (Lines of Executable Code)` – Glob pattern matching for search and hide filtering.
-- **[hyperlink.rs](fs/hyperlink.rs)** – `87 LoEC (Lines of Executable Code)` – Terminal hyperlinks (OSC 8) for filesystem entries.
-- **[metadata.rs](fs/metadata.rs)** – `78 LoEC (Lines of Executable Code)` – File metadata extraction and handling.
+- **[dir.rs](fs/dir.rs)** – `174 LoEC (Lines of Executable Code)` – Directory traversal and filesystem operations.
+- **[glob.rs](fs/glob.rs)** – `83 LoEC (Lines of Executable Code)` – Glob pattern matching for search and hide filtering.
+- **[hyperlink.rs](fs/hyperlink.rs)** – `61 LoEC (Lines of Executable Code)` – Terminal hyperlinks (OSC 8) for filesystem entries.
+- **[metadata.rs](fs/metadata.rs)** – `79 LoEC (Lines of Executable Code)` – File metadata extraction and handling.
 - **[mod.rs](fs/mod.rs)** – `34 LoEC (Lines of Executable Code)` – Filesystem module exports.
 - **[mountpoint.rs](fs/mountpoint.rs)** – `80 LoEC (Lines of Executable Code)` – Mountpoint detection for filesystem entries.
-- **[permissions.rs](fs/permissions.rs)** – `154 LoEC (Lines of Executable Code)` – Entry permissions extraction and handling.
-- **[search.rs](fs/search.rs)** – `177 LoEC (Lines of Executable Code)` – File search functionality using glob patterns.
-- **[symlink.rs](fs/symlink.rs)** – `72 LoEC (Lines of Executable Code)` – Symlink utilities (reading targets, formats display).
-- **[tree.rs](fs/tree.rs)** – `155 LoEC (Lines of Executable Code)` – Tree structure and builder for hierarchical directory representation.
+- **[permissions.rs](fs/permissions.rs)** – `66 LoEC (Lines of Executable Code)` – Entry permissions extraction and handling.
+- **[search.rs](fs/search.rs)** – `82 LoEC (Lines of Executable Code)` – File search functionality using glob patterns.
+- **[symlink.rs](fs/symlink.rs)** – `39 LoEC (Lines of Executable Code)` – Symlink utilities (reading targets, formats display).
+- **[tree.rs](fs/tree.rs)** – `57 LoEC (Lines of Executable Code)` – Tree structure and builder for hierarchical directory representation.
 - **[xattr.rs](fs/xattr.rs)** – `64 LoEC (Lines of Executable Code)` – Extended attributes (xattr) detection and handling.
 
 #### entry/ – Entry types and metadata representation.
 
-- **[directory.rs](fs/entry/directory.rs)** – `54 LoEC (Lines of Executable Code)` – Directory entry type and metadata.
+- **[directory.rs](fs/entry/directory.rs)** – `52 LoEC (Lines of Executable Code)` – Directory entry type and metadata.
 - **[file.rs](fs/entry/file.rs)** – `47 LoEC (Lines of Executable Code)` – File entry type and metadata.
-- **[mod.rs](fs/entry/mod.rs)** – `574 LoEC (Lines of Executable Code)` – Entry module exports and shared entry logic.
-- **[symlink.rs](fs/entry/symlink.rs)** – `61 LoEC (Lines of Executable Code)` – Symlink entry type and metadata.
+- **[mod.rs](fs/entry/mod.rs)** – `185 LoEC (Lines of Executable Code)` – Entry module exports and shared entry logic.
+- **[symlink.rs](fs/entry/symlink.rs)** – `56 LoEC (Lines of Executable Code)` – Symlink entry type and metadata.
 
 #### feature/ – Additional filesystem features (magic, checksum).
 
@@ -198,6 +218,28 @@ src/
 - **[magic.rs](fs/feature/magic.rs)** – `61 LoEC (Lines of Executable Code)` – File magic type detection via libmagic.
 - **[mod.rs](fs/feature/mod.rs)** – `3 LoEC (Lines of Executable Code)` – Features module exports.
 
+## Tests
+
+- **[display_permission_format.rs](display_permission_format.rs)** – `78 LoEC (Lines of Executable Code)` – Tests for symbolic, octal, and hex permission formats.
+- **[display_term_grid.rs](display_term_grid.rs)** – `62 LoEC (Lines of Executable Code)` – Tests for terminal grid layout and column fitting.
+- **[display_theme.rs](display_theme.rs)** – `81 LoEC (Lines of Executable Code)` – Tests for theme creation and TOML deserialisation.
+- **[display_theme_colour.rs](display_theme_colour.rs)** – `52 LoEC (Lines of Executable Code)` – Tests for colour deserialisation (RGB and named).
+- **[display_theme_config.rs](display_theme_config.rs)** – `77 LoEC (Lines of Executable Code)` – Tests for theme config loading and fallback.
+- **[display_unicode_width.rs](display_unicode_width.rs)** – `18 LoEC (Lines of Executable Code)` – Tests for Unicode character width calculation.
+- **[display_width.rs](display_width.rs)** – `18 LoEC (Lines of Executable Code)` – Tests for cached width measurement.
+- **[fs_dir.rs](fs_dir.rs)** – `157 LoEC (Lines of Executable Code)` – Tests for directory traversal, sorting, and filtering.
+- **[fs_entry.rs](fs_entry.rs)** – `342 LoEC (Lines of Executable Code)` – Tests for entry creation, metadata loading, and caching.
+- **[fs_glob.rs](fs_glob.rs)** – `45 LoEC (Lines of Executable Code)` – Tests for glob pattern matching.
+- **[fs_hyperlink.rs](fs_hyperlink.rs)** – `24 LoEC (Lines of Executable Code)` – Tests for terminal hyperlink (OSC 8) wrapping.
+- **[fs_permissions.rs](fs_permissions.rs)** – `85 LoEC (Lines of Executable Code)` – Tests for permission extraction and file type detection.
+- **[fs_search.rs](fs_search.rs)** – `44 LoEC (Lines of Executable Code)` – Tests for file search with glob patterns.
+- **[fs_symlink.rs](fs_symlink.rs)** – `32 LoEC (Lines of Executable Code)` – Tests for symlink formatting and parsing.
+- **[fs_tree.rs](fs_tree.rs)** – `48 LoEC (Lines of Executable Code)` – Tests for tree structure building and node layout.
+
+### common/ – Shared test helpers and fixtures.
+
+- **[mod.rs](common/mod.rs)** – `25 LoEC (Lines of Executable Code)` – Common test utilities (default args, temp directory setup).
+
 ---
 
-*Generated by [generate_source_map.py](../scripts/generate_source_map.py) on 01/31/26 15:41:15*
+*Generated by [generate_source_map.py](../scripts/generate_source_map.py) on 02/07/26 18:36:39*

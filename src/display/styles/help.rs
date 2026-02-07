@@ -26,16 +26,16 @@ use crate::display::theme::config::Theme;
 use clap::builder::Styles;
 use clap::builder::styling::{Color, RgbColor, Style};
 
-pub(crate) struct HelpStyle<'a> {
+pub struct HelpStyle<'a> {
     theme: &'a Theme,
 }
 
 impl<'a> HelpStyle<'a> {
-    pub(crate) fn new(theme: &'a Theme) -> Self {
+    pub fn new(theme: &'a Theme) -> Self {
         Self { theme }
     }
 
-    pub(crate) fn get_styles(&self) -> Styles {
+    pub fn get_styles(&self) -> Styles {
         use nu_ansi_term::Color as Colour;
 
         // Convert nu_ansi_term::Color to clap::builder::styling::Color
@@ -64,19 +64,23 @@ impl<'a> HelpStyle<'a> {
             }
         };
 
+        let header_style = Style::new()
+            .fg_color(Some(to_clap_color(&self.theme.cli_help_header.colour)))
+            .bold()
+            .underline();
+        let usage_style =
+            Style::new().fg_color(Some(to_clap_color(&self.theme.cli_help_usage.colour)));
+        let literal_style =
+            Style::new().fg_color(Some(to_clap_color(&self.theme.cli_help_literal.colour)));
+        let placeholder_style =
+            Style::new().fg_color(Some(to_clap_color(&self.theme.cli_help_placeholder.colour)));
+
         Styles::styled()
-            .header(
-                Style::new()
-                    .fg_color(Some(to_clap_color(&self.theme.cli_help_header.colour)))
-                    .bold()
-                    .underline(),
-            )
-            .usage(Style::new().fg_color(Some(to_clap_color(&self.theme.cli_help_usage.colour))))
-            .literal(
-                Style::new().fg_color(Some(to_clap_color(&self.theme.cli_help_literal.colour))),
-            )
-            .placeholder(
-                Style::new().fg_color(Some(to_clap_color(&self.theme.cli_help_placeholder.colour))),
-            )
+            .header(header_style)
+            .usage(usage_style)
+            .literal(literal_style)
+            .placeholder(placeholder_style)
+            .context(usage_style)
+            .context_value(placeholder_style)
     }
 }

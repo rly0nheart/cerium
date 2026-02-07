@@ -23,17 +23,17 @@ SOFTWARE.
 */
 
 pub(crate) mod acl;
-pub(crate) mod cache;
+pub mod cache;
 pub(crate) mod context;
-pub(crate) mod dir;
-pub(crate) mod entry;
+pub mod dir;
+pub mod entry;
 pub(crate) mod feature;
-pub(crate) mod glob;
-pub(crate) mod hyperlink;
-pub(crate) mod metadata;
+pub mod glob;
+pub mod hyperlink;
+pub mod metadata;
 pub(crate) mod mountpoint;
-pub(crate) mod permissions;
-pub(crate) mod search;
-pub(crate) mod symlink;
-pub(crate) mod tree;
+pub mod permissions;
+pub mod search;
+pub mod symlink;
+pub mod tree;
 pub(crate) mod xattr;

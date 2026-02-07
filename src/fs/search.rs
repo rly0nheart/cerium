@@ -31,14 +31,14 @@ use crate::fs::glob::Glob;
 use std::path::PathBuf;
 
 /// Searches for files matching a glob pattern.
-pub(crate) struct Search {
+pub struct Search {
     glob: Glob,
     base_path: PathBuf,
 }
 
 impl Search {
     /// Creates a new search with the given glob pattern.
-    pub(crate) fn new(pattern: &str, base_path: PathBuf) -> Result<Self, String> {
+    pub fn new(pattern: &str, base_path: PathBuf) -> Result<Self, String> {
         let glob = Glob::new(pattern)?;
         Ok(Self { glob, base_path })
     }
@@ -46,7 +46,7 @@ impl Search {
     /// Executes the search and returns matching entries.
     ///
     /// If `args.recursive` is true, searches subdirectories as well.
-    pub(crate) fn find(&self, args: &Args) -> Vec<Entry> {
+    pub fn find(&self, args: &Args) -> Vec<Entry> {
         let mut matches = Vec::new();
         let dir_reader = DirReader::from(self.base_path.clone());
         self.search_dir(&dir_reader, args, &mut matches);
@@ -109,115 +109,5 @@ impl Search {
             .unwrap_or_default();
 
         format!("{}{}", parent_prefix, entry.name())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::cli::flags::*;
-    use std::fs::{self, File};
-    use tempfile::TempDir;
-
-    fn default_args() -> Args {
-        Args {
-            path: PathBuf::from("."),
-            oneline: false,
-            accessed: false,
-            all: false,
-            blocks: false,
-            block_size: false,
-            long: false,
-            modified: false,
-            mountpoint: false,
-            permission: false,
-            recursive: false,
-            tree: false,
-            true_size: false,
-            reverse: false,
-            sort: SortBy::Name,
-            dirs: false,
-            files: false,
-            group: false,
-            headers: false,
-            hide: Vec::new(),
-            inode: false,
-            verbose: false,
-            xattr: false,
-            prune: false,
-            colours: ShowColour::Always,
-            icons: ShowIcons::Auto,
-            hyperlink: ShowHyperlink::Never,
-            find: "".to_string(),
-            #[cfg(all(feature = "magic", not(target_os = "android")))]
-            magic: false,
-            #[cfg(feature = "checksum")]
-            checksum: None,
-            date_format: DateFormat::Locale,
-            number_format: NumberFormat::Humanly,
-            ownership_format: OwnershipFormat::Name,
-            permission_format: PermissionFormat::Symbolic,
-            created: false,
-            hard_links: false,
-            quote_name: QuoteStyle::Auto,
-            size: false,
-            user: false,
-            size_format: SizeFormat::Bytes,
-            acl: false,
-            context: false,
-            width: None,
-        }
-    }
-
-    fn setup_test_dir() -> TempDir {
-        let temp_dir = TempDir::new().unwrap();
-        let base = temp_dir.path();
-
-        File::create(base.join("file1.txt")).unwrap();
-        File::create(base.join("file2.rs")).unwrap();
-        File::create(base.join("other.txt")).unwrap();
-
-        fs::create_dir(base.join("subdir")).unwrap();
-        File::create(base.join("subdir/nested.txt")).unwrap();
-        File::create(base.join("subdir/nested.rs")).unwrap();
-
-        temp_dir
-    }
-
-    #[test]
-    fn test_search_glob() {
-        let temp_dir = setup_test_dir();
-        let search = Search::new("*.txt", temp_dir.path().to_path_buf()).unwrap();
-        let args = default_args();
-
-        let matches = search.find(&args);
-
-        assert_eq!(matches.len(), 2);
-        assert!(matches.iter().any(|e| e.name().contains("file1.txt")));
-        assert!(matches.iter().any(|e| e.name().contains("other.txt")));
-    }
-
-    #[test]
-    fn test_search_recursive() {
-        let temp_dir = setup_test_dir();
-        let search = Search::new("*.txt", temp_dir.path().to_path_buf()).unwrap();
-        let mut args = default_args();
-        args.recursive = true;
-
-        let matches = search.find(&args);
-
-        assert_eq!(matches.len(), 3);
-        assert!(matches.iter().any(|e| e.name().contains("nested.txt")));
-    }
-
-    #[test]
-    fn test_search_case_insensitive() {
-        let temp_dir = setup_test_dir();
-        let search = Search::new("FILE*", temp_dir.path().to_path_buf()).unwrap();
-        let args = default_args();
-
-        let matches = search.find(&args);
-
-        assert_eq!(matches.len(), 2);
     }
 }

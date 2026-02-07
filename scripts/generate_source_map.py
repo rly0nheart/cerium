@@ -5,6 +5,7 @@ from typing import Dict, List, Tuple
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
+TESTS_DIR = PROJECT_ROOT / "tests"
 OUTPUT_FILE = SRC_DIR / "README.md"
 
 # Descriptions for known files/folders using relative paths to src/
@@ -95,11 +96,35 @@ DESCRIPTIONS = {
     "display/styles/entry.rs": "Entry-specific styling and colourisation.",
 }
 
+# Descriptions for test files using relative paths to tests/
+TEST_DESCRIPTIONS = {
+    "common": "Shared test helpers and fixtures.",
+    "common/mod.rs": "Common test utilities (default args, temp directory setup).",
+    "fs_symlink.rs": "Tests for symlink formatting and parsing.",
+    "fs_glob.rs": "Tests for glob pattern matching.",
+    "fs_hyperlink.rs": "Tests for terminal hyperlink (OSC 8) wrapping.",
+    "fs_permissions.rs": "Tests for permission extraction and file type detection.",
+    "fs_entry.rs": "Tests for entry creation, metadata loading, and caching.",
+    "fs_dir.rs": "Tests for directory traversal, sorting, and filtering.",
+    "fs_tree.rs": "Tests for tree structure building and node layout.",
+    "fs_search.rs": "Tests for file search with glob patterns.",
+    "display_permission_format.rs": "Tests for symbolic, octal, and hex permission formats.",
+    "display_term_grid.rs": "Tests for terminal grid layout and column fitting.",
+    "display_unicode_width.rs": "Tests for Unicode character width calculation.",
+    "display_width.rs": "Tests for cached width measurement.",
+    "display_theme_colour.rs": "Tests for colour deserialisation (RGB and named).",
+    "display_theme.rs": "Tests for theme creation and TOML deserialisation.",
+    "display_theme_config.rs": "Tests for theme config loading and fallback.",
+}
 
-def describe(path: Path) -> str:
+
+def describe(path: Path, base: Path = None) -> str:
     """Get description for a file or directory."""
-    rel = path.relative_to(SRC_DIR).as_posix()
-    return DESCRIPTIONS.get(rel, "No description available.")
+    if base is None:
+        base = SRC_DIR
+    rel = path.relative_to(base).as_posix()
+    descriptions = TEST_DESCRIPTIONS if base == TESTS_DIR else DESCRIPTIONS
+    return descriptions.get(rel, "No description available.")
 
 
 def line_count(path: Path) -> int:
@@ -122,11 +147,13 @@ def is_rust_file(path: Path) -> bool:
     return path.suffix == ".rs"
 
 
-def generate_tree(base: Path) -> Dict:
+def generate_tree(base: Path, root: Path = None) -> Dict:
     """
     Recursively generate a tree structure of the directory.
     Returns dict with 'files' (list of tuples) and 'dirs' (dict of subdirs).
     """
+    if root is None:
+        root = SRC_DIR
     result = {"files": [], "dirs": {}}
 
     try:
@@ -146,9 +173,9 @@ def generate_tree(base: Path) -> Dict:
         if entry.is_file():
             # Only include Rust files and README
             if is_rust_file(entry) or entry.name == "README.md":
-                result["files"].append((entry.name, describe(entry), line_count(entry)))
+                result["files"].append((entry.name, describe(entry, root), line_count(entry)))
         elif entry.is_dir():
-            result["dirs"][entry.name] = generate_tree(entry)
+            result["dirs"][entry.name] = generate_tree(entry, root)
 
     return result
 
@@ -207,11 +234,13 @@ def write_section(md: List[str], title: str):
     md.append("")
 
 
-def write_file_list(md: List[str], folder_path: Path, tree: Dict):
+def write_file_list(md: List[str], folder_path: Path, tree: Dict, root: Path = None):
     """Write a list of files in a directory."""
+    if root is None:
+        root = SRC_DIR
     for filename, desc, lines in tree["files"]:
         file_path = folder_path / filename
-        rel = file_path.relative_to(SRC_DIR)
+        rel = file_path.relative_to(root)
 
         # Format with proper styling
         if desc != "No description available.":
@@ -224,11 +253,13 @@ def write_file_list(md: List[str], folder_path: Path, tree: Dict):
             )
 
 
-def write_directory(md: List[str], base: Path, tree: Dict, level: int = 0):
+def write_directory(md: List[str], base: Path, tree: Dict, level: int = 0, root: Path = None):
     """Recursively write directory structure to markdown."""
+    if root is None:
+        root = SRC_DIR
     for dirname, subtree in sorted(tree["dirs"].items()):
         full = base / dirname
-        desc = describe(full)
+        desc = describe(full, root)
 
         # Create heading with description
         heading = f"{'#' * (3 + level)} {dirname}/"
@@ -239,13 +270,13 @@ def write_directory(md: List[str], base: Path, tree: Dict, level: int = 0):
 
         # Write files in this directory
         if subtree["files"]:
-            write_file_list(md, full, subtree)
+            write_file_list(md, full, subtree, root)
         else:
             md.append("*No files in this directory.*")
 
         # Recurse into subdirectories
         if subtree["dirs"]:
-            write_directory(md, full, subtree, level + 1)
+            write_directory(md, full, subtree, level + 1, root)
 
 
 def count_total_lines(tree: Dict) -> int:
@@ -268,15 +299,25 @@ def generate_source_map():
     """Generate the complete source map documentation."""
     now = datetime.now().strftime("%x %X")
 
-    # Generate tree
+    # Generate trees for src/ and tests/
     src_tree = generate_tree(SRC_DIR)
-    total_lines = count_total_lines(src_tree)
-    total_files = count_total_files(src_tree)
+    tests_tree = generate_tree(TESTS_DIR, TESTS_DIR)
 
-    # Build dynamic tree visual
-    tree_lines = ["src/"]
-    tree_lines.extend(build_tree_visual(SRC_DIR, src_tree))
-    tree_visual = "\n".join(tree_lines)
+    src_lines = count_total_lines(src_tree)
+    src_files = count_total_files(src_tree)
+    test_lines = count_total_lines(tests_tree)
+    test_files = count_total_files(tests_tree)
+    total_lines = src_lines + test_lines
+    total_files = src_files + test_files
+
+    # Build dynamic tree visuals
+    src_tree_lines = ["src/"]
+    src_tree_lines.extend(build_tree_visual(SRC_DIR, src_tree))
+
+    tests_tree_lines = ["tests/"]
+    tests_tree_lines.extend(build_tree_visual(TESTS_DIR, tests_tree))
+
+    tree_visual = "\n".join(src_tree_lines + [""] + tests_tree_lines)
 
     md = [
         "# Cerium: Source Map (Auto-Generated)",
@@ -286,8 +327,8 @@ def generate_source_map():
         "",
         "## Overview",
         "",
-        f"- **Total Files**: {total_files}",
-        f"- **Total Lines**: {total_lines:,}",
+        f"- **Total Files**: {total_files} ({src_files} source, {test_files} test)",
+        f"- **Total Lines**: {total_lines:,} ({src_lines:,} source, {test_lines:,} test)",
         f"- **Language**: Rust, Python, Shell",
         "",
         "## Project Structure",
@@ -309,6 +350,17 @@ def generate_source_map():
     # Recursively write all directories under src
     write_section(md, "## Modules")
     write_directory(md, SRC_DIR, src_tree)
+
+    # Tests section
+    write_section(md, "## Tests")
+
+    # Write test files at top level
+    if tests_tree["files"]:
+        write_file_list(md, TESTS_DIR, tests_tree, TESTS_DIR)
+
+    # Write test subdirectories (e.g., common/)
+    if tests_tree["dirs"]:
+        write_directory(md, TESTS_DIR, tests_tree, level=0, root=TESTS_DIR)
 
     # Footer
     md.extend(

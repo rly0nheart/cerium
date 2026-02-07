@@ -44,9 +44,10 @@ static GROUP_CACHE: OnceLock<Mutex<HashMap<u32, Arc<str>>>> = OnceLock::new();
 pub(crate) struct Cache;
 
 impl Cache {
-    /// Loads metadata for a path using lstat.
-    pub(crate) fn metadata(path: &Path) -> io::Result<Metadata> {
-        Metadata::load(path)
+    /// Loads metadata for a path.
+    /// When `dereference` is true, follows symlinks (stat); otherwise uses lstat.
+    pub(crate) fn metadata(path: &Path, dereference: bool) -> io::Result<Metadata> {
+        Metadata::load(path, dereference)
     }
 
     pub(crate) fn number(number: u64, format: impl Fn(u64) -> Arc<str>) -> Arc<str> {

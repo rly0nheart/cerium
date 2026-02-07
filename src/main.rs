@@ -22,18 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-mod cli;
-mod display;
-mod fs;
-
-use crate::cli::args::Args;
-use crate::display::factory::DisplayFactory;
-use crate::display::styles::help;
-use crate::display::theme::colours::{ColourSettings, RgbColours};
-use crate::display::theme::config;
-use crate::display::theme::icons::IconSettings;
-use crate::fs::dir::DirReader;
-use crate::fs::hyperlink::HyperlinkSettings;
+use cerium::cli::args::Args;
+use cerium::display::factory::DisplayFactory;
+use cerium::display::styles::help;
+use cerium::display::theme::colours::{ColourSettings, RgbColours};
+use cerium::display::theme::config;
+use cerium::display::theme::icons::IconSettings;
+use cerium::fs::dir::DirReader;
+use cerium::fs::hyperlink::HyperlinkSettings;
 use clap::{CommandFactory, FromArgMatches};
 use std::process;
 

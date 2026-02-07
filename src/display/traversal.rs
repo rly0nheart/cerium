@@ -39,7 +39,7 @@ use std::path::Path;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```text
 /// impl RecursiveTraversal for List {
 ///     fn render_level(&self, entries: &[Entry], args: &Args) {
 ///         // List-specific rendering

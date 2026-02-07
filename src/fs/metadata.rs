@@ -29,24 +29,27 @@ use std::path::Path;
 
 /// Minimal POSIX-like metadata struct loaded via libc::lstat
 #[derive(Clone, Debug)]
-pub(crate) struct Metadata {
-    pub(crate) mode: u32,
-    pub(crate) size: u64,
-    pub(crate) ino: u64,
-    pub(crate) nlink: u64,
-    pub(crate) uid: u32,
-    pub(crate) gid: u32,
-    pub(crate) blocks: u64,
-    pub(crate) blksize: u64,
-    pub(crate) atime: i64,
-    pub(crate) mtime: i64,
-    pub(crate) ctime: i64,
+pub struct Metadata {
+    pub mode: u32,
+    pub size: u64,
+    pub ino: u64,
+    pub nlink: u64,
+    pub uid: u32,
+    pub gid: u32,
+    pub blocks: u64,
+    pub blksize: u64,
+    pub atime: i64,
+    pub mtime: i64,
+    pub ctime: i64,
 }
 
 impl Metadata {
-    /// Load metadata using libc::lstat (does not follow symlinks).
-    /// Returns io::Error from errno on failure, or Ok(LibcMetadata).
-    pub(crate) fn load(path: &Path) -> io::Result<Self> {
+    /// Load metadata for a path.
+    ///
+    /// When `dereference` is `false` (the default), uses `libc::lstat` which
+    /// returns the symlink's own metadata.  When `true`, uses `libc::stat`
+    /// which follows the symlink and returns the target's metadata.
+    pub fn load(path: &Path, dereference: bool) -> io::Result<Self> {
         let c_path = CString::new(path.as_os_str().as_bytes()).map_err(|_| {
             io::Error::new(io::ErrorKind::InvalidInput, "path contains interior nul")
         })?;
@@ -54,7 +57,8 @@ impl Metadata {
         unsafe {
             let mut st: libc::stat = std::mem::zeroed();
 
-            if libc::lstat(c_path.as_ptr(), &mut st) != 0 {
+            let stat_fn = if dereference { libc::stat } else { libc::lstat };
+            if stat_fn(c_path.as_ptr(), &mut st) != 0 {
                 return Err(io::Error::last_os_error());
             }
 
@@ -74,7 +78,7 @@ impl Metadata {
         }
     }
 
-    pub(crate) fn empty() -> Self {
+    pub fn empty() -> Self {
         Self {
             mode: 0,
             size: 0,

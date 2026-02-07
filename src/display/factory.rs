@@ -49,12 +49,12 @@ use crate::fs::tree::TreeBuilder;
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```text
 /// let dir_reader = DirReader::from(path);
 /// let display = DisplayFactory::create(&dir_reader, args);
 /// display.print();
 /// ```
-pub(crate) struct DisplayFactory;
+pub struct DisplayFactory;
 
 impl DisplayFactory {
     /// Creates the appropriate display mode based on the command-line arguments.
@@ -79,7 +79,7 @@ impl DisplayFactory {
     /// # Returns
     ///
     /// A boxed DisplayMode trait object ready to render output
-    pub(crate) fn create(dir_reader: &DirReader, args: Args) -> Box<dyn DisplayMode> {
+    pub fn create(dir_reader: &DirReader, args: Args) -> Box<dyn DisplayMode> {
         // 1. Find/Search mode
         if !args.find.is_empty() {
             let search = match Search::new(&args.find, dir_reader.path().clone()) {
@@ -162,7 +162,7 @@ impl DisplayFactory {
         }
 
         // Permissions / ownership / inode info
-        if args.permission
+        if args.permissions
             || args.hard_links
             || args.blocks
             || args.block_size

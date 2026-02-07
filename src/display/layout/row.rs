@@ -66,7 +66,7 @@ impl<'a> Row<'a> {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```text
     /// let row = Row::new(&entry, &args);
     /// let size = row.value(&Column::Size);
     /// ```

@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-pub(crate) mod alignment;
-pub(crate) mod column;
-pub(crate) mod row;
-pub(crate) mod term_grid;
-pub(crate) mod unicode_width;
-pub(crate) mod width;
+pub mod alignment;
+pub mod column;
+pub mod row;
+pub mod term_grid;
+pub mod unicode_width;
+pub mod width;

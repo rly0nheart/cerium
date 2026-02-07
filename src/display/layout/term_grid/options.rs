@@ -25,7 +25,7 @@ SOFTWARE.
 /// The direction cells are laid out in the grid.
 #[derive(Debug, Clone, Copy)]
 #[allow(dead_code)]
-pub(crate) enum Direction {
+pub enum Direction {
     /// Cells fill columns top-to-bottom, then move to the next column.
     TopToBottom,
     /// Cells fill rows left-to-right, then move to the next row.
@@ -34,14 +34,14 @@ pub(crate) enum Direction {
 
 /// The separator between columns in the grid.
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum Filling {
+pub enum Filling {
     /// Use the specified number of spaces between columns.
     Spaces(usize),
 }
 
 /// Options for configuring grid layout.
 #[derive(Debug, Clone)]
-pub(crate) struct GridOptions {
+pub struct GridOptions {
     /// The direction cells are laid out.
     pub direction: Direction,
     /// The separator between columns.

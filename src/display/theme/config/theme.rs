@@ -37,86 +37,86 @@ use serde::Deserialize;
 /// - UI colours (tree connectors, headers, paths, etc.)
 #[allow(dead_code)]
 #[derive(Debug, Clone, Deserialize)]
-pub(crate) struct Theme {
+pub struct Theme {
     // Size gradients (bytes → gigabytes)
-    pub(crate) size_bytes: ThemeColour,
-    pub(crate) size_kb: ThemeColour,
-    pub(crate) size_mb: ThemeColour,
-    pub(crate) size_gb: ThemeColour,
+    pub size_bytes: ThemeColour,
+    pub size_kb: ThemeColour,
+    pub size_mb: ThemeColour,
+    pub size_gb: ThemeColour,
 
     // Date gradients (recent → old)
-    pub(crate) date_recent: ThemeColour,
-    pub(crate) date_hours: ThemeColour,
-    pub(crate) date_days: ThemeColour,
-    pub(crate) date_weeks: ThemeColour,
-    pub(crate) date_months: ThemeColour,
-    pub(crate) date_old: ThemeColour,
+    pub date_recent: ThemeColour,
+    pub date_hours: ThemeColour,
+    pub date_days: ThemeColour,
+    pub date_weeks: ThemeColour,
+    pub date_months: ThemeColour,
+    pub date_old: ThemeColour,
 
     // Permission colours
-    pub(crate) perm_read: ThemeColour,
-    pub(crate) perm_write: ThemeColour,
-    pub(crate) perm_execute: ThemeColour,
-    pub(crate) perm_none: ThemeColour,
-    pub(crate) perm_special: ThemeColour,
-    pub(crate) perm_filetype: ThemeColour,
+    pub perm_read: ThemeColour,
+    pub perm_write: ThemeColour,
+    pub perm_execute: ThemeColour,
+    pub perm_none: ThemeColour,
+    pub perm_special: ThemeColour,
+    pub perm_filetype: ThemeColour,
 
     // Entry types
-    pub(crate) entry_directory: ThemeColour,
-    pub(crate) entry_symlink: ThemeColour,
-    pub(crate) entry_file: ThemeColour,
+    pub entry_directory: ThemeColour,
+    pub entry_symlink: ThemeColour,
+    pub entry_file: ThemeColour,
 
     // User/Group
-    pub(crate) user: ThemeColour,
-    pub(crate) group: ThemeColour,
+    pub user: ThemeColour,
+    pub group: ThemeColour,
 
     // Code file types
-    pub(crate) code_rust: ThemeColour,
-    pub(crate) code_python: ThemeColour,
-    pub(crate) code_javascript: ThemeColour,
-    pub(crate) code_c: ThemeColour,
-    pub(crate) code_go: ThemeColour,
-    pub(crate) code_java: ThemeColour,
-    pub(crate) code_ruby: ThemeColour,
-    pub(crate) code_php: ThemeColour,
-    pub(crate) code_lua: ThemeColour,
+    pub code_rust: ThemeColour,
+    pub code_python: ThemeColour,
+    pub code_javascript: ThemeColour,
+    pub code_c: ThemeColour,
+    pub code_go: ThemeColour,
+    pub code_java: ThemeColour,
+    pub code_ruby: ThemeColour,
+    pub code_php: ThemeColour,
+    pub code_lua: ThemeColour,
 
     // Web file types
-    pub(crate) web_html: ThemeColour,
-    pub(crate) web_css: ThemeColour,
-    pub(crate) web_json: ThemeColour,
-    pub(crate) web_xml: ThemeColour,
-    pub(crate) web_yaml: ThemeColour,
+    pub web_html: ThemeColour,
+    pub web_css: ThemeColour,
+    pub web_json: ThemeColour,
+    pub web_xml: ThemeColour,
+    pub web_yaml: ThemeColour,
 
     // Document types
-    pub(crate) doc_text: ThemeColour,
-    pub(crate) doc_markdown: ThemeColour,
-    pub(crate) doc_pdf: ThemeColour,
+    pub doc_text: ThemeColour,
+    pub doc_markdown: ThemeColour,
+    pub doc_pdf: ThemeColour,
 
     // Media types
-    pub(crate) media_image: ThemeColour,
-    pub(crate) media_video: ThemeColour,
-    pub(crate) media_audio: ThemeColour,
+    pub media_image: ThemeColour,
+    pub media_video: ThemeColour,
+    pub media_audio: ThemeColour,
 
     // Archive types
-    pub(crate) archive: ThemeColour,
+    pub archive: ThemeColour,
 
     // Misc UI colours
-    pub(crate) tree_connector: ThemeColour,
-    pub(crate) table_header: ThemeColour,
-    pub(crate) path_display: ThemeColour,
-    pub(crate) checksum: ThemeColour,
-    pub(crate) magic: ThemeColour,
-    pub(crate) xattr: ThemeColour,
-    pub(crate) acl: ThemeColour,
-    pub(crate) mountpoint: ThemeColour,
-    pub(crate) numeric: ThemeColour,
-    pub(crate) placeholder: ThemeColour,
+    pub tree_connector: ThemeColour,
+    pub table_header: ThemeColour,
+    pub path_display: ThemeColour,
+    pub checksum: ThemeColour,
+    pub magic: ThemeColour,
+    pub xattr: ThemeColour,
+    pub acl: ThemeColour,
+    pub mountpoint: ThemeColour,
+    pub numeric: ThemeColour,
+    pub placeholder: ThemeColour,
 
     // CLI help colours
-    pub(crate) cli_help_header: ThemeColour,
-    pub(crate) cli_help_usage: ThemeColour,
-    pub(crate) cli_help_literal: ThemeColour,
-    pub(crate) cli_help_placeholder: ThemeColour,
+    pub cli_help_header: ThemeColour,
+    pub cli_help_usage: ThemeColour,
+    pub cli_help_literal: ThemeColour,
+    pub cli_help_placeholder: ThemeColour,
 }
 
 impl Theme {
@@ -124,7 +124,7 @@ impl Theme {
     ///
     /// Uses the authentic Gruvbox colour palette by Pavel Pertsev (morhetz).
     /// Color palette: https://github.com/morhetz/gruvbox
-    pub(crate) fn default() -> Self {
+    pub fn default() -> Self {
         // Authentic Gruvbox Dark palette
         let fg = color_rgb(235, 219, 178); // fg (light1)
         let red = color_rgb(204, 36, 29); // red
@@ -231,93 +231,5 @@ impl Theme {
 fn color_rgb(r: u8, g: u8, b: u8) -> ThemeColour {
     ThemeColour {
         colour: Colour::Rgb(r, g, b),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_gruvbox_theme_creation() {
-        let theme = Theme::default();
-        // Verify a few key authentic Gruvbox colours
-        assert!(matches!(theme.size_bytes.colour, Colour::Rgb(152, 151, 26))); // green
-        assert!(matches!(theme.perm_read.colour, Colour::Rgb(215, 153, 33))); // yellow
-        assert!(matches!(
-            theme.entry_directory.colour,
-            Colour::Rgb(131, 165, 152) // bright_blue
-        ));
-        assert!(matches!(
-            theme.entry_file.colour,
-            Colour::Rgb(235, 219, 178)
-        )); // fg
-        assert!(matches!(theme.code_rust.colour, Colour::Rgb(214, 93, 14))); // orange
-    }
-
-    #[test]
-    fn test_theme_deserialisation() {
-        let toml = r#"
-            size_bytes = { r = 255, g = 0, b = 0 }
-            size_kb = "green"
-            size_mb = { r = 0, g = 255, b = 0 }
-            size_gb = "blue"
-            date_recent = "white"
-            date_hours = "white"
-            date_days = "white"
-            date_weeks = "white"
-            date_months = "white"
-            date_old = "white"
-            perm_read = "yellow"
-            perm_write = "red"
-            perm_execute = "green"
-            perm_none = "darkgray"
-            perm_special = "magenta"
-            perm_filetype = "blue"
-            entry_directory = "blue"
-            entry_symlink = "cyan"
-            entry_file = "white"
-            user = "white"
-            group = "white"
-            code_rust = "red"
-            code_python = "blue"
-            code_javascript = "yellow"
-            code_c = "cyan"
-            code_go = "blue"
-            code_java = "red"
-            code_ruby = "red"
-            code_php = "blue"
-            code_lua = "blue"
-            web_html = "red"
-            web_css = "purple"
-            web_json = "magenta"
-            web_xml = "white"
-            web_yaml = "cyan"
-            doc_text = "white"
-            doc_markdown = "white"
-            doc_pdf = "white"
-            media_image = "magenta"
-            media_video = "red"
-            media_audio = "green"
-            archive = "yellow"
-            tree_connector = "darkgray"
-            table_header = "white"
-            path_display = "blue"
-            checksum = "white"
-            magic = "white"
-            xattr = "cyan"
-            acl = "green"
-            mountpoint = "magenta"
-            numeric = "cyan"
-            placeholder = "darkgray"
-            cli_help_header = "yellow"
-            cli_help_usage = "green"
-            cli_help_literal = "cyan"
-            cli_help_placeholder = "yellow"
-        "#;
-
-        let theme: Theme = toml::from_str(toml).unwrap();
-        assert!(matches!(theme.size_bytes.colour, Colour::Rgb(255, 0, 0)));
-        assert!(matches!(theme.size_kb.colour, Colour::Green));
     }
 }

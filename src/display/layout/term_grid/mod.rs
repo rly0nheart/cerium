@@ -26,6 +26,6 @@ mod cell;
 mod layout;
 mod options;
 
-pub(crate) use cell::Cell;
-pub(crate) use layout::TermGrid;
-pub(crate) use options::{Direction, Filling, GridOptions};
+pub use cell::Cell;
+pub use layout::{GridDisplay, TermGrid};
+pub use options::{Direction, Filling, GridOptions};

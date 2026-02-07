@@ -46,13 +46,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-pub(crate) mod factory;
+pub mod factory;
 pub(crate) mod grid;
-pub(crate) mod layout;
+pub mod layout;
 pub(crate) mod list;
 pub(crate) mod mode;
-pub(crate) mod output;
-pub(crate) mod styles;
-pub(crate) mod theme;
+pub mod output;
+pub mod styles;
+pub mod theme;
 pub(crate) mod traversal;
 pub(crate) mod tree;

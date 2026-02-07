@@ -36,7 +36,7 @@ use crate::fs::entry::Entry;
 impl DisplayMode for Grid {
     /// Prints the grid output, either recursively or non-recursively based on args.
     ///
-    /// # Behavior
+    /// # Behaviour
     ///
     /// * If `args.recursive` is true, displays entries in a hierarchical format
     ///   with directory titles, recursing into subdirectories
@@ -79,7 +79,7 @@ impl RecursiveTraversal for Grid {
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```text
 /// let grid = Grid::new(entries, args);
 /// grid.print(); // Outputs multi-column layout
 /// ```
@@ -104,7 +104,7 @@ impl Grid {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```text
     /// let entries = directory.list(&args);
     /// let grid = Grid::new(entries, args);
     /// grid.print();

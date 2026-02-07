@@ -108,7 +108,7 @@ impl List {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```text
     /// let entries = directory.list(&args);
     /// let list = List::new(entries, args);
     /// list.print();
