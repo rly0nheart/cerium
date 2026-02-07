@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 - Styling in help message for `context` and `context_value`
+- Extracted tests to a `tests/` directory 
 
 ### Removed
 - Windows column from the availability table in [README](README.md)
