@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
-## [0.1.18] - 2026-02-07
+## [0.1.18] - 2026-02-08
 ### Changed
 - Symlink icon from f0337 to f1177
 - Showing Rust icons for `.cargo` and `.rustup` directories.
@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 - Icon for `.android` directory
 - Icon for `CLAUDE.md` file
+
+### Fixed
+- Nightly builds workflow file
 
 ## [0.1.17] - 2026-02-07
 ### Added
