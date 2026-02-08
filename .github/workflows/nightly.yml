@@ -46,10 +46,10 @@ jobs:
           TEST_EXIT_CODE=$?
           set -e
 
-          # Parse test results
-          PASSED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= passed)' | tail -1 || echo "0")
-          FAILED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= failed)' | tail -1 || echo "0")
-          IGNORED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= ignored)' | tail -1 || echo "0")
+          # Sum results across ALL test binaries
+          PASSED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= passed)' | awk '{s+=$1} END {print s+0}')
+          FAILED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= failed)' | awk '{s+=$1} END {print s+0}')
+          IGNORED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= ignored)' | awk '{s+=$1} END {print s+0}')
 
           # Build results summary
           if [ $TEST_EXIT_CODE -eq 0 ]; then
