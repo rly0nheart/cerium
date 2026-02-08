@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.18] - 2026-02-07
+### Changed
+- Symlink icon from f0337 to f1177
+
 ## [0.1.17] - 2026-02-07
 ### Added
 - `-L/--dereference` option to show metadata for the link target rather than the link itself
