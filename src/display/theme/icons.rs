@@ -247,7 +247,10 @@ impl Icons {
 
 /// PHF map for directory icon lookups (all keys must be lowercase for case-insensitive matching)
 const DIRECTORY_ICONS: Map<&'static str, char> = phf_map! {
+    ".cache"              => Icons::CACHE,
+    ".cargo" | ".rustup"  => Icons::LANG_RUST,
     ".config" | "config" | "cron.d" | "cron.daily" | "cron.hourly" | "cron.minutely" | "cron.monthly" | "cron.weekly" | "etc" | "include" | "pacman.d" | "xbps.d" | "xorg.conf.d" => Icons::FOLDER_CONFIG,
+    ".claude" | ".cursor" | ".codex" | ".aider" | ".autogpt" | ".devin" | ".copilot" | ".openai" | ".junie" => Icons::ROBOT,
     ".exercism"           => Icons::FOLDER_EXERCISM,
     ".git"                => Icons::FOLDER_GIT,
     ".github"             => Icons::FOLDER_GITHUB,
@@ -271,7 +274,6 @@ const DIRECTORY_ICONS: Map<&'static str, char> = phf_map! {
     "pictures" | "img"    => Icons::FOLDER_IMAGE,
     "src"                 => Icons::FOLDER_SRC,
     "videos"              => Icons::VIDEO,
-    ".claude" | ".cursor" | ".codex" | ".aider" | ".autogpt" | ".devin" | ".copilot" | ".openai" => Icons::ROBOT,
 };
 
 /// PHF map for directory colour lookups (non-themed directories only)
