@@ -30,7 +30,8 @@ pub use directory::DirectoryEntry;
 pub use file::FileEntry;
 pub use symlink::SymlinkEntry;
 
-use crate::cli::args::{Args, is_metadata_args};
+use crate::cli::args;
+use crate::cli::args::Args;
 use crate::fs::cache::Cache;
 use crate::fs::metadata::Metadata;
 use crate::fs::symlink as symlink_utils;
@@ -225,7 +226,7 @@ impl Entry {
     /// Populates fields like size, timestamps, permissions, owner/group, inode, links, and block info
     /// only if the corresponding display args are enabled. Skips loading if metadata is already populated.
     pub fn conditional_metadata(&mut self, args: &Args) {
-        if !is_metadata_args(args) {
+        if !args::is_args_requesting_metadata(args) {
             return;
         }
 

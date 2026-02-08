@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
+use crate::cli::args;
 use crate::cli::args::Args;
 use crate::display::grid::Grid;
 use crate::display::list::List;
@@ -111,6 +111,18 @@ impl DisplayFactory {
 
         // 3. List vs Grid mode
         let entries = dir_reader.list(&args);
+        let mut files_count = 0;
+        let mut dirs_count = 0;
+
+        for entry in &entries {
+            if entry.is_file() {
+                files_count += 1;
+            } else if entry.is_dir() {
+                dirs_count += 1;
+            }
+        }
+
+        println!("{dirs_count} directories, {files_count} files");
 
         // Print directory title for recursive mode
         if args.recursive {
@@ -138,71 +150,6 @@ impl DisplayFactory {
     ///
     /// `true` if List renderer should be used, `false` for Grid
     fn needs_list_renderer(args: &Args) -> bool {
-        Self::needs_metadata(args) || Self::needs_table_columns(args)
-    }
-
-    /// Checks if metadata columns are requested.
-    ///
-    /// Metadata columns include size, timestamps, permissions, ownership, etc.
-    /// These require reading file metadata via stat() and are displayed in
-    /// table format.
-    ///
-    /// # Returns
-    ///
-    /// `true` if any metadata columns are requested
-    fn needs_metadata(args: &Args) -> bool {
-        // Size columns
-        if args.size || args.long {
-            return true;
-        }
-
-        // Date columns
-        if args.created || args.modified || args.accessed || args.long {
-            return true;
-        }
-
-        // Permissions / ownership / inode info
-        if args.permissions
-            || args.hard_links
-            || args.blocks
-            || args.block_size
-            || args.inode
-            || args.user
-            || args.group
-            || args.long
-        {
-            return true;
-        }
-
-        false
-    }
-
-    /// Checks if table-specific columns are requested.
-    ///
-    /// Table-specific columns are those that only make sense in tabular layout,
-    /// such as magic (file type), head/tail (byte preview), or oneline mode.
-    ///
-    /// # Returns
-    ///
-    /// `true` if any table-specific columns are requested
-    fn needs_table_columns(args: &Args) -> bool {
-        #[cfg(all(feature = "magic", not(target_os = "android")))]
-        let magic = args.magic;
-        #[cfg(any(not(feature = "magic"), target_os = "android"))]
-        let magic = false;
-
-        #[cfg(feature = "checksum")]
-        let checksum = args.checksum.is_some();
-
-        #[cfg(not(feature = "checksum"))]
-        let checksum = false;
-
-        magic
-            || checksum
-            || args.xattr
-            || args.acl
-            || args.context
-            || args.mountpoint
-            || args.oneline
+        args::is_args_requesting_metadata(args) || args::is_args_requesting_table_column(args)
     }
 }
