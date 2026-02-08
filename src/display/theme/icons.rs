@@ -247,6 +247,7 @@ impl Icons {
 
 /// PHF map for directory icon lookups (all keys must be lowercase for case-insensitive matching)
 const DIRECTORY_ICONS: Map<&'static str, char> = phf_map! {
+    ".android"            => Icons::ANDROID,
     ".cache"              => Icons::CACHE,
     ".cargo" | ".rustup"  => Icons::LANG_RUST,
     ".config" | "config" | "cron.d" | "cron.daily" | "cron.hourly" | "cron.minutely" | "cron.monthly" | "cron.weekly" | "etc" | "include" | "pacman.d" | "xbps.d" | "xorg.conf.d" => Icons::FOLDER_CONFIG,

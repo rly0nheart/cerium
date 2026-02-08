@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [0.1.18] - 2026-02-07
 ### Changed
 - Symlink icon from f0337 to f1177
+- Showing Rust icons for `.cargo` and `.rustup` directories.
+
+### Added
+- Icon for `.android` directory
 
 ## [0.1.17] - 2026-02-07
 ### Added
