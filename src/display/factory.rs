@@ -80,7 +80,7 @@ impl DisplayFactory {
     ///
     /// A boxed DisplayMode trait object ready to render output
     pub fn create(dir_reader: &DirReader, args: Args) -> Box<dyn DisplayMode> {
-        // 1. Find/Search mode
+        // Find/Search mode
         if !args.find.is_empty() {
             let search = match Search::new(&args.find, dir_reader.path().clone()) {
                 Ok(s) => s,
@@ -97,7 +97,7 @@ impl DisplayFactory {
             };
         }
 
-        // 2. Tree mode
+        // Tree mode
         if args.tree {
             // Use streaming mode for instant output when no table columns are needed
             return if Tree::needs_table_layout(&args) {
@@ -109,20 +109,8 @@ impl DisplayFactory {
             };
         }
 
-        // 3. List vs Grid mode
+        // List vs Grid mode
         let entries = dir_reader.list(&args);
-        let mut files_count = 0;
-        let mut dirs_count = 0;
-
-        for entry in &entries {
-            if entry.is_file() {
-                files_count += 1;
-            } else if entry.is_dir() {
-                dirs_count += 1;
-            }
-        }
-
-        println!("{dirs_count} directories, {files_count} files");
 
         // Print directory title for recursive mode
         if args.recursive {

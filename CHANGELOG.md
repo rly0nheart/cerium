@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Security
 
 ## [0.1.19] - YYYY-MM-DD
+### Changed
+- Simplify is_args_requesting_metadata into single expression
+- Remove unnecessary abstractions in code
 
 ## [0.1.18] - 2026-02-08
 ### Changed
