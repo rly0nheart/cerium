@@ -247,7 +247,7 @@ impl Icons {
 
 /// PHF map for directory icon lookups (all keys must be lowercase for case-insensitive matching)
 const DIRECTORY_ICONS: Map<&'static str, char> = phf_map! {
-    ".android"            => Icons::ANDROID,
+    ".android"            => Icons::OS_ANDROID,
     ".cache"              => Icons::CACHE,
     ".cargo" | ".rustup"  => Icons::LANG_RUST,
     ".config" | "config" | "cron.d" | "cron.daily" | "cron.hourly" | "cron.minutely" | "cron.monthly" | "cron.weekly" | "etc" | "include" | "pacman.d" | "xbps.d" | "xorg.conf.d" => Icons::FOLDER_CONFIG,
@@ -259,6 +259,7 @@ const DIRECTORY_ICONS: Map<&'static str, char> = phf_map! {
     ".opam"               => Icons::FOLDER_OCAML,
     ".ssh" | "pam.d" | "ssh" | "sudoers.d" => Icons::FOLDER_KEY,
     ".trash"              => Icons::TRASH,
+    ".logs"               => Icons::LOG,
     "tests"               => Icons::TEST_TUBE,
     "build"               => Icons::FOLDER_BUILD,
     "cabal"               => Icons::LANG_HASKELL,
@@ -366,6 +367,7 @@ const FILENAME_ICONS: Map<&'static str, char> = phf_map! {
     ".gitlab-ci.yml"      => Icons::GITLAB,
     ".gtkrc-2.0"          => Icons::GTK,
     ".idea"               => Icons::INTELLIJ,
+    ".claude.json"        => Icons::ROBOT,
     ".nanorc"             => Icons::NANO,
     ".nuxtrc"             => Icons::NUXT,
     ".node_repl_history"  => Icons::NODEJS,
@@ -403,6 +405,7 @@ const FILENAME_ICONS: Map<&'static str, char> = phf_map! {
     "webpack.config.js"   => '\u{f072b}',
     "weston.ini"          => '\u{f367}',
     "yarn.lock"           => Icons::YARN,
+    "claude.md"           => Icons::ROBOT,
 };
 
 /// PHF map for filename colour lookups (non-themed files only)

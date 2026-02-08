@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 - Icon for `.android` directory
+- Icon for `CLAUDE.md` file
 
 ## [0.1.17] - 2026-02-07
 ### Added
