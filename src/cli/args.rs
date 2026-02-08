@@ -248,59 +248,56 @@ pub struct Args {
     pub size_format: SizeFormat,
 }
 
-/// Checks if table-specific columns are requested.
-///
-/// Table-specific columns are those that only make sense in tabular layout,
-/// such as magic (file type), head/tail (byte preview), or oneline mode.
-///
-/// # Returns
-///
-/// `true` if any table-specific columns are requested
-pub(crate) fn is_args_requesting_table_column(args: &Args) -> bool {
-    #[cfg(all(feature = "magic", not(target_os = "android")))]
-    let magic = args.magic;
-    #[cfg(any(not(feature = "magic"), target_os = "android"))]
-    let magic = false;
+impl Args {
+    /// Checks if table-specific columns are requested.
+    ///
+    /// Table-specific columns are those that only make sense in tabular layout,
+    /// such as magic (file type), head/tail (byte preview), or oneline mode.
+    ///
+    /// # Returns
+    ///
+    /// `true` if any table-specific columns are requested
+    pub(crate) fn is_args_requesting_table_column(args: &Args) -> bool {
+        #[cfg(all(feature = "magic", not(target_os = "android")))]
+        let magic = args.magic;
+        #[cfg(any(not(feature = "magic"), target_os = "android"))]
+        let magic = false;
 
-    #[cfg(feature = "checksum")]
-    let checksum = args.checksum.is_some();
+        #[cfg(feature = "checksum")]
+        let checksum = args.checksum.is_some();
 
-    #[cfg(not(feature = "checksum"))]
-    let checksum = false;
+        #[cfg(not(feature = "checksum"))]
+        let checksum = false;
 
-    magic || checksum || args.xattr || args.acl || args.context || args.mountpoint || args.oneline
-}
-
-/// Determines whether specified args requests entry metadata
-///
-/// # Parameters
-///
-/// * `args` Parsed command-line args
-/// # Returns
-///
-/// True if any of the passed args request metadata, otherwise False.
-pub fn is_args_requesting_metadata(args: &Args) -> bool {
-    // 1. Anything that reads size
-    if args.size || args.long {
-        return true;
+        magic
+            || checksum
+            || args.xattr
+            || args.acl
+            || args.context
+            || args.mountpoint
+            || args.oneline
     }
 
-    // 2. Any date information
-    if args.created || args.modified || args.accessed || args.long {
-        return true;
+    /// Determines whether specified args requests entry metadata
+    ///
+    /// # Parameters
+    ///
+    /// * `args` Parsed command-line args
+    /// # Returns
+    ///
+    /// True if any of the passed args request metadata, otherwise False.
+    pub fn is_args_requesting_metadata(args: &Args) -> bool {
+        args.long
+            || args.size
+            || args.created
+            || args.modified
+            || args.accessed
+            || args.permissions
+            || args.hard_links
+            || args.blocks
+            || args.block_size
+            || args.user
+            || args.group
+            || args.inode
     }
-
-    // 3. Permissions / owner / group / hard_links / blocks / inode
-    if args.permissions
-        || args.hard_links
-        || args.blocks
-        || args.block_size
-        || args.user
-        || args.group
-        || args.long
-        || args.inode
-    {
-        return true;
-    }
-    false
 }

@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-use crate::cli::args;
+
 use crate::cli::args::Args;
 use crate::display::grid::Grid;
 use crate::display::list::List;
@@ -150,6 +150,6 @@ impl DisplayFactory {
     ///
     /// `true` if List renderer should be used, `false` for Grid
     fn needs_list_renderer(args: &Args) -> bool {
-        args::is_args_requesting_metadata(args) || args::is_args_requesting_table_column(args)
+        Args::is_args_requesting_metadata(args) || Args::is_args_requesting_table_column(args)
     }
 }
