@@ -95,7 +95,7 @@ impl Icons {
     const ESLINT: char          = '\u{e655}';  // 
     const FILE: char            = '\u{f15b}';  // 
     const FILE_3D: char         = '\u{f01a7}'; // 󰆧
-    const FILE_SYMLINK: char    = '\u{f0337}'; // 󰌷
+    const FILE_SYMLINK: char    = '\u{f1177}'; // 󱅷
     const FOLDER: char          = '\u{f07b}';  // 
     const FOLDER_CONTACTS: char = '\u{f024c}'; // 󰉌
     const FOLDER_BUILD: char    = '\u{f19fc}'; // 󱧼
