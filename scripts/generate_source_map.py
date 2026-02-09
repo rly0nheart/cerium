@@ -48,6 +48,7 @@ DESCRIPTIONS = {
     "display/factory.rs": "Factory for creating appropriate display modes based on args.",
     "display/grid.rs": "Grid display mode for compact multi-column layout.",
     "display/list.rs": "List display mode with column-based table output.",
+    "display/summary.rs": "Summary trait and counting helpers for directory/file totals.",
     "display/tree.rs": "Tree display mode for hierarchical directory view.",
     "display/traversal.rs": "RecursiveTraversal trait for recursive directory rendering.",
     # Display output submodule

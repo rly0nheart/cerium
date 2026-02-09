@@ -5,8 +5,8 @@
 
 ## Overview
 
-- **Total Files**: 82 (66 source, 16 test)
-- **Total Lines**: 7,157 (5,969 source, 1,188 test)
+- **Total Files**: 83 (67 source, 16 test)
+- **Total Lines**: 7,316 (6,124 source, 1,192 test)
 - **Language**: Rust, Python, Shell
 
 ## Project Structure
@@ -62,6 +62,7 @@ src/
 │   ├── list.rs
 │   ├── mod.rs
 │   ├── mode.rs
+│   ├── summary.rs
 │   ├── traversal.rs
 │   ╰── tree.rs
 ├── fs/
@@ -128,12 +129,13 @@ tests/
 ### display/ – Display system (modes, layouts, themes, and output formatting).
 
 - **[factory.rs](display/factory.rs)** – `69 LoEC (Lines of Executable Code)` – Factory for creating appropriate display modes based on args.
-- **[grid.rs](display/grid.rs)** – `123 LoEC (Lines of Executable Code)` – Grid display mode for compact multi-column layout.
-- **[list.rs](display/list.rs)** – `91 LoEC (Lines of Executable Code)` – List display mode with column-based table output.
-- **[mod.rs](display/mod.rs)** – `48 LoEC (Lines of Executable Code)` – Display module exports.
+- **[grid.rs](display/grid.rs)** – `130 LoEC (Lines of Executable Code)` – Grid display mode for compact multi-column layout.
+- **[list.rs](display/list.rs)** – `98 LoEC (Lines of Executable Code)` – List display mode with column-based table output.
+- **[mod.rs](display/mod.rs)** – `49 LoEC (Lines of Executable Code)` – Display module exports.
 - **[mode.rs](display/mode.rs)** – `22 LoEC (Lines of Executable Code)` – DisplayMode trait for different output formats.
+- **[summary.rs](display/summary.rs)** – `79 LoEC (Lines of Executable Code)` – Summary trait and counting helpers for directory/file totals.
 - **[traversal.rs](display/traversal.rs)** – `41 LoEC (Lines of Executable Code)` – RecursiveTraversal trait for recursive directory rendering.
-- **[tree.rs](display/tree.rs)** – `198 LoEC (Lines of Executable Code)` – Tree display mode for hierarchical directory view.
+- **[tree.rs](display/tree.rs)** – `222 LoEC (Lines of Executable Code)` – Tree display mode for hierarchical directory view.
 
 #### layout/ – Column and row data structures, width calculation, and alignment.
 
@@ -174,11 +176,11 @@ tests/
 - **[entry.rs](display/styles/entry.rs)** – `92 LoEC (Lines of Executable Code)` – Entry-specific styling and colourisation.
 - **[help.rs](display/styles/help.rs)** – `74 LoEC (Lines of Executable Code)` – CLI help styling rules.
 - **[mod.rs](display/styles/mod.rs)** – `23 LoEC (Lines of Executable Code)` – Styles module exports.
-- **[text.rs](display/styles/text.rs)** – `130 LoEC (Lines of Executable Code)` – Individual text styles logic.
+- **[text.rs](display/styles/text.rs)** – `155 LoEC (Lines of Executable Code)` – Individual text styles logic.
 
 #### theme/ – UI theme, icons, colours, and styling system.
 
-- **[colours.rs](display/theme/colours.rs)** – `185 LoEC (Lines of Executable Code)` – Colour palette and RGB colour definitions.
+- **[colours.rs](display/theme/colours.rs)** – `191 LoEC (Lines of Executable Code)` – Colour palette and RGB colour definitions.
 - **[icons.rs](display/theme/icons.rs)** – `810 LoEC (Lines of Executable Code)` – Icons for file types, folders, and extensions.
 - **[mod.rs](display/theme/mod.rs)** – `22 LoEC (Lines of Executable Code)` – Theme module exports.
 
@@ -186,7 +188,7 @@ tests/
 
 - **[colour.rs](display/theme/config/colour.rs)** – `68 LoEC (Lines of Executable Code)` – Colour deserialisation (RGB and named colours).
 - **[mod.rs](display/theme/config/mod.rs)** – `49 LoEC (Lines of Executable Code)` – Config module exports and theme loader.
-- **[theme.rs](display/theme/config/theme.rs)** – `165 LoEC (Lines of Executable Code)` – Theme struct with semantic colour categories and Gruvbox default.
+- **[theme.rs](display/theme/config/theme.rs)** – `169 LoEC (Lines of Executable Code)` – Theme struct with semantic colour categories and Gruvbox default.
 
 ### fs/ – Filesystem management (entries, directories, metadata).
 
@@ -222,9 +224,9 @@ tests/
 
 - **[display_permission_format.rs](display_permission_format.rs)** – `78 LoEC (Lines of Executable Code)` – Tests for symbolic, octal, and hex permission formats.
 - **[display_term_grid.rs](display_term_grid.rs)** – `62 LoEC (Lines of Executable Code)` – Tests for terminal grid layout and column fitting.
-- **[display_theme.rs](display_theme.rs)** – `81 LoEC (Lines of Executable Code)` – Tests for theme creation and TOML deserialisation.
+- **[display_theme.rs](display_theme.rs)** – `83 LoEC (Lines of Executable Code)` – Tests for theme creation and TOML deserialisation.
 - **[display_theme_colour.rs](display_theme_colour.rs)** – `52 LoEC (Lines of Executable Code)` – Tests for colour deserialisation (RGB and named).
-- **[display_theme_config.rs](display_theme_config.rs)** – `77 LoEC (Lines of Executable Code)` – Tests for theme config loading and fallback.
+- **[display_theme_config.rs](display_theme_config.rs)** – `79 LoEC (Lines of Executable Code)` – Tests for theme config loading and fallback.
 - **[display_unicode_width.rs](display_unicode_width.rs)** – `18 LoEC (Lines of Executable Code)` – Tests for Unicode character width calculation.
 - **[display_width.rs](display_width.rs)** – `18 LoEC (Lines of Executable Code)` – Tests for cached width measurement.
 - **[fs_dir.rs](fs_dir.rs)** – `157 LoEC (Lines of Executable Code)` – Tests for directory traversal, sorting, and filtering.
@@ -242,4 +244,4 @@ tests/
 
 ---
 
-*Generated by [generate_source_map.py](../scripts/generate_source_map.py) on 02/09/26 02:18:06*
+*Generated by [generate_source_map.py](../scripts/generate_source_map.py) on 02/09/26 22:09:21*

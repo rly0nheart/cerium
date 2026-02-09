@@ -33,8 +33,10 @@ use crate::display::styles::column::ColumnStyle;
 use crate::display::styles::entry::StyledEntry;
 use crate::display::styles::text::TextStyle;
 use crate::fs::dir::DirReader;
+use crate::display::summary::Summary;
 use crate::fs::entry::Entry;
 use crate::fs::tree::TreeNode;
+use std::cell::Cell;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
@@ -68,7 +70,7 @@ impl DisplayMode for Tree {
                 // Streaming mode: traverse and print on-demand
                 let mut parent_entry = Entry::from_path(path.clone(), self.args.long);
                 parent_entry.conditional_metadata(&self.args);
-                Self::traverse_and_print(parent_entry, &Vec::new(), &self.args);
+                self.traverse_and_print(parent_entry, &Vec::new());
             }
             TreeData::Table(node) => {
                 // Table mode: use pre-built tree with width calculations
@@ -89,6 +91,8 @@ impl DisplayMode for Tree {
                 Self::add_node(node, &widths, &Vec::new(), &self.args, add_alignment_space);
             }
         }
+
+        self.print_summary();
     }
 }
 
@@ -104,6 +108,21 @@ pub(crate) enum TreeData {
 pub(crate) struct Tree {
     data: TreeData,
     args: Args,
+    dir_count: Cell<usize>,
+    file_count: Cell<usize>,
+}
+
+impl Summary for Tree {
+    /// Returns the accumulated directory and file counts.
+    ///
+    /// For table mode, counts are computed from the pre-built tree.
+    /// For streaming mode, counts are accumulated during traversal.
+    fn counts(&self) -> (usize, usize) {
+        match &self.data {
+            TreeData::Table(node) => crate::display::summary::count_tree_children(node),
+            TreeData::Streaming(_) => (self.dir_count.get(), self.file_count.get()),
+        }
+    }
 }
 
 impl Tree {
@@ -116,6 +135,8 @@ impl Tree {
         Self {
             data: TreeData::Table(node),
             args,
+            dir_count: Cell::new(0),
+            file_count: Cell::new(0),
         }
     }
 
@@ -128,6 +149,8 @@ impl Tree {
         Self {
             data: TreeData::Streaming(path),
             args,
+            dir_count: Cell::new(0),
+            file_count: Cell::new(0),
         }
     }
 
@@ -176,16 +199,18 @@ impl Tree {
 
     /// Traverses the filesystem and prints the tree in streaming mode.
     ///
+    /// Accumulates directory and file counts (excluding the root) into the
+    /// struct's [`Cell`] fields for later retrieval via [`Summary::counts`].
+    ///
     /// # Parameters
     /// - `entry`: The current entry to render.
     /// - `parents_last`: Boolean flags indicating whether each ancestor is the last child.
-    /// - `args`: Command-line arguments controlling display options.
-    fn traverse_and_print(entry: Entry, parents_last: &[bool], args: &Args) {
+    fn traverse_and_print(&self, entry: Entry, parents_last: &[bool]) {
         let connector = Self::draw_connector(parents_last);
 
         // Get styled entry for name display (no alignment space for tree)
         let styled_entry = StyledEntry::new(&entry);
-        let entry_view = styled_entry.load(args, false);
+        let entry_view = styled_entry.load(&self.args, false);
 
         // Print: [connector] [name]
         println!(
@@ -194,17 +219,26 @@ impl Tree {
             TextStyle::name(&entry_view.name, entry_view.colour),
         );
 
+        // Count non-root entries (root has empty parents_last)
+        if !parents_last.is_empty() {
+            if entry.is_dir() {
+                self.dir_count.set(self.dir_count.get() + 1);
+            } else {
+                self.file_count.set(self.file_count.get() + 1);
+            }
+        }
+
         // If this is a directory, traverse and print its children
         if entry.is_dir() {
             let dir_reader = DirReader::from(entry.path().clone());
-            let children = dir_reader.list(args);
+            let children = dir_reader.list(&self.args);
 
             let count = children.len();
             for (i, mut child_entry) in children.into_iter().enumerate() {
-                child_entry.conditional_metadata(args);
+                child_entry.conditional_metadata(&self.args);
                 let mut new_parents = parents_last.to_owned();
                 new_parents.push(i == count - 1);
-                Self::traverse_and_print(child_entry, &new_parents, args);
+                self.traverse_and_print(child_entry, &new_parents);
             }
         }
     }

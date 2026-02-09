@@ -71,4 +71,5 @@ Each theme defines colours for:
 - **Documents**: `doc_text`, `doc_markdown`, `doc_pdf`
 - **Media**: `media_image`, `media_video`, `media_audio`
 - **UI elements**: `tree_connector`, `table_header`, `path_display`, etc.
+- **Summary**: `summary_number`, `summary_text`
 - **CLI help**: `cli_help_header`, `cli_help_usage`, etc.

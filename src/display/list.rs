@@ -30,6 +30,7 @@ use crate::display::layout::width::Width;
 use crate::display::mode::DisplayMode;
 use crate::display::output::quotes::Quotes;
 use crate::display::styles::column::ColumnStyle;
+use crate::display::summary::Summary;
 use crate::display::traversal::RecursiveTraversal;
 use crate::fs::entry::Entry;
 use std::collections::HashMap;
@@ -48,6 +49,8 @@ impl DisplayMode for List {
         } else {
             Self::nonrecursive(&self.entries, &self.args);
         }
+
+        self.print_summary();
     }
 }
 
@@ -72,6 +75,13 @@ pub(crate) struct List {
     entries: Vec<Entry>,
     /// Command-line arguments controlling display options
     args: Args,
+}
+
+impl Summary for List {
+    /// Counts directories and files from the list's entries.
+    fn counts(&self) -> (usize, usize) {
+        crate::display::summary::count_entries(&self.entries)
+    }
 }
 
 impl List {

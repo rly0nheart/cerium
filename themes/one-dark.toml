@@ -84,3 +84,7 @@ cli_help_header = { r = 229, g = 192, b = 123 }      # yellow
 cli_help_usage = { r = 152, g = 195, b = 121 }       # green
 cli_help_literal = { r = 86, g = 182, b = 194 }      # cyan
 cli_help_placeholder = { r = 209, g = 154, b = 102 } # orange
+
+# Summary Colours
+summary_number = { r = 86, g = 182, b = 194 }       # cyan
+summary_text = { r = 171, g = 178, b = 191 }        # fg

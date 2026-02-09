@@ -84,3 +84,7 @@ cli_help_header = { r = 250, g = 189, b = 47 }       # bright_yellow
 cli_help_usage = { r = 184, g = 187, b = 38 }        # bright_green
 cli_help_literal = { r = 142, g = 192, b = 124 }     # bright_aqua
 cli_help_placeholder = { r = 215, g = 153, b = 33 }  # yellow
+
+# Summary Colours
+summary_number = { r = 142, g = 192, b = 124 }      # bright_aqua
+summary_text = { r = 235, g = 219, b = 178 }        # fg (light1)

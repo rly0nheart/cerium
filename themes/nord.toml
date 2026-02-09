@@ -84,3 +84,7 @@ cli_help_header = { r = 235, g = 203, b = 139 }      # nord13
 cli_help_usage = { r = 163, g = 190, b = 140 }       # nord14
 cli_help_literal = { r = 136, g = 192, b = 208 }     # nord8
 cli_help_placeholder = { r = 208, g = 135, b = 112 } # nord12
+
+# Summary Colours
+summary_number = { r = 136, g = 192, b = 208 }      # nord8 (frost)
+summary_text = { r = 216, g = 222, b = 233 }        # nord4 (snow)

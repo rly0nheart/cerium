@@ -55,4 +55,5 @@ pub mod output;
 pub mod styles;
 pub mod theme;
 pub(crate) mod traversal;
+pub(crate) mod summary;
 pub(crate) mod tree;

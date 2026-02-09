@@ -30,6 +30,7 @@ use crate::display::layout::width::Width;
 use crate::display::mode::DisplayMode;
 use crate::display::output::quotes::Quotes;
 use crate::display::styles::column::ColumnStyle;
+use crate::display::summary::Summary;
 use crate::display::traversal::RecursiveTraversal;
 use crate::fs::entry::Entry;
 
@@ -47,6 +48,8 @@ impl DisplayMode for Grid {
         } else {
             self.nonrecursive(&self.entries);
         }
+
+        self.print_summary();
     }
 }
 
@@ -71,6 +74,13 @@ pub(crate) struct Grid {
     entries: Vec<Entry>,
     /// Command-line arguments controlling display options
     args: Args,
+}
+
+impl Summary for Grid {
+    /// Counts directories and files from the grid's entries.
+    fn counts(&self) -> (usize, usize) {
+        crate::display::summary::count_entries(&self.entries)
+    }
 }
 
 impl Grid {

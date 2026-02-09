@@ -19,7 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
-## [0.1.19] - YYYY-MM-DD
+## [0.1.20] - 2026-02-09
+### Added
+- Add directory and file count summary to all display modes
+
+## [0.1.19] - 2026-02-08
 ### Changed
 - Simplify is_args_requesting_metadata into single expression
 - Remove unnecessary abstractions in code

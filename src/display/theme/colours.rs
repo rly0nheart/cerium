@@ -275,6 +275,16 @@ impl RgbColours {
     pub(crate) fn cobalite() -> Colour {
         Self::theme().entry_directory.colour
     }
+
+    /// Returns the theme colour for summary numbers.
+    pub(crate) fn summary_number() -> Colour {
+        Self::theme().summary_number.colour
+    }
+
+    /// Returns the theme colour for summary text.
+    pub(crate) fn summary_text() -> Colour {
+        Self::theme().summary_text.colour
+    }
     pub(crate) const ZESTY: Color                    = Color::Rgb(248, 248, 148);
     pub(crate) const LILLIPUTIAN_LIME: Color         = Color::Rgb(137, 227, 81);
     pub(crate) const SNOWFLAKE: Color                = Color::Rgb(240, 240, 240);

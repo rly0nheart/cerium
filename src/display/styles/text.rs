@@ -204,6 +204,51 @@ impl TextStyle {
         Colour::White.underline().bold().apply_to(name)
     }
 
+    /// Styles a summary string with bold themed numbers and italic themed labels.
+    ///
+    /// # Parameters
+    /// - `text`: The formatted summary string (e.g., "3 directories and 5 files").
+    ///
+    /// # Returns
+    /// Styled text with each numeric segment in bold theme colour and the rest in italic theme colour.
+    pub(crate) fn summary(text: &str) -> String {
+        /// Styles a single chunk of summary text as either a number or a label.
+        ///
+        /// # Parameters
+        /// - `chunk`: The text fragment to style.
+        /// - `is_number`: Whether the chunk contains digits.
+        ///
+        /// # Returns
+        /// Bold themed colour for numbers, italic themed colour for labels.
+        fn style_summary_chunk(chunk: &str, is_number: bool) -> String {
+            if is_number {
+                RgbColours::summary_number().bold().apply_to(chunk)
+            } else {
+                RgbColours::summary_text().italic().apply_to(chunk)
+            }
+        }
+
+        let mut result = String::new();
+        let mut chunk = String::new();
+        let mut in_digits = text.starts_with(|c: char| c.is_ascii_digit());
+
+        for ch in text.chars() {
+            let is_digit = ch.is_ascii_digit();
+            if is_digit != in_digits && !chunk.is_empty() {
+                result.push_str(&style_summary_chunk(&chunk, in_digits));
+                chunk.clear();
+                in_digits = is_digit;
+            }
+            chunk.push(ch);
+        }
+
+        if !chunk.is_empty() {
+            result.push_str(&style_summary_chunk(&chunk, in_digits));
+        }
+
+        result
+    }
+
     /// Styles directory path titles for recursive mode output.
     ///
     /// # Parameters

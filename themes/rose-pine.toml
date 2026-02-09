@@ -84,3 +84,7 @@ cli_help_header = { r = 246, g = 193, b = 119 }      # gold
 cli_help_usage = { r = 156, g = 207, b = 216 }       # foam
 cli_help_literal = { r = 49, g = 116, b = 143 }      # pine
 cli_help_placeholder = { r = 234, g = 154, b = 151 } # rose
+
+# Summary Colours
+summary_number = { r = 156, g = 207, b = 216 }      # foam
+summary_text = { r = 224, g = 222, b = 244 }        # text

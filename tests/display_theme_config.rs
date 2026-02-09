@@ -68,6 +68,8 @@ fn test_load_config_with_valid_toml() {
         cli_help_usage = "green"
         cli_help_literal = "cyan"
         cli_help_placeholder = "yellow"
+        summary_number = "cyan"
+        summary_text = "white"
         banner_gradient_1 = "cyan"
         banner_gradient_2 = "green"
         banner_gradient_3 = "yellow"
