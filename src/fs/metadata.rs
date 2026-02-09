@@ -27,7 +27,7 @@ use std::io;
 use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
 
-/// Minimal POSIX-like metadata struct loaded via libc::lstat
+/// Minimal POSIX-like metadata struct loaded via `libc::lstat` or `libc::stat`.
 #[derive(Clone, Debug)]
 pub struct Metadata {
     pub mode: u32,
@@ -44,11 +44,16 @@ pub struct Metadata {
 }
 
 impl Metadata {
-    /// Load metadata for a path.
+    /// Loads metadata for a path using a raw libc stat call.
     ///
-    /// When `dereference` is `false` (the default), uses `libc::lstat` which
-    /// returns the symlink's own metadata.  When `true`, uses `libc::stat`
-    /// which follows the symlink and returns the target's metadata.
+    /// # Parameters
+    /// - `path`: The filesystem path to query.
+    /// - `dereference`: If `true`, uses `libc::stat` (follows symlinks);
+    ///   if `false`, uses `libc::lstat` (returns the symlink's own metadata).
+    ///
+    /// # Returns
+    /// The populated [`Metadata`], or an I/O error if the stat call fails
+    /// or the path contains an interior null byte.
     pub fn load(path: &Path, dereference: bool) -> io::Result<Self> {
         let c_path = CString::new(path.as_os_str().as_bytes()).map_err(|_| {
             io::Error::new(io::ErrorKind::InvalidInput, "path contains interior nul")
@@ -78,6 +83,10 @@ impl Metadata {
         }
     }
 
+    /// Creates a zeroed-out [`Metadata`] instance, useful as a default placeholder.
+    ///
+    /// # Returns
+    /// A [`Metadata`] with all fields set to `0`.
     pub fn empty() -> Self {
         Self {
             mode: 0,

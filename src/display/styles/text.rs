@@ -36,24 +36,11 @@ pub(crate) struct TextStyle;
 impl TextStyle {
     /// Styles entry size with colours based on magnitude.
     ///
-    /// Applies a colour gradient from green (small files) through yellow to red (large files),
-    /// making it easy to visually identify file sizes at a glance.
-    ///
     /// # Parameters
-    ///
-    /// * `size` - The formatted size string (e.g., "1.2 MB", "45 KB")
+    /// - `size`: The formatted size string (e.g., "1.2 MB", "45 KB").
     ///
     /// # Returns
-    ///
-    /// Bold-styled text with magnitude-appropriate colour
-    ///
-    /// # Color Mapping
-    ///
-    /// * Bytes (B) → Pine glade green
-    /// * Kilobytes (kB/KiB) → Leaf green
-    /// * Megabytes (MB/MiB) → Fern green
-    /// * Gigabytes (GB/GiB) → Gleaming mint
-    /// * Other/Unknown → Red (fallback)
+    /// Bold-styled text with magnitude-appropriate colour.
     pub(crate) fn size(size: &str) -> String {
         let colour = if size.ends_with(" kB") || size.ends_with("KiB") {
             RgbColours::leaf_green()
@@ -70,16 +57,11 @@ impl TextStyle {
 
     /// Styles tree connector characters (│, ├──, ╰──) in a subdued colour.
     ///
-    /// Tree connectors are displayed in dark gray to make them visually distinct
-    /// from entry names while still showing the hierarchical structure clearly.
-    ///
     /// # Parameters
-    ///
-    /// * `connector` - The connector string (box-drawing characters)
+    /// - `connector`: The connector string (box-drawing characters).
     ///
     /// # Returns
-    ///
-    /// Dark gray styled connector text
+    /// Dark grey styled connector text.
     pub(crate) fn tree_connector(connector: &str) -> String {
         Colour::DarkGray.normal().apply_to(connector)
     }
@@ -87,19 +69,11 @@ impl TextStyle {
     /// Styles entry names with special handling for symlinks and ignored files.
     ///
     /// # Parameters
-    ///
-    /// * `name` - The entry name (may contain symlink arrow `⇒`)
-    /// * `colour` - The base colour for the entry
+    /// - `name`: The entry name (may contain symlink arrow `⇒`).
+    /// - `colour`: The base colour for the entry.
     ///
     /// # Returns
-    ///
-    /// Styled name with appropriate formatting
-    ///
-    /// # Special Styling
-    ///
-    /// * **Symlinks**: Link name in italic, arrow in plain text, target in base colour
-    /// * **Ignored files**: Strikethrough style if name contains "ignore"
-    /// * **Normal files**: Bold text in base colour
+    /// Styled name with appropriate formatting.
     pub(crate) fn name(name: &str, colour: Colour) -> String {
         // Symlink case
         if let Some((link_part, target)) = symlink::split_symlink(name) {
@@ -132,25 +106,11 @@ impl TextStyle {
 
     /// Styles dates with colours indicating recency.
     ///
-    /// Uses a colour gradient from light blue (recent) to darker blues (older),
-    /// making it easy to identify when files were last modified at a glance.
-    ///
     /// # Parameters
-    ///
-    /// * `datetime` - The formatted timestamp string (e.g., "2 hours ago", "Jan 15")
+    /// - `datetime`: The formatted timestamp string (e.g., "2 hours ago", "Jan 15").
     ///
     /// # Returns
-    ///
-    /// Bold-styled text with recency-appropriate colour
-    ///
-    /// # Color Mapping (Recent to Old)
-    ///
-    /// * Seconds/Minutes → Frost glimmer (lightest blue)
-    /// * Hours → Crystal blue
-    /// * Days → Cerulean
-    /// * Weeks → Azure sky
-    /// * Months → Royal blue / Ocean blue
-    /// * Jan-Dec → Various blues matching seasonal progression
+    /// Bold-styled text with recency-appropriate colour.
     pub(crate) fn datetime(datetime: &str) -> String {
         let colour = if datetime.contains("second") {
             RgbColours::frost_glimmer()
@@ -197,28 +157,11 @@ impl TextStyle {
 
     /// Styles Unix permission strings with character-by-character colour coding.
     ///
-    /// Each character in the permission string receives its own colour based on
-    /// its meaning, making it easy to quickly parse permission information.
-    ///
     /// # Parameters
-    ///
-    /// * `permissions` - The permission string (e.g., "rwxr-xr-x", "drwxr-xr-x", ".rwxr-xr-x")
+    /// - `permissions`: The permission string (e.g., "rwxr-xr-x", "drwxr-xr-x", ".rwxr-xr-x").
     ///
     /// # Returns
-    ///
-    /// String with each character individually styled
-    ///
-    /// # Character Color Mapping
-    ///
-    /// * `.` (dot prefix) → White bold
-    /// * `r` (read) → Yellow bold
-    /// * `w` (write) → Red bold
-    /// * `x` (execute) → Green bold
-    /// * `-` (no permission) → Dark gray
-    /// * `d`, `l`, `b`, `c`, `p`, `s` (file types) → Blue bold
-    /// * `S`, `T`, `t` (special bits) → Magenta bold
-    /// * `0-9` (octal/hex) → Cyan bold
-    /// * Other → White bold (fallback)
+    /// String with each character individually styled.
     pub(crate) fn permissions(permissions: &str) -> String {
         permissions
             .chars()
@@ -253,34 +196,21 @@ impl TextStyle {
     /// Styles table column headers with bold, underlined white text.
     ///
     /// # Parameters
-    ///
-    /// * `name` - The header text (column name)
+    /// - `name`: The header text (column name).
     ///
     /// # Returns
-    ///
-    /// Styled header text in white, bold, and underlined
+    /// Styled header text in white, bold, and underlined.
     pub(crate) fn table_header(name: &str) -> String {
         Colour::White.underline().bold().apply_to(name)
     }
 
     /// Styles directory path titles for recursive mode output.
     ///
-    /// Used when displaying section headers in recursive directory listings,
-    /// providing clear visual separation between different directory levels.
-    ///
     /// # Parameters
-    ///
-    /// * `path_display` - The path display object (typically from `Path::display()`)
+    /// - `path_display`: The path display object (typically from `Path::display()`).
     ///
     /// # Returns
-    ///
-    /// Styled path in blue, underlined, with appropriate quoting applied
-    ///
-    /// # Formatting
-    ///
-    /// * Applies shell-style quoting if path contains special characters
-    /// * Uses blue colour with underline for prominence
-    /// * Normal weight (not bold) for readability
+    /// Styled path in blue, underlined.
     pub(crate) fn path_display(path_display: Display) -> String {
         Colour::Blue
             .underline()

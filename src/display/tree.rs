@@ -92,49 +92,7 @@ impl DisplayMode for Tree {
     }
 }
 
-/// A tree-structured renderer that displays filesystem entries in a hierarchical format.
-///
-/// `Tree` presents directory contents as a visual tree using Unicode box-drawing
-/// characters to show parent-child relationships, similar to the `tree` command.
-/// Entries can also include additional column data (size, permissions, etc.) when
-/// combined with table mode.
-///
-/// # Visual Format
-///
-/// ```text
-/// root/
-/// ├── file1.txt
-/// ├── subdir/
-/// │   ├── file2.txt
-/// │   ╰── file3.txt
-/// ╰── file4.txt
-/// ```
-///
-/// # Features
-///
-/// * **Hierarchical display**: Shows directory structure with visual connectors
-/// * **Column support**: Can include table columns alongside tree structure
-/// * **Headers**: Optional column headers
-/// * **Recursive traversal**: Automatically descends into subdirectories
-/// * **Streaming mode**: Prints entries as discovered for instant feedback
-///
-/// # Box-Drawing Characters
-///
-/// * `│` - Vertical line (continues parent connection)
-/// * `├─` - Branch connector (more children follow)
-/// * `╰─` - Corner connector (last child)
-///
-/// # Examples
-///
-/// ```text
-/// // Table mode (pre-built tree)
-/// let tree = Tree::new_table(root_node, args);
-/// tree.print();
-///
-/// // Streaming mode (on-demand traversal)
-/// let tree = Tree::new_streaming(root_path, args);
-/// tree.print();
-/// ```
+/// Backing data for the tree renderer.
 pub(crate) enum TreeData {
     /// Pre-built tree structure for table mode with columns
     Table(TreeNode),
@@ -142,27 +100,18 @@ pub(crate) enum TreeData {
     Streaming(PathBuf),
 }
 
+/// Hierarchical renderer using Unicode box-drawing connectors.
 pub(crate) struct Tree {
-    /// The tree data source (pre-built or path for streaming)
     data: TreeData,
-    /// Command-line arguments controlling display options
     args: Args,
 }
 
 impl Tree {
-    /// Creates a new `Tree` renderer in table mode with a pre-built tree structure.
-    ///
-    /// Table mode is used when metadata columns are requested and requires width
-    /// calculations across all entries before rendering.
+    /// Creates a [`Tree`] renderer in table mode with a pre-built tree.
     ///
     /// # Parameters
-    ///
-    /// * `node` - The root node of the directory tree to render
-    /// * `args` - Command-line arguments controlling columns, colours, headers, etc.
-    ///
-    /// # Returns
-    ///
-    /// A new `Tree` instance ready to render in table mode
+    /// - `node`: The root node of the directory tree.
+    /// - `args`: Command-line arguments controlling display options.
     pub(crate) fn new_table(node: TreeNode, args: Args) -> Self {
         Self {
             data: TreeData::Table(node),
@@ -170,20 +119,11 @@ impl Tree {
         }
     }
 
-    /// Creates a new `Tree` renderer in streaming mode for on-demand traversal.
-    ///
-    /// Streaming mode traverses and prints the filesystem tree on-demand, providing
-    /// instant output for large directory structures. Used when no metadata columns
-    /// are requested.
+    /// Creates a [`Tree`] renderer in streaming mode for on-demand traversal.
     ///
     /// # Parameters
-    ///
-    /// * `path` - The root path to traverse
-    /// * `args` - Command-line arguments controlling display options
-    ///
-    /// # Returns
-    ///
-    /// A new `Tree` instance ready to render in streaming mode
+    /// - `path`: The root path to traverse.
+    /// - `args`: Command-line arguments controlling display options.
     pub(crate) fn new_streaming(path: PathBuf, args: Args) -> Self {
         Self {
             data: TreeData::Streaming(path),
@@ -191,35 +131,13 @@ impl Tree {
         }
     }
 
-    /// Determines if the tree requires table layout with column width calculations.
-    ///
-    /// Table layout is needed when any metadata columns or table-specific columns are
-    /// requested. Without these, the tree can stream output immediately as entries
-    /// are discovered, providing instant feedback for large directory trees.
-    ///
-    /// # Columns requiring table layout:
-    ///
-    /// **Metadata columns:**
-    /// - `--long`, `--size`, `--permission`, `--user`, `--group`
-    /// - `--created`, `--modified`, `--accessed`
-    /// - `--inode`, `--blocks`, `--hard-links`, `--block-size`
-    ///
-    /// **Table-specific columns:**
-    /// - `--magic` (file type detection)
-    /// - `--hash` (file hash computation)
-    /// - `--xattr` (extended attributes)
-    /// - `--acl` (ACL indicator)
-    /// - `--head` (first N bytes preview)
-    /// - `--tail` (last N bytes preview)
-    /// - `--oneline` (force single column)
+    /// Checks whether the tree requires table layout with column width calculations.
     ///
     /// # Parameters
-    ///
-    /// * `args` - Command-line arguments to check
+    /// - `args`: Command-line arguments to check.
     ///
     /// # Returns
-    ///
-    /// `true` if table layout is required, `false` for streaming mode
+    /// `true` if any metadata or table-specific columns are requested.
     pub(crate) fn needs_table_layout(args: &Args) -> bool {
         // Metadata columns
         if args.long
@@ -258,24 +176,10 @@ impl Tree {
 
     /// Traverses the filesystem and prints the tree in streaming mode.
     ///
-    /// This method performs on-demand filesystem traversal and prints entries
-    /// immediately as they are discovered, providing instant feedback for large
-    /// directory structures. Unlike the table mode which pre-builds the entire
-    /// tree, this approach only traverses directories as needed.
-    ///
     /// # Parameters
-    ///
-    /// * `entry` - The current entry to render
-    /// * `parents_last` - Boolean flags indicating whether each ancestor is the last child
-    /// * `args` - Command-line arguments controlling display options
-    ///
-    /// # Performance
-    ///
-    /// This is significantly faster for large trees because:
-    /// - No upfront tree building
-    /// - No width calculations across all entries
-    /// - Output appears immediately as filesystem is traversed
-    /// - Directories are only read when needed
+    /// - `entry`: The current entry to render.
+    /// - `parents_last`: Boolean flags indicating whether each ancestor is the last child.
+    /// - `args`: Command-line arguments controlling display options.
     fn traverse_and_print(entry: Entry, parents_last: &[bool], args: &Args) {
         let connector = Self::draw_connector(parents_last);
 
@@ -305,22 +209,11 @@ impl Tree {
         }
     }
 
-    /// Flattens a hierarchical tree structure into a linear vector of entries.
-    ///
-    /// This depth-first traversal collects all entries in the tree, which is
-    /// necessary for calculating column widths that accommodate all entries
-    /// before rendering begins.
+    /// Flattens a tree into a linear vector of entries for width calculation.
     ///
     /// # Parameters
-    ///
-    /// * `node` - The root node to flatten
-    /// * `entries` - Mutable vector to populate with entries (initially empty)
-    ///
-    /// # Traversal Order
-    ///
-    /// Depth-first, pre-order traversal:
-    /// 1. Process current node
-    /// 2. Recursively process all children
+    /// - `node`: The root node to flatten.
+    /// - `entries`: Mutable vector to populate with entries.
     fn flatten(node: &TreeNode, entries: &mut Vec<Entry>) {
         entries.push(node.entry.clone());
         for child in &node.children {
@@ -328,34 +221,14 @@ impl Tree {
         }
     }
 
-    /// Recursively renders a node and all its children with proper tree connectors.
-    ///
-    /// This is the core rendering function that traverses the tree structure and
-    /// generates the visual output with appropriate indentation and connector symbols.
+    /// Recursively renders a node and its children with tree connectors.
     ///
     /// # Parameters
-    ///
-    /// * `node` - The current node to render
-    /// * `widths` - Pre-calculated column widths for alignment
-    /// * `parents_last` - Boolean flags indicating whether each ancestor in the path
-    ///   is the last child of its parent. Used to determine connector style.
-    /// * `args` - Command-line arguments controlling display options
-    ///
-    /// # Connector Logic
-    ///
-    /// The `parents_last` vector tracks the tree path:
-    /// * `[false]` → Current node has siblings below it → use `├──`
-    /// * `[true]` → Current node is the last child → use `╰──`
-    /// * `[false, false]` → Parent has siblings, current has siblings → `│   ├──`
-    /// * `[false, true]` → Parent has siblings, current is last → `│   ╰──`
-    /// * `[true, false]` → Parent is last, current has siblings → `    ├──`
-    ///
-    /// # Recursion
-    ///
-    /// For each child, the function:
-    /// 1. Clones the current `parents_last` state
-    /// 2. Appends whether the child is the last sibling
-    /// 3. Recursively calls itself with the updated state
+    /// - `node`: The current node to render.
+    /// - `widths`: Pre-calculated column widths for alignment.
+    /// - `parents_last`: Flags indicating whether each ancestor is the last child.
+    /// - `args`: Command-line arguments controlling display options.
+    /// - `add_alignment_space`: Whether to add a space for quote-alignment.
     fn add_node(
         node: &TreeNode,
         widths: &HashMap<Column, usize>,
@@ -379,24 +252,12 @@ impl Tree {
 
     /// Renders a single row in tree mode with connectors and column data.
     ///
-    /// This method combines tabular column data with tree visualization,
-    /// producing output that shows both hierarchical structure and detailed
-    /// entry information.
-    ///
     /// # Parameters
-    ///
-    /// * `entry` - The entry to render
-    /// * `widths` - Pre-calculated column widths for alignment
-    /// * `connector` - Tree connector string (e.g., "├── ", "│   ╰── ")
-    /// * `args` - Command-line arguments controlling display options
-    /// * `add_alignment_space` - Whether any entries in this batch need quoting
-    ///
-    /// # Output Format
-    ///
-    /// ```text
-    /// 1.2 KB  2025-01-15  ├── file1.txt
-    /// 45 KB   2025-01-14  │   ╰── subfile.txt
-    /// ```
+    /// - `entry`: The entry to render.
+    /// - `widths`: Pre-calculated column widths for alignment.
+    /// - `connector`: Tree connector string (e.g., `"├── "`).
+    /// - `args`: Command-line arguments controlling display options.
+    /// - `add_alignment_space`: Whether to add a space for quote-alignment.
     fn render_tree_row(
         entry: &Entry,
         widths: &HashMap<Column, usize>,
@@ -430,40 +291,13 @@ impl Tree {
         );
     }
 
-    /// Builds the connector string with proper box-drawing characters for a tree node.
-    ///
-    /// This function constructs the visual prefix that appears before each entry name,
-    /// using Unicode box-drawing characters to represent the hierarchical structure.
+    /// Builds the connector string with box-drawing characters for a tree node.
     ///
     /// # Parameters
-    ///
-    /// * `parents_last` - A vector of boolean flags where each element indicates
-    ///   whether the corresponding ancestor in the path is the last child of its parent
+    /// - `parents_last`: Flags indicating whether each ancestor is the last child.
     ///
     /// # Returns
-    ///
-    /// A string containing the appropriate combination of vertical lines, spaces,
-    /// and branch connectors to visually represent the node's position in the tree
-    ///
-    /// # Construction Logic
-    ///
-    /// 1. For each ancestor (except the immediate parent):
-    ///    - If ancestor is last child: add 4 spaces (no vertical line needed)
-    ///    - If ancestor has siblings: add `│   ` (vertical line continues)
-    /// 2. For the immediate parent:
-    ///    - If current node is last child: add `╰── ` (corner connector)
-    ///    - If current node has siblings: add `├── ` (branch connector)
-    ///
-    /// # Visual Reference
-    ///
-    /// ```text
-    /// root/                    depth: 0, connector: ""
-    /// ├── file1               depth: 1, parents_last: [false], connector: "├── "
-    /// ├── dir1/               depth: 1, parents_last: [false], connector: "├── "
-    /// │   ├── file2           depth: 2, parents_last: [false, false], connector: "│   ├── "
-    /// │   ╰── file3           depth: 2, parents_last: [false, true], connector: "│   ╰── "
-    /// ╰── file4               depth: 1, parents_last: [true], connector: "╰── "
-    /// ```
+    /// A string of box-drawing characters representing the node's position in the tree.
     fn draw_connector(parents_last: &[bool]) -> String {
         let mut connector = String::new();
         let depth = parents_last.len();

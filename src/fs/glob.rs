@@ -32,18 +32,21 @@ use std::ffi::CString;
 use std::mem::MaybeUninit;
 
 /// A compiled glob pattern for matching filenames.
+///
+/// Wraps a POSIX `regex_t` compiled with case-insensitive, anchored matching.
+/// The compiled regex is freed on drop.
 pub struct Glob {
     inner: libc::regex_t,
 }
 
 impl Glob {
-    /// Compiles a glob pattern.
+    /// Compiles a glob pattern into a matcher.
     ///
-    /// Wildcards:
-    /// - `*` matches any sequence of characters
-    /// - `?` matches any single character
+    /// # Parameters
+    /// - `pattern`: A glob string where `*` matches any sequence and `?` matches any single character.
     ///
-    /// Matching is case-insensitive and anchored (matches entire string).
+    /// # Returns
+    /// A compiled [`Glob`] or an error message if the pattern is invalid.
     pub fn new(pattern: &str) -> Result<Self, String> {
         let regex_pattern = Self::to_regex(pattern);
 
@@ -65,7 +68,10 @@ impl Glob {
         }
     }
 
-    /// Tests if the pattern matches the given text.
+    /// Tests if the compiled pattern matches the given text.
+    ///
+    /// # Parameters
+    /// - `text`: The string to match against. Returns `false` if it contains a null byte.
     pub fn is_match(&self, text: &str) -> bool {
         let Ok(c_text) = CString::new(text) else {
             return false;
@@ -77,7 +83,10 @@ impl Glob {
         result == 0
     }
 
-    /// Converts glob pattern to POSIX regex.
+    /// Converts a glob pattern to an anchored POSIX extended regex string.
+    ///
+    /// # Parameters
+    /// - `pattern`: The glob pattern to convert. Metacharacters are escaped; `*` and `?` are translated.
     fn to_regex(pattern: &str) -> String {
         let mut result = String::with_capacity(pattern.len() * 2 + 2);
         result.push('^');
@@ -98,6 +107,11 @@ impl Glob {
         result
     }
 
+    /// Extracts a human-readable error message from a failed `regcomp` call.
+    ///
+    /// # Parameters
+    /// - `regex`: The (initialised) regex that failed compilation.
+    /// - `error_code`: The non-zero error code returned by `regcomp`.
     fn error_message(regex: &libc::regex_t, error_code: i32) -> String {
         // c_char is i8 on most platforms but u8 on Android
         let mut buffer = [0 as libc::c_char; 256];
@@ -111,6 +125,7 @@ impl Glob {
 }
 
 impl Drop for Glob {
+    /// Frees the underlying POSIX regex resources.
     fn drop(&mut self) {
         unsafe {
             libc::regfree(&mut self.inner);
@@ -118,4 +133,6 @@ impl Drop for Glob {
     }
 }
 
+/// # Safety
+/// The POSIX `regex_t` is self-contained after compilation and safe to send across threads.
 unsafe impl Send for Glob {}

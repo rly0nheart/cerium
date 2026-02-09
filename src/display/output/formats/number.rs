@@ -28,20 +28,30 @@ use humanly::HumanNumber;
 use std::sync::Arc;
 
 impl Format<u64> for Number {
+    /// Formats a `u64` according to the configured number format.
     fn format(&self, input: u64) -> Arc<str> {
         self.format_number(input)
     }
 }
 
+/// Formats numeric values according to the selected [`NumberFormat`].
 pub(crate) struct Number {
     number_format: NumberFormat,
 }
 
 impl Number {
+    /// Creates a new [`Number`] formatter.
+    ///
+    /// # Parameters
+    /// - `number_format`: The display format to use.
     pub(crate) fn new(number_format: NumberFormat) -> Self {
         Self { number_format }
     }
 
+    /// Formats a number as human-readable or natural.
+    ///
+    /// # Parameters
+    /// - `number`: The value to format.
     fn format_number(&self, number: u64) -> Arc<str> {
         match self.number_format {
             NumberFormat::Humanly => HumanNumber::from(number as f64).concise().into(),

@@ -46,9 +46,8 @@ impl DirectoryEntry {
     /// Creates a new DirectoryEntry.
     ///
     /// # Parameters
-    ///
-    /// * `name` - The display name of the directory
-    /// * `path` - The full path to the directory
+    /// - `name`: The display name of the directory.
+    /// - `path`: The full path to the directory.
     pub fn new(name: Arc<str>, path: PathBuf) -> Self {
         Self {
             name,

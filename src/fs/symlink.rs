@@ -37,7 +37,7 @@ pub const SYMLINK_ARROW_WITH_SPACES: &str = " \u{21D2} ";
 ///
 /// # Parameters
 ///
-/// * `text` - The symlink display string (e.g., "name ⇒ target")
+/// - `text`: The symlink display string (e.g., "name ⇒ target").
 ///
 /// # Returns
 ///
@@ -68,8 +68,8 @@ pub fn split_symlink(text: &str) -> Option<(&str, &str)> {
 ///
 /// # Parameters
 ///
-/// * `name` - The symlink name
-/// * `target` - The symlink target path
+/// - `name`: The symlink name.
+/// - `target`: The symlink target path.
 ///
 /// # Returns
 ///
@@ -91,7 +91,7 @@ pub fn format_symlink(name: &str, target: &str) -> String {
 ///
 /// # Parameters
 ///
-/// * `path` - The path to the symlink
+/// - `path`: The path to the symlink.
 ///
 /// # Returns
 ///

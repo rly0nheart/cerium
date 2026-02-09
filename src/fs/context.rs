@@ -31,19 +31,18 @@ use std::sync::Arc;
 
 const SELINUX_XATTR: &str = "security.selinux";
 
+/// Retrieves SELinux security contexts from file extended attributes.
 pub(crate) struct Context;
 
 impl Context {
     /// Gets the SELinux security context for a file.
     ///
     /// # Parameters
-    ///
-    /// * `path` - Path to the file
+    /// - `path`: Path to the file to query.
     ///
     /// # Returns
-    ///
-    /// The SELinux context string (e.g., "system_u:object_r:usr_t:s0"),
-    /// or "?" if SELinux is not enabled or context cannot be retrieved.
+    /// The SELinux context string (e.g. `"system_u:object_r:usr_t:s0"`),
+    /// or `"?"` if SELinux is not enabled or the context cannot be retrieved.
     pub(crate) fn get(path: &Path) -> Arc<str> {
         match Self::get_context(path) {
             Ok(ctx) => ctx.into(),
@@ -51,7 +50,17 @@ impl Context {
         }
     }
 
-    /// Internal context retrieval using lgetxattr.
+    /// Reads the `security.selinux` extended attribute via `lgetxattr`.
+    ///
+    /// Uses a two-pass approach: first call to determine buffer size,
+    /// second call to read the data.
+    ///
+    /// # Parameters
+    /// - `path`: Path to the file to query.
+    ///
+    /// # Returns
+    /// `Ok(String)` containing the context, or `Err(())` if the attribute
+    /// is missing, empty, the path contains a null byte, or the value is not valid UTF-8.
     fn get_context(path: &Path) -> Result<String, ()> {
         let path_c = CString::new(path.as_os_str().as_bytes()).map_err(|_| ())?;
         let name_c = CString::new(SELINUX_XATTR).map_err(|_| ())?;

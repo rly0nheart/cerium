@@ -45,9 +45,8 @@ impl FileEntry {
     /// Creates a new FileEntry.
     ///
     /// # Parameters
-    ///
-    /// * `name` - The display name of the file
-    /// * `path` - The full path to the file
+    /// - `name`: The display name of the file.
+    /// - `path`: The full path to the file.
     pub fn new(name: Arc<str>, path: PathBuf) -> Self {
         let extension = Self::get_extension(&path);
         Self {
@@ -59,6 +58,9 @@ impl FileEntry {
     }
 
     /// Returns the file extension in lowercase.
+    ///
+    /// # Parameters
+    /// - `path`: The file path to extract the extension from.
     fn get_extension(path: &Path) -> Arc<str> {
         path.extension()
             .and_then(|e| e.to_str())

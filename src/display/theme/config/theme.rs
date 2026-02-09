@@ -119,12 +119,12 @@ pub struct Theme {
     pub cli_help_placeholder: ThemeColour,
 }
 
-impl Theme {
-    /// Built-in Gruvbox Dark theme.
+impl Default for Theme {
+    /// Returns the built-in Gruvbox Dark theme.
     ///
-    /// Uses the authentic Gruvbox colour palette by Pavel Pertsev (morhetz).
-    /// Color palette: https://github.com/morhetz/gruvbox
-    pub fn default() -> Self {
+    /// # Returns
+    /// A [`Theme`] using the authentic Gruvbox colour palette by Pavel Pertsev (morhetz).
+    fn default() -> Self {
         // Authentic Gruvbox Dark palette
         let fg = color_rgb(235, 219, 178); // fg (light1)
         let red = color_rgb(204, 36, 29); // red
@@ -227,7 +227,15 @@ impl Theme {
     }
 }
 
-/// Helper to create a ThemeColor from RGB values
+/// Creates a [`ThemeColour`] from RGB values.
+///
+/// # Parameters
+/// - `r`: Red channel (0–255).
+/// - `g`: Green channel (0–255).
+/// - `b`: Blue channel (0–255).
+///
+/// # Returns
+/// A [`ThemeColour`] wrapping the specified RGB colour.
 fn color_rgb(r: u8, g: u8, b: u8) -> ThemeColour {
     ThemeColour {
         colour: Colour::Rgb(r, g, b),

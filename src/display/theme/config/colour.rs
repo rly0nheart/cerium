@@ -41,14 +41,21 @@ use serde::{Deserialize, Deserializer, de};
 ///
 /// Supported named colours match nu_ansi_term::Colour variants:
 /// - Basic: black, red, green, yellow, blue, purple/magenta, cyan, white
-/// - Light: lightred, lightgreen, lightyellow, lightblue, lightpurple/lightmagenta, lightcyan, lightgray
-/// - System: darkgray
+/// - Light: lightred, lightgreen, lightyellow, lightblue, lightpurple/lightmagenta, lightcyan, lightgrey
+/// - System: darkgrey
 #[derive(Debug, Clone)]
 pub struct ThemeColour {
     pub colour: Colour,
 }
 
 impl<'de> Deserialize<'de> for ThemeColour {
+    /// Deserialises a colour from either an RGB object or a named colour string.
+    ///
+    /// # Parameters
+    /// - `deserializer`: The serde deserialiser to read from.
+    ///
+    /// # Returns
+    /// A [`ThemeColour`], or an error if the value is not a valid colour.
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -71,7 +78,13 @@ impl<'de> Deserialize<'de> for ThemeColour {
     }
 }
 
-/// Parses a named colour string to a nu_ansi_term::Colour
+/// Parses a named colour string to a `nu_ansi_term::Colour`.
+///
+/// # Parameters
+/// - `name`: The colour name to parse (case-insensitive).
+///
+/// # Returns
+/// The corresponding [`Colour`], or an error string if the name is unrecognised.
 fn parse_named_colour(name: &str) -> Result<Colour, String> {
     match name.to_lowercase().as_str() {
         // Basic colours

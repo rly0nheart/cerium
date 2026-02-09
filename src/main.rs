@@ -33,13 +33,7 @@ use cerium::fs::hyperlink::HyperlinkSettings;
 use clap::{CommandFactory, FromArgMatches};
 use std::process;
 
-/// Application entry point.
-///
-/// # Description
-///
-/// Parses CLI arguments, validates the target directory, prepares display options,
-/// and invokes the appropriate display mode. Handles warnings and errors for invalid
-/// paths, non-directory paths, or empty directories.
+/// Parses CLI arguments, validates the target directory, and invokes the appropriate display mode.
 fn main() {
     // Load theme from config file (or use built-in Gruvbox) BEFORE parsing args
     let theme = config::load_theme();

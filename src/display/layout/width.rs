@@ -33,47 +33,28 @@ use std::os::fd::AsRawFd;
 use std::sync::Arc;
 use std::{io, mem};
 
-/// Centralised width calculator with caching for improved performance.
-///
-/// This calculator provides a single source of truth for width calculations
-/// across all rendering modes (list, grid, tree). It caches measurements
-/// to avoid redundant ANSI text parsing, which significantly improves
-/// performance when rendering large directories.
+/// Centralised width calculator with caching for ANSI-aware text measurement.
 pub struct Width {
-    /// Cache of measured widths for text strings (Arc<str> -> width)
     width_cache: HashMap<Arc<str>, usize>,
 }
 
 impl Width {
-    /// Creates a new Width with an empty cache
+    /// Creates a new [`Width`] with an empty cache.
     pub fn new() -> Self {
         Self {
             width_cache: HashMap::new(),
         }
     }
 
-    /// Calculates optimal column widths for all entries with caching.
-    ///
-    /// This method performs a single pass over all entries, measuring
-    /// each column value and caching the results. Cached measurements
-    /// are reused for duplicate values, significantly improving performance
-    /// for large directories with repeated values.
+    /// Calculates optimal column widths for all entries.
     ///
     /// # Parameters
-    ///
-    /// * `entries` - The filesystem entries to measure
-    /// * `columns` - The columns to calculate widths for
-    /// * `args` - Command-line arguments controlling display options
+    /// - `entries`: The filesystem entries to measure.
+    /// - `columns`: The columns to calculate widths for.
+    /// - `args`: Command-line arguments controlling display options.
     ///
     /// # Returns
-    ///
-    /// A HashMap mapping each column to its maximum required width
-    ///
-    /// # Performance
-    ///
-    /// - **Without caching**: O(n * m) where n = entries, m = columns
-    /// - **With caching**: O(n * m) first call, but with significant constant factor improvement
-    ///   due to cache hits on repeated values (e.g., same file sizes, permissions)
+    /// A `HashMap` mapping each column to its maximum required width.
     pub fn calculate(
         &mut self,
         entries: &[Entry],
@@ -112,27 +93,10 @@ impl Width {
         widths
     }
 
-    /// Gets the current terminal width in columns using the TIOCGWINSZ ioctl.
-    ///
-    /// Queries the terminal directly to determine its width,
-    /// which is essential for proper text wrapping and layout.
+    /// Returns the current terminal width in columns via `TIOCGWINSZ` ioctl.
     ///
     /// # Returns
-    ///
-    /// The terminal width in columns. Returns 80 as a fallback if the query fails
-    /// (e.g., when stdout is not connected to a terminal).
-    ///
-    /// # Platform Support
-    ///
-    /// This function uses Unix-specific system calls and is available on Unix-like
-    /// systems (Linux, macOS, BSD, etc.).
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// let width = Width::terminal_width();
-    /// println!("Terminal is {} columns wide", width);
-    /// ```
+    /// The terminal width, or `80` if the query fails.
     pub fn terminal_width() -> usize {
         {
             let fd = io::stdout().as_raw_fd();
@@ -151,17 +115,11 @@ impl Width {
 
     /// Measures the display width of text with caching.
     ///
-    /// This method caches measurements to avoid redundant ANSI text parsing.
-    /// For large directories with many duplicate values (e.g., same permissions,
-    /// same file sizes), this provides significant performance improvements.
-    ///
     /// # Parameters
-    ///
-    /// * `text` - The text to measure (may contain ANSI escape codes)
+    /// - `text`: The text to measure (may contain ANSI escape codes).
     ///
     /// # Returns
-    ///
-    /// The display width in characters (excluding ANSI codes)
+    /// The display width in characters (excluding ANSI codes).
     pub fn measure_text_cached(&mut self, text: &str) -> usize {
         // Try to get from cache first
         let text_arc = Arc::<str>::from(text);
@@ -176,29 +134,13 @@ impl Width {
         width
     }
 
-    /// Measures the display width of text, accounting for ANSI escape codes
-    /// and Unicode character widths.
-    ///
-    /// Handles:
-    /// - ANSI escape sequences (which have zero display width)
-    /// - Wide Unicode characters (e.g., CJK characters, emojis)
-    /// - Regular ASCII characters
+    /// Measures the display width of text, skipping ANSI escape codes and respecting Unicode widths.
     ///
     /// # Parameters
-    ///
-    /// * `text` - The text string to measure, which may contain ANSI escape codes
+    /// - `text`: The text string to measure (may contain ANSI escape codes).
     ///
     /// # Returns
-    ///
-    /// The visual width of the text in terminal columns, excluding ANSI codes
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// Width::measure_ansi_text("hello")       // Returns 5
-    /// Width::measure_ansi_text("\x1b[31mred\x1b[0m")  // Returns 3 (ignores colour codes)
-    /// Width::measure_ansi_text("日本語")      // Returns 6 (wide chars)
-    /// ```
+    /// The visual width of the text in terminal columns.
     pub fn measure_ansi_text(text: &str) -> usize {
         let mut width = 0;
         let mut chars = text.chars().peekable();

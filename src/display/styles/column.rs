@@ -30,9 +30,20 @@ use crate::display::styles::text::TextStyle;
 use crate::display::theme::colours::{Colour, ColourPaint, RgbColours};
 use crate::fs::entry::Entry;
 
+/// Provides styling logic for individual columns in the output display.
 pub(crate) struct ColumnStyle;
 
 impl ColumnStyle {
+    /// Resolves the styled string value for a given column and entry.
+    ///
+    /// # Parameters
+    /// - `entry`: The filesystem entry to display.
+    /// - `column`: The column type to render.
+    /// - `args`: Command-line arguments controlling display options.
+    /// - `add_alignment_space`: Whether to add alignment spacing for the name column.
+    ///
+    /// # Returns
+    /// The styled column value as a string with ANSI colour codes.
     pub(crate) fn get(
         entry: &Entry,
         column: &Column,
@@ -53,27 +64,13 @@ impl ColumnStyle {
 
     /// Applies appropriate styling to a column value based on the column type and content.
     ///
-    /// This is the main entry point for styling column values. It applies context-aware
-    /// styling rules that vary based on:
-    /// * The column type (size, timestamp, permissions, etc.)
-    /// * The content (special values like `-`, numeric values)
-    /// * User-provided colour preferences
-    ///
     /// # Parameters
-    ///
-    /// * `column` - The column type, which determines the styling rules
-    /// * `value` - The raw text value to style
-    /// * `colour` - The base colour to use (typically from entry type)
+    /// - `column`: The column type, which determines the styling rules.
+    /// - `value`: The raw text value to style.
+    /// - `colour`: The base colour to use (typically from entry type).
     ///
     /// # Returns
-    ///
-    /// A string with ANSI colour codes applied for terminal display
-    ///
-    /// # Special Cases
-    ///
-    /// * `"-"` → Dark gray (placeholder value)
-    /// * Numeric strings → Cyan bold
-    /// * Symlinks (containing `⇒`) → Dual-coloured with arrow
+    /// A string with ANSI colour codes applied for terminal display.
     fn column_value(column: &Column, value: String, colour: Colour) -> String {
         if value == "-" {
             Colour::DarkGray.normal().apply_to(&value) // DarkGray for values that are "-"

@@ -46,20 +46,11 @@ fn init_locale() {
 
 /// Returns the display width of a Unicode character using libc's `wcwidth()`.
 ///
-/// This function correctly handles:
-/// - ASCII characters (width 1)
-/// - Wide characters like CJK ideographs (width 2)
-/// - Zero-width characters like combining marks (width 0)
-/// - Control characters (returns 1 as fallback)
-///
 /// # Parameters
-///
-/// * `ch` - The character to measure
+/// - `ch`: The character to measure.
 ///
 /// # Returns
-///
-/// The display width of the character (0, 1, or 2), or 1 as fallback for
-/// non-printable characters.
+/// The display width (0, 1, or 2), or `1` as fallback for non-printable characters.
 pub fn char_width(ch: char) -> usize {
     init_locale();
 

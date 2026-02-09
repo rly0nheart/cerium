@@ -45,7 +45,13 @@ pub(crate) struct EntryStyle {
 }
 
 impl EntryStyle {
-    /// Resolves the appropriate icon and colour for a filesystem entry using PHF maps
+    /// Resolves the appropriate icon and colour for a filesystem entry using PHF maps.
+    ///
+    /// # Parameters
+    /// - `entry`: The filesystem entry to resolve styling for.
+    ///
+    /// # Returns
+    /// An [`EntryStyle`] with the resolved icon and colour.
     pub(crate) fn from(entry: &Entry) -> Self {
         let name = entry.name().as_ref();
         let extension = entry.extension().as_ref();
@@ -70,20 +76,26 @@ pub(crate) struct StyledEntry<'a> {
 }
 
 impl<'a> StyledEntry<'a> {
+    /// Creates a new styled entry by resolving the style for the given entry.
+    ///
+    /// # Parameters
+    /// - `entry`: The filesystem entry to style.
+    ///
+    /// # Returns
+    /// A [`StyledEntry`] pairing the entry with its resolved styling.
     pub(crate) fn new(entry: &'a Entry) -> Self {
         let style = EntryStyle::from(entry);
         Self { entry, style }
     }
 
-    /// Renders the entry name with icon and styling
+    /// Renders the entry name with icon and styling.
     ///
     /// # Parameters
+    /// - `args`: Command-line arguments controlling display options.
+    /// - `add_alignment_space`: Whether to add space for grid/list alignment when entries aren't quoted.
     ///
-    /// * `args` - Command-line arguments controlling display options
-    /// * `add_alignment_space` - Whether to add space for grid/list alignment when entries aren't quoted
     /// # Returns
-    ///
-    /// A `EntryView` with the styled entry name
+    /// An [`EntryView`] with the styled entry name.
     pub(crate) fn load(&self, args: &Args, add_alignment_space: bool) -> EntryView {
         let mut name = String::new();
 

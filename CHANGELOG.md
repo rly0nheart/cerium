@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Changed
 - Simplify is_args_requesting_metadata into single expression
 - Remove unnecessary abstractions in code
+- Updated code doc strings
 
 ## [0.1.18] - 2026-02-08
 ### Changed

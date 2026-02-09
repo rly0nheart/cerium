@@ -44,6 +44,7 @@ use crc32fast::Hasher;
 use std::sync::Arc;
 
 #[cfg(feature = "checksum")]
+/// Computes a hash digest for a file using a specified algorithm.
 pub struct Checksum<'a> {
     path: &'a Path,
     algorithm: HashAlgorithm,
@@ -51,11 +52,19 @@ pub struct Checksum<'a> {
 
 #[cfg(feature = "checksum")]
 impl<'a> Checksum<'a> {
+    /// Creates a new [`Checksum`] for the given path and algorithm.
+    ///
+    /// # Parameters
+    /// - `path`: The file to hash.
+    /// - `algorithm`: The hash algorithm to use.
     pub(crate) fn new(path: &'a Path, algorithm: HashAlgorithm) -> Self {
         Self { path, algorithm }
     }
 
-    /// Compute checksum for the file
+    /// Computes the checksum for the file.
+    ///
+    /// # Returns
+    /// The hex-encoded hash digest, or `"-"` for directories or on error.
     pub(crate) fn compute(&self) -> Arc<str> {
         // Skip directories
         if self.path.is_dir() {
@@ -68,7 +77,7 @@ impl<'a> Checksum<'a> {
         }
     }
 
-    /// Generic hash computation
+    /// Dispatches to the selected hash algorithm and returns the hex-encoded digest.
     fn compute_hash(&self) -> io::Result<String> {
         match self.algorithm {
             HashAlgorithm::Md5 => {

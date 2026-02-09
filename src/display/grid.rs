@@ -65,24 +65,7 @@ impl RecursiveTraversal for Grid {
     }
 }
 
-/// A grid-based renderer that displays filesystem entries in a multi-column layout.
-///
-/// `Grid` arranges entries into columns that fit within the terminal width.
-/// The layout is optimised to use available horizontal space efficiently while maintaining readability.
-///
-/// # Layout Strategy
-///
-/// * **Direction**: Top-to-bottom filling (entries flow down columns, then across)
-/// * **Spacing**: 2 spaces between columns
-/// * **Width calculation**: Measures actual rendered width including ANSI codes
-/// * **Fitting algorithm**: Maximises column count while respecting terminal width
-///
-/// # Examples
-///
-/// ```text
-/// let grid = Grid::new(entries, args);
-/// grid.print(); // Outputs multi-column layout
-/// ```
+/// Multi-column renderer that arranges entries to fit the terminal width.
 pub(crate) struct Grid {
     /// The filesystem entries to display
     entries: Vec<Entry>,
@@ -91,51 +74,19 @@ pub(crate) struct Grid {
 }
 
 impl Grid {
-    /// Creates a new `Grid` renderer with the given entries and arguments.
+    /// Creates a new [`Grid`] renderer.
     ///
     /// # Parameters
-    ///
-    /// * `entries` - The filesystem entries to display in the grid
-    /// * `args` - Command-line arguments that control formatting, colours, icons, etc.
-    ///
-    /// # Returns
-    ///
-    /// A new `Grid` instance ready to render
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// let entries = directory.list(&args);
-    /// let grid = Grid::new(entries, args);
-    /// grid.print();
-    /// ```
+    /// - `entries`: The filesystem entries to display.
+    /// - `args`: Command-line arguments controlling formatting.
     pub(crate) fn new(entries: Vec<Entry>, args: Args) -> Self {
         Self { entries, args }
     }
 
     /// Displays entries in a non-recursive grid layout fitted to the terminal width.
     ///
-    /// This method creates a compact multi-column layout where entries are arranged
-    /// to maximise the use of available terminal width while maintaining consistent
-    /// spacing and alignment.
-    ///
     /// # Parameters
-    ///
-    /// * `entries` - The entries to display
-    ///
-    /// # Behavior
-    ///
-    /// 1. Returns early if entries list is empty
-    /// 2. Queries current terminal width
-    /// 3. Converts entries to `Cell` objects with styled content and measured widths
-    /// 4. Creates a grid with 2-space column separation and top-to-bottom filling
-    /// 5. Uses `fit_grid` to find optimal column layout for terminal width
-    ///
-    /// # Grid Configuration
-    ///
-    /// * **Filling**: 2 spaces between columns
-    /// * **Direction**: TopToBottom (entries fill columns vertically before moving right)
-    /// * **Alignment**: Left-aligned entries
+    /// - `entries`: The entries to display.
     fn nonrecursive(&self, entries: &[Entry]) {
         if entries.is_empty() {
             return;
@@ -147,7 +98,7 @@ impl Grid {
             Some(w) => w,
         };
 
-        // Add an alignment space in any entries in have got special characters and will get quoted
+        // Add an alignment space in any entries that have got special characters (quotable)
         let add_alignment_space = entries
             .iter()
             .any(|entry| Quotes::is_quotable(entry.name()));
@@ -180,37 +131,12 @@ impl Grid {
         Self::fit_grid(grid, terminal_width, entries.len())
     }
 
-    /// Attempts to print a `TermGrid` so that it fits cleanly within the
-    /// available terminal width.
-    ///
-    /// This function implements an intelligent fitting algorithm that maximises
-    /// the number of columns while ensuring all content fits within the terminal.
+    /// Fits the grid into the terminal width and prints it.
     ///
     /// # Parameters
-    ///
-    /// * `grid` - The fully populated `TermGrid` to be rendered
-    /// * `terminal_width` - The visible width of the terminal in characters
-    /// * `entries_length` - The number of entries being displayed; used to
-    ///   determine the maximum possible column count
-    ///
-    /// # Algorithm
-    ///
-    /// The function uses a two-phase approach:
-    ///
-    /// 1. **Fast path**: Attempts `fit_into_width()` which lets term_grid
-    ///    compute an ideal layout automatically. If successful, uses that layout.
-    ///
-    /// 2. **Fallback path**: If the fast path fails, uses binary search to find
-    ///    the maximum number of columns that fits within terminal width.
-    ///
-    /// # Output
-    ///
-    /// Prints the grid directly to stdout using the optimal layout found.
-    ///
-    /// # Performance
-    ///
-    /// * Fast path: O(1) - immediate if term_grid's algorithm succeeds
-    /// * Fallback: O(log n) - binary search for optimal column count
+    /// - `grid`: The fully populated [`TermGrid`] to print.
+    /// - `terminal_width`: The visible width of the terminal in characters.
+    /// - `entries_length`: The number of entries (caps the column count).
     fn fit_grid(grid: TermGrid, terminal_width: usize, entries_length: usize) {
         // Try the easy fit first
         if let Some(fit) = grid.fit_into_width(terminal_width) {

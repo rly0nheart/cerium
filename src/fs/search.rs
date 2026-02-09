@@ -30,14 +30,21 @@ use crate::fs::entry::Entry;
 use crate::fs::glob::Glob;
 use std::path::PathBuf;
 
-/// Searches for files matching a glob pattern.
+/// Searches for files matching a glob pattern under a base directory.
 pub struct Search {
     glob: Glob,
     base_path: PathBuf,
 }
 
 impl Search {
-    /// Creates a new search with the given glob pattern.
+    /// Creates a new search with the given glob pattern rooted at `base_path`.
+    ///
+    /// # Parameters
+    /// - `pattern`: A glob string where `*` matches any sequence and `?` matches any single character.
+    /// - `base_path`: The root directory to search from.
+    ///
+    /// # Returns
+    /// A configured [`Search`], or an error if the pattern fails to compile.
     pub fn new(pattern: &str, base_path: PathBuf) -> Result<Self, String> {
         let glob = Glob::new(pattern)?;
         Ok(Self { glob, base_path })
@@ -46,6 +53,12 @@ impl Search {
     /// Executes the search and returns matching entries.
     ///
     /// If `args.recursive` is true, searches subdirectories as well.
+    ///
+    /// # Parameters
+    /// - `args`: CLI arguments controlling recursion, filters, verbosity, and metadata.
+    ///
+    /// # Returns
+    /// A `Vec<Entry>` of all entries whose names match the glob pattern.
     pub fn find(&self, args: &Args) -> Vec<Entry> {
         let mut matches = Vec::new();
         let dir_reader = DirReader::from(self.base_path.clone());
@@ -62,6 +75,12 @@ impl Search {
         matches
     }
 
+    /// Recursively searches a directory, appending matched entries to `matches`.
+    ///
+    /// # Parameters
+    /// - `dir_reader`: The directory to scan.
+    /// - `args`: CLI arguments controlling filters, recursion, and verbosity.
+    /// - `matches`: Accumulator for entries whose names match the glob.
     fn search_dir(&self, dir_reader: &DirReader, args: &Args, matches: &mut Vec<Entry>) {
         if args.verbose {
             println!("Searching in {} ...", dir_reader.path().display());
@@ -99,7 +118,14 @@ impl Search {
         }
     }
 
-    /// Creates the display name with relative path prefix.
+    /// Builds a display name with the relative path prefix from `base_path`.
+    ///
+    /// # Parameters
+    /// - `entry`: The entry to produce a display name for.
+    ///
+    /// # Returns
+    /// A string like `"subdir/file.txt"` relative to the search root, or just
+    /// the entry name if it lives directly under `base_path`.
     fn relative_display_name(&self, entry: &Entry) -> String {
         let parent_prefix = entry
             .path()

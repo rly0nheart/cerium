@@ -32,6 +32,7 @@ use crate::display::layout::width::Width;
 use crate::display::styles::text::TextStyle;
 use std::collections::HashMap;
 
+/// Identifies a data column in the tabular output.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Column {
     #[cfg(all(feature = "magic", not(target_os = "android")))]
@@ -59,6 +60,7 @@ pub enum Column {
 }
 
 impl Column {
+    /// Returns the display header label for this column.
     pub(crate) fn header(&self) -> &str {
         match self {
             Self::Name => "Name",
@@ -94,6 +96,7 @@ impl Column {
         }
     }
 
+    /// Returns the text alignment for this column.
     pub(crate) fn alignment(&self) -> Alignment {
         match self {
             Self::Size
@@ -108,6 +111,11 @@ impl Column {
         }
     }
 
+    /// Prints styled column headers aligned to the given widths.
+    ///
+    /// # Parameters
+    /// - `widths`: Pre-calculated column widths.
+    /// - `args`: Command-line arguments (checked for `headers` flag).
     pub(crate) fn headers(widths: &HashMap<Column, usize>, args: &Args) {
         if !args.headers {
             return;
@@ -129,9 +137,17 @@ impl Column {
     }
 }
 
+/// Builds the ordered list of columns to display based on CLI arguments.
 pub(crate) struct Selector;
 
 impl Selector {
+    /// Selects the columns to display based on the given arguments.
+    ///
+    /// # Parameters
+    /// - `args`: Parsed command-line arguments.
+    ///
+    /// # Returns
+    /// An ordered vector of [`Column`] variants to display.
     pub(crate) fn select(args: &Args) -> Vec<Column> {
         let mut columns = Vec::new();
 

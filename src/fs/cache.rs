@@ -41,15 +41,34 @@ static PERMISSIONS_CACHE: OnceLock<Mutex<HashMap<u32, Arc<str>>>> = OnceLock::ne
 static USER_CACHE: OnceLock<Mutex<HashMap<u32, Arc<str>>>> = OnceLock::new();
 static GROUP_CACHE: OnceLock<Mutex<HashMap<u32, Arc<str>>>> = OnceLock::new();
 
+/// Thread-safe caching layer for formatted display strings and computed values.
+///
+/// Each cache method checks a global `OnceLock<Mutex<HashMap>>` before calling
+/// the provided formatting/compute closure, ensuring each unique key is only
+/// computed once.
 pub(crate) struct Cache;
 
 impl Cache {
-    /// Loads metadata for a path.
-    /// When `dereference` is true, follows symlinks (stat); otherwise uses lstat.
+    /// Loads metadata for a path. Not cached — delegates directly to [`Metadata::load`].
+    ///
+    /// # Parameters
+    /// - `path`: The filesystem path to query.
+    /// - `dereference`: If `true`, follows symlinks (stat); otherwise uses lstat.
+    ///
+    /// # Returns
+    /// The loaded [`Metadata`], or an I/O error.
     pub(crate) fn metadata(path: &Path, dereference: bool) -> io::Result<Metadata> {
         Metadata::load(path, dereference)
     }
 
+    /// Returns a cached formatted string for a number, computing it via `format` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `number`: The numeric key to look up or cache.
+    /// - `format`: Closure to produce the display string on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly computed display string.
     pub(crate) fn number(number: u64, format: impl Fn(u64) -> Arc<str>) -> Arc<str> {
         let cache = NUMBER_DISPLAY_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
@@ -62,6 +81,14 @@ impl Cache {
         formatted
     }
 
+    /// Returns a cached permission string for a Unix mode, computing it via `format` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `mode`: The raw Unix permission bits.
+    /// - `format`: Closure to produce the display string (e.g. `"rwxr-xr-x"`) on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly computed permission string.
     pub(crate) fn permissions(mode: u32, format: impl Fn(u32) -> Arc<str>) -> Arc<str> {
         let cache = PERMISSIONS_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
@@ -74,6 +101,14 @@ impl Cache {
         formatted
     }
 
+    /// Returns a cached human-readable size string, computing it via `format` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `bytes`: The raw byte count.
+    /// - `format`: Closure to produce the display string (e.g. `"4.2 KiB"`) on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly computed size string.
     pub(crate) fn size(bytes: u64, format: impl Fn(u64) -> Arc<str>) -> Arc<str> {
         let cache = SIZE_DISPLAY_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
@@ -86,6 +121,15 @@ impl Cache {
         formatted
     }
 
+    /// Returns a cached recursive directory size, computing it via `compute` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `path`: The directory path to compute size for.
+    /// - `include_hidden`: Whether hidden files are included (part of the cache key).
+    /// - `compute`: Closure to calculate the total size on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly computed total size in bytes.
     pub(crate) fn true_size(
         path: &Path,
         include_hidden: bool,
@@ -102,6 +146,14 @@ impl Cache {
         size
     }
 
+    /// Returns a cached username for a UID, resolving it via `lookup` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `uid`: The user ID to resolve.
+    /// - `lookup`: Closure to resolve the UID to a username string on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly resolved username.
     pub(crate) fn owner(uid: u32, lookup: impl Fn(u32) -> Arc<str>) -> Arc<str> {
         let cache = USER_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
@@ -114,6 +166,14 @@ impl Cache {
         formatted
     }
 
+    /// Returns a cached formatted date string, computing it via `format` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `ts`: The optional timestamp to format. `None` represents an unavailable timestamp.
+    /// - `format`: Closure to produce the display string on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly computed date string.
     pub(crate) fn date(
         ts: Option<SystemTime>,
         format: impl Fn(Option<SystemTime>) -> Arc<str>,
@@ -129,6 +189,14 @@ impl Cache {
         formatted
     }
 
+    /// Returns a cached libmagic file description, computing it via `compute` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `path`: The file path to identify.
+    /// - `compute`: Closure to produce the magic description string on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly computed file description.
     #[cfg(all(feature = "magic", not(target_os = "android")))]
     pub(crate) fn magic(path: &PathBuf, compute: impl FnOnce() -> Arc<str>) -> Arc<str> {
         let cache = MAGIC_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
@@ -142,6 +210,14 @@ impl Cache {
         description
     }
 
+    /// Returns a cached group name for a GID, resolving it via `lookup` on a cache miss.
+    ///
+    /// # Parameters
+    /// - `gid`: The group ID to resolve.
+    /// - `lookup`: Closure to resolve the GID to a group name string on a cache miss.
+    ///
+    /// # Returns
+    /// The cached or freshly resolved group name.
     pub(crate) fn group(gid: u32, lookup: impl Fn(u32) -> Arc<str>) -> Arc<str> {
         let cache = GROUP_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
@@ -154,7 +230,14 @@ impl Cache {
         formatted
     }
 
-    /// Cache getter
+    /// Attempts to retrieve a cloned value from a locked cache map.
+    ///
+    /// # Parameters
+    /// - `cache`: The mutex-guarded hash map to look up.
+    /// - `key`: The key to search for.
+    ///
+    /// # Returns
+    /// `Some(value)` on a cache hit, or `None` on a miss or poisoned lock.
     fn getter<K: Eq + std::hash::Hash, V: Clone>(
         cache: &Mutex<HashMap<K, V>>,
         key: &K,
@@ -166,7 +249,12 @@ impl Cache {
         }
     }
 
-    /// Cache setter
+    /// Inserts a key-value pair into a locked cache map. Silently no-ops on a poisoned lock.
+    ///
+    /// # Parameters
+    /// - `cache`: The mutex-guarded hash map to insert into.
+    /// - `key`: The cache key.
+    /// - `value`: The value to store.
     fn setter<K: Eq + std::hash::Hash, V>(cache: &Mutex<HashMap<K, V>>, key: K, value: V) {
         if let Ok(mut map) = cache.lock() {
             map.insert(key, value);

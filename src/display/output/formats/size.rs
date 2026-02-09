@@ -27,15 +27,24 @@ use crate::display::output::formats::format::Format;
 use humanly::HumanSize;
 use std::sync::Arc;
 
+/// Formats byte sizes according to the selected [`SizeFormat`].
 pub(crate) struct Size {
     size_mode: SizeFormat,
 }
 
 impl Size {
+    /// Creates a new [`Size`] formatter.
+    ///
+    /// # Parameters
+    /// - `size_mode`: The display format (bytes, binary, or decimal).
     pub(crate) fn new(size_mode: SizeFormat) -> Self {
         Self { size_mode }
     }
 
+    /// Formats a byte count as human-readable or raw.
+    ///
+    /// # Parameters
+    /// - `bytes`: The byte count to format.
     pub(crate) fn format_size(&self, bytes: u64) -> Arc<str> {
         match self.size_mode {
             SizeFormat::Binary => HumanSize::from(bytes).binary().concise().into(),
@@ -46,6 +55,7 @@ impl Size {
 }
 
 impl Format<u64> for Size {
+    /// Formats a `u64` byte count according to the configured size format.
     fn format(&self, input: u64) -> Arc<str> {
         self.format_size(input)
     }

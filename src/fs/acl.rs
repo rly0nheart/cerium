@@ -27,18 +27,17 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
 use std::sync::Arc;
 
+/// Utilities for querying POSIX Access Control Lists via extended attributes.
 pub struct Acl;
 
 impl Acl {
-    /// Checks if a file has ACLs beyond standard permissions.
+    /// Checks if a file has ACLs beyond standard Unix permissions.
     ///
     /// # Parameters
-    ///
-    /// * `path` - Path to the file
+    /// - `path`: Path to the file to inspect.
     ///
     /// # Returns
-    ///
-    /// "+" if ACLs present, "-" if none/error
+    /// `"+"` if ACLs are present, `"-"` if none or on error.
     pub fn check(path: &Path) -> Arc<str> {
         match Self::has_acl(path) {
             Ok(true) => "+".into(),
@@ -46,7 +45,14 @@ impl Acl {
         }
     }
 
-    /// Internal ACL check using libc
+    /// Queries `listxattr` for the `system.posix_acl_access` extended attribute.
+    ///
+    /// # Parameters
+    /// - `path`: Path to the file to inspect.
+    ///
+    /// # Returns
+    /// `Ok(true)` if the file has a POSIX ACL, `Ok(false)` if not or on
+    /// a libc error, `Err(())` if the path contains a null byte.
     fn has_acl(path: &Path) -> Result<bool, ()> {
         let path_c = CString::new(path.as_os_str().as_bytes()).map_err(|_| ())?;
 

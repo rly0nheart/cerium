@@ -47,17 +47,11 @@ pub enum Entry {
 }
 
 impl Entry {
-    /// Creates a new entry from a DirEntry, using d_type to avoid stat calls.
+    /// Creates a new entry from a [`DirEntry`], using `d_type` to avoid stat calls.
     ///
     /// # Parameters
-    ///
-    /// * `dir_entry` - The directory entry from readdir
-    /// * `show_link_target` - If `true`, include symlink target in display name
-    ///
-    /// # Performance
-    ///
-    /// This avoids separate is_dir() and is_symlink() calls by using DirEntry::file_type()
-    /// which reads from the cached d_type field on Linux.
+    /// - `dir_entry`: The directory entry from readdir.
+    /// - `show_link_target`: If `true`, includes the symlink target in the display name.
     pub fn from_dir_entry(dir_entry: &DirEntry, show_link_target: bool) -> Self {
         let path = dir_entry.path();
 
@@ -72,17 +66,9 @@ impl Entry {
 
     /// Creates a new entry for a known path (e.g., root path for tree traversal).
     ///
-    /// This constructor is used when we don't have a DirEntry (e.g., for the root
-    /// path passed on command line). It does require stat calls.
-    ///
-    /// Prefer `from_dir_entry()` when iterating directory contents as it avoids
-    /// stat syscalls by using the cached d_type from readdir.
-    ///
     /// # Parameters
-    ///
-    /// * `path` - The path to the file, directory, or symlink.
-    /// * `show_link_target` - If `true`, the entry will include the symlink target
-    ///   in its display name (e.g., `"name ⇒ target"`).
+    /// - `path`: The path to the file, directory, or symlink.
+    /// - `show_link_target`: If `true`, includes the symlink target in the display name.
     pub fn from_path(path: PathBuf, show_link_target: bool) -> Self {
         // For root paths we need to stat - but this is only called once per listing
         let is_symlink = path.is_symlink();
@@ -91,7 +77,13 @@ impl Entry {
         Self::create(path, is_dir, is_symlink, show_link_target)
     }
 
-    /// Internal helper to create the appropriate Entry variant.
+    /// Creates the appropriate [`Entry`] variant from pre-computed type flags.
+    ///
+    /// # Parameters
+    /// - `path`: The filesystem path.
+    /// - `is_dir`: Whether the path is a directory.
+    /// - `is_symlink`: Whether the path is a symbolic link.
+    /// - `show_link_target`: If `true`, includes the symlink target in the display name.
     fn create(path: PathBuf, is_dir: bool, is_symlink: bool, show_link_target: bool) -> Self {
         let name = Self::get_name(&path, is_symlink, show_link_target);
 
@@ -188,7 +180,9 @@ impl Entry {
     }
 
     /// Sets the entry's display name.
-    /// Used by search.rs for highlighting matches.
+    ///
+    /// # Parameters
+    /// - `name`: The new display name.
     pub fn set_name(&mut self, name: Arc<str>) {
         match self {
             Entry::File(file) => file.name = name,
@@ -216,14 +210,10 @@ impl Entry {
         }
     }
 
-    /// Conditionally loads metadata for this entry if requested by any args option.
+    /// Loads metadata for this entry only if the arguments request it.
     ///
     /// # Parameters
-    /// - `args`: Reference to args options that determine which metadata fields to populate.
-    ///
-    /// # Description
-    /// Populates fields like size, timestamps, permissions, owner/group, inode, links, and block info
-    /// only if the corresponding display args are enabled. Skips loading if metadata is already populated.
+    /// - `args`: Parsed command-line arguments that determine which metadata fields to populate.
     pub fn conditional_metadata(&mut self, args: &Args) {
         if !Args::is_args_requesting_metadata(args) {
             return;
@@ -232,12 +222,10 @@ impl Entry {
         self.unconditional_metadata(args.dereference);
     }
 
-    /// Unconditionally loads metadata for sorting purposes.
-    /// This bypasses the args_request_metadata check since sorting
-    /// needs metadata even when display flags don't request it.
+    /// Unconditionally loads metadata, bypassing display-flag checks.
     ///
-    /// When `dereference` is true, symlinks are followed (stat) so
-    /// metadata reflects the link target rather than the link itself.
+    /// # Parameters
+    /// - `dereference`: If `true`, follows symlinks so metadata reflects the target.
     pub fn unconditional_metadata(&mut self, dereference: bool) {
         // Skip if already loaded (check both size and ino for robustness)
         if let Some(meta) = self.metadata()
@@ -259,14 +247,12 @@ impl Entry {
         }
     }
 
-    /// Returns a display name for a file, directory, or symlink.
+    /// Builds a display name for a file, directory, or symlink.
     ///
     /// # Parameters
-    ///
-    /// * `path` - The path to the file, directory, or symlink.
-    /// * `is_symlink` - Whether the path is a symbolic link.
-    /// * `show_link_target` - If `true` and `path` is a symlink, the returned name
-    ///   will include the symlink target in the format `"name ⇒ target"`.
+    /// - `path`: The filesystem path.
+    /// - `is_symlink`: Whether the path is a symbolic link.
+    /// - `show_link_target`: If `true` and the path is a symlink, appends the target.
     fn get_name(path: &Path, is_symlink: bool, show_link_target: bool) -> Arc<str> {
         if !is_symlink {
             path.file_name()

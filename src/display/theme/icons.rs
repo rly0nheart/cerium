@@ -30,21 +30,29 @@ use std::sync::atomic::{AtomicBool, Ordering};
 // Global atomic: are icons enabled?
 static ICONS_ENABLED: AtomicBool = AtomicBool::new(true);
 
+/// Global icon toggle controlling whether Nerd Font icons are displayed.
 pub struct IconSettings;
 
 impl IconSettings {
+    /// Enables icon output globally.
     pub(crate) fn enable() {
         ICONS_ENABLED.store(true, Ordering::SeqCst);
     }
 
+    /// Disables icon output globally.
     pub(crate) fn disable() {
         ICONS_ENABLED.store(false, Ordering::SeqCst);
     }
 
+    /// Checks whether icon output is currently enabled.
     pub(crate) fn enabled() -> bool {
         ICONS_ENABLED.load(Ordering::SeqCst)
     }
 
+    /// Configures icon output at startup based on the CLI flag and terminal detection.
+    ///
+    /// # Parameters
+    /// - `show_icons`: The user's icon preference from the CLI.
     pub fn setup(show_icons: ShowIcons) {
         match show_icons {
             ShowIcons::Always => Self::enable(),
@@ -60,6 +68,7 @@ impl IconSettings {
     }
 }
 
+/// Nerd Font icon constants for filesystem entries.
 #[non_exhaustive]
 pub(crate) struct Icons;
 
@@ -733,23 +742,33 @@ pub(crate) const DEFAULT_FILE_ICON: char = Icons::FILE;
 pub(crate) const DEFAULT_DIR_ICON: char = Icons::FOLDER;
 pub(crate) const SYMLINK_ICON: char = Icons::FILE_SYMLINK;
 
-/// Default file colour (from theme)
+/// Returns the default file colour from the active theme.
 pub(crate) fn default_file_colour() -> Colour {
     RgbColours::theme().entry_file.colour
 }
 
+/// Returns the default directory colour from the active theme.
 #[allow(dead_code)]
-/// Default directory colour (from theme)
 pub(crate) fn default_dir_colour() -> Colour {
     RgbColours::theme().entry_directory.colour
 }
 
-/// Symlink colour (from theme)
+/// Returns the symlink colour from the active theme.
 pub(crate) fn symlink_colour() -> Colour {
     RgbColours::theme().entry_symlink.colour
 }
 
-/// Lookup icon for an entry
+/// Looks up the icon for a filesystem entry by name, extension, and type.
+///
+/// # Parameters
+/// - `name`: The entry filename.
+/// - `extension`: The file extension (empty string if none).
+/// - `is_dir`: Whether the entry is a directory.
+/// - `has_children`: Whether the directory contains children.
+/// - `is_symlink`: Whether the entry is a symbolic link.
+///
+/// # Returns
+/// The Nerd Font icon character for the entry.
 pub(crate) fn icon_for_entry(
     name: &str,
     extension: &str,
@@ -787,7 +806,16 @@ pub(crate) fn icon_for_entry(
     DEFAULT_FILE_ICON
 }
 
-/// Lookup colour for an entry
+/// Looks up the colour for a filesystem entry by name, extension, and type.
+///
+/// # Parameters
+/// - `name`: The entry filename.
+/// - `extension`: The file extension (empty string if none).
+/// - `is_dir`: Whether the entry is a directory.
+/// - `is_symlink`: Whether the entry is a symbolic link.
+///
+/// # Returns
+/// The theme colour for the entry.
 pub(crate) fn colour_for_entry(
     name: &str,
     extension: &str,

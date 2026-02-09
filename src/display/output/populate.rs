@@ -47,6 +47,7 @@ use crate::fs::xattr::Xattr;
 use std::sync::Arc;
 use std::time;
 
+/// Extracts a formatted column value from a filesystem entry.
 pub(crate) struct Populate<'a> {
     entry: &'a Entry,
     column: &'a Column,
@@ -54,6 +55,12 @@ pub(crate) struct Populate<'a> {
 }
 
 impl<'a> Populate<'a> {
+    /// Creates a new [`Populate`] for the given entry and column.
+    ///
+    /// # Parameters
+    /// - `entry`: The filesystem entry to query.
+    /// - `column`: The column whose value to extract.
+    /// - `args`: Command-line arguments controlling formatting.
     pub(crate) fn new(entry: &'a Entry, column: &'a Column, args: &'a Args) -> Self {
         Self {
             entry,
@@ -62,6 +69,7 @@ impl<'a> Populate<'a> {
         }
     }
 
+    /// Returns the formatted value for this column.
     pub(crate) fn value(&self) -> Arc<str> {
         let path = self.entry.path();
 

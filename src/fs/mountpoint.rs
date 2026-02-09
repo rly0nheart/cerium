@@ -29,26 +29,17 @@ use std::sync::{Arc, OnceLock};
 /// Global cache of mount points parsed from /proc/mounts
 static MOUNT_POINTS: OnceLock<Vec<(PathBuf, String)>> = OnceLock::new();
 
+/// Resolves the filesystem mount point for a given path via `/proc/mounts`.
 pub struct Mountpoint;
 
 impl Mountpoint {
     /// Determines the mount point for a given path.
     ///
-    /// Returns the mount point path as a string. If the mount point cannot be
-    /// determined, returns "-".
-    ///
-    /// # Implementation
-    ///
-    /// This function reads `/proc/mounts` (only once, cached globally) to get all
-    /// active mount points, then finds the longest matching prefix for the given path.
-    ///
     /// # Parameters
-    ///
-    /// * `path` - The file or directory path to check
+    /// - `path`: The file or directory path to check.
     ///
     /// # Returns
-    ///
-    /// The mount point path as an Arc<str>, or "-" if unavailable
+    /// The mount point path as an `Arc<str>`, or `"-"` if unavailable.
     pub fn get(path: &Path) -> Arc<str> {
         let mounts = MOUNT_POINTS.get_or_init(|| Self::parse_mounts().unwrap_or_default());
 
@@ -58,25 +49,11 @@ impl Mountpoint {
         }
     }
 
-    /// Parses /proc/mounts to extract all mount points.
-    ///
-    /// # Format
-    ///
-    /// Each line in /proc/mounts has the format:
-    /// ```text
-    /// device mountpoint filesystem options dump pass
-    /// ```
-    ///
-    /// Example:
-    /// ```text
-    /// /dev/sda1 / ext4 rw,relatime 0 0
-    /// tmpfs /tmp tmpfs rw,nosuid,nodev 0 0
-    /// ```
+    /// Parses `/proc/mounts` to extract all mount points.
     ///
     /// # Returns
-    ///
-    /// A vector of (mount_path, filesystem_type) tuples, sorted by path length
-    /// (longest first) to ensure correct prefix matching.
+    /// A vector of `(mount_path, filesystem_type)` tuples sorted by path length
+    /// (longest first), or `Err(())` if `/proc/mounts` cannot be read.
     fn parse_mounts() -> Result<Vec<(PathBuf, String)>, ()> {
         let content = fs::read_to_string("/proc/mounts").map_err(|_| ())?;
 
@@ -101,18 +78,13 @@ impl Mountpoint {
         Ok(mounts)
     }
 
-    /// Unescapes octal sequences in mount point paths from /proc/mounts.
-    ///
-    /// /proc/mounts escapes special characters (like spaces) as octal sequences.
-    /// For example, "/mnt/my\040folder" represents "/mnt/my folder".
+    /// Unescapes octal sequences in mount point paths from `/proc/mounts`.
     ///
     /// # Parameters
-    ///
-    /// * `path` - The escaped path string from /proc/mounts
+    /// - `path`: The escaped path string from `/proc/mounts`.
     ///
     /// # Returns
-    ///
-    /// The unescaped path string
+    /// The unescaped path string.
     fn unescape_mount_path(path: &str) -> String {
         let mut result = String::new();
         let mut chars = path.chars();
@@ -138,22 +110,14 @@ impl Mountpoint {
         result
     }
 
-    /// Finds the mount point for a given path by matching against known mounts.
-    ///
-    /// # Algorithm
-    ///
-    /// Since mounts are sorted by length (longest first), we iterate through them
-    /// and return the first one where the path starts with the mount point.
-    /// This ensures we match the most specific mount.
+    /// Finds the most specific mount point for a given path.
     ///
     /// # Parameters
-    ///
-    /// * `path` - The path to find the mount point for
-    /// * `mounts` - List of (mount_path, fs_type) tuples, sorted longest first
+    /// - `path`: The path to find the mount point for.
+    /// - `mounts`: List of `(mount_path, fs_type)` tuples, sorted longest first.
     ///
     /// # Returns
-    ///
-    /// The mount point path as a String, or None if no match found
+    /// The mount point path as a `String`, or `None` if no match is found.
     fn find_mountpoint(path: &Path, mounts: &[(PathBuf, String)]) -> Option<String> {
         // Canonicalise the path to resolve symlinks and get absolute path
         let canonical_path = path.canonicalize().ok()?;

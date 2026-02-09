@@ -22,7 +22,7 @@ use filemagic::Magic as FileMagic;
 ///
 /// # Parameters
 ///
-/// * `text` - The input string to truncate
+/// - `text`: The input string to truncate.
 ///
 /// # Returns
 ///
@@ -51,11 +51,18 @@ fn clip_2nd_comma(text: String) -> Arc<str> {
 }
 
 #[cfg(all(feature = "magic", not(target_os = "android")))]
+/// Detects file types using `libmagic`.
 pub(crate) struct Magic;
 
 #[cfg(all(feature = "magic", not(target_os = "android")))]
 impl Magic {
-    // #[cfg(all(feature = "magic", not(target_os = "android")))]
+    /// Returns the `libmagic` file type description for a path.
+    ///
+    /// # Parameters
+    /// - `path`: The file to identify.
+    ///
+    /// # Returns
+    /// A truncated magic description, or an empty string for directories.
     pub(crate) fn file(path: &PathBuf) -> Arc<str> {
         if path.is_dir() {
             return "".into();

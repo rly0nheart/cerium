@@ -24,6 +24,11 @@ SOFTWARE.
 
 use std::sync::Arc;
 
+/// Trait for formatting a value into a display string.
 pub trait Format<I> {
+    /// Formats the input value into a display string.
+    ///
+    /// # Parameters
+    /// - `input`: The value to format.
     fn format(&self, input: I) -> Arc<str>;
 }

@@ -53,13 +53,9 @@ use std::path::Path;
 pub(crate) trait RecursiveTraversal {
     /// Renders entries at a single directory level.
     ///
-    /// This method is implemented by each renderer to provide its specific
-    /// rendering logic (list, grid, etc.) without the recursion overhead.
-    ///
     /// # Parameters
-    ///
-    /// * `entries` - The entries to render at this level
-    /// * `args` - Command-line arguments controlling display options
+    /// - `entries`: The entries to render at this level.
+    /// - `args`: Command-line arguments controlling display options.
     fn render_level(&self, entries: &[Entry], args: &Args);
 
     /// Returns a reference to the Args for this renderer.
@@ -70,33 +66,9 @@ pub(crate) trait RecursiveTraversal {
 
     /// Recursively renders entries with directory titles, descending into subdirectories.
     ///
-    /// This default implementation provides the common recursion pattern used by
-    /// multiple renderers, eliminating code duplication. It:
-    /// 1. Prints an optional title (directory path) as a section header
-    /// 2. Calls `render_level()` for renderer-specific output
-    /// 3. Recursively processes all subdirectories
-    ///
     /// # Parameters
-    ///
-    /// * `entries` - The entries to display at the current level
-    /// * `title` - Optional path to display as a section title before the entries.
-    ///   `None` for the initial/root call, `Some(path)` for subdirectories
-    ///
-    /// # Output Format
-    ///
-    /// ```text
-    /// /path/to/directory:
-    /// [entries rendered by render_level()]
-    ///
-    /// /path/to/directory/subdir:
-    /// [entries rendered by render_level()]
-    /// ```
-    ///
-    /// # Performance
-    ///
-    /// This method performs a depth-first traversal, rendering each directory
-    /// before descending into its subdirectories. For large directory trees,
-    /// this can be memory-intensive as it maintains the full call stack.
+    /// - `entries`: The entries to display at the current level.
+    /// - `title`: Optional path to display as a section header; `None` for the root call.
     fn render_recursive(&self, entries: &[Entry], title: Option<&Path>) {
         // 1. Print section title if provided
         if let Some(path) = title {

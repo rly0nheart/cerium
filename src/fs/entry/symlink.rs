@@ -50,11 +50,10 @@ impl SymlinkEntry {
     /// Creates a new SymlinkEntry.
     ///
     /// # Parameters
-    ///
-    /// * `name` - The display name of the symlink
-    /// * `path` - The full path to the symlink
-    /// * `target_is_dir` - Whether the symlink points to a directory
-    /// * `target_exists` - Whether the symlink target exists
+    /// - `name`: The display name of the symlink.
+    /// - `path`: The full path to the symlink.
+    /// - `target_is_dir`: Whether the symlink points to a directory.
+    /// - `target_exists`: Whether the symlink target exists.
     pub fn new(name: Arc<str>, path: PathBuf, target_is_dir: bool, target_exists: bool) -> Self {
         let extension = Self::get_extension(&path);
         Self {
@@ -68,6 +67,9 @@ impl SymlinkEntry {
     }
 
     /// Returns the file extension in lowercase from the symlink name.
+    ///
+    /// # Parameters
+    /// - `path`: The symlink path to extract the extension from.
     fn get_extension(path: &Path) -> Arc<str> {
         path.extension()
             .and_then(|e| e.to_str())

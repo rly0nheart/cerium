@@ -24,6 +24,7 @@ SOFTWARE.
 
 use clap::ValueEnum;
 
+/// Controls how dates are formatted in output.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum DateFormat {
     Locale,
@@ -31,18 +32,21 @@ pub enum DateFormat {
     Timestamp,
 }
 
+/// Controls how numeric values (hard links, blocks) are formatted.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum NumberFormat {
     Humanly,
     Natural,
 }
 
+/// Controls how user and group ownership is displayed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum OwnershipFormat {
     Name,
     Id,
 }
 
+/// Controls when file-type icons are shown.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum ShowIcons {
     Auto,
@@ -50,6 +54,7 @@ pub enum ShowIcons {
     Never,
 }
 
+/// Controls how file permissions are formatted.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum PermissionFormat {
     Symbolic,
@@ -57,6 +62,7 @@ pub enum PermissionFormat {
     Hex,
 }
 
+/// Controls how file sizes are formatted.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum SizeFormat {
     Bytes,
@@ -64,6 +70,7 @@ pub enum SizeFormat {
     Decimal,
 }
 
+/// Determines the field used to sort directory entries.
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum SortBy {
     Name,
@@ -75,6 +82,7 @@ pub enum SortBy {
     Inode,
 }
 
+/// Controls when ANSI colours are used in output.
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum ShowColour {
     Always,
@@ -82,6 +90,7 @@ pub enum ShowColour {
     Never,
 }
 
+/// Controls when OSC 8 hyperlinks wrap entry names.
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum ShowHyperlink {
     Always,
@@ -89,6 +98,7 @@ pub enum ShowHyperlink {
     Never,
 }
 
+/// Controls how entry names are quoted in output.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum QuoteStyle {
     Auto,

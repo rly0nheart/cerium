@@ -14,7 +14,7 @@ impl<'a> Quotes<'a> {
     ///
     /// # Parameters
     ///
-    /// * `text` - The text to be quoted
+    /// - `text`: The text to be quoted.
     ///
     /// # Examples
     ///
@@ -31,10 +31,8 @@ impl<'a> Quotes<'a> {
     ///
     /// # Parameters
     ///
-    /// * `style` - The quoting style to apply
-    /// * `add_alignment_space` - Whether to add a leading space for unquoted entries.
-    ///   Only applies to Auto mode when alignment is needed. For Single and Double modes,
-    ///   this parameter is ignored since all entries are quoted uniformly.
+    /// - `style`: The quoting style to apply.
+    /// - `add_alignment_space`: Whether to add a leading space for unquoted entries (Auto mode only).
     ///
     /// # Returns
     ///
@@ -190,7 +188,7 @@ impl<'a> Quotes<'a> {
     ///
     /// # Parameters
     ///
-    /// * `text` - The text to check
+    /// - `text`: The text to check.
     ///
     /// # Returns
     ///
@@ -205,6 +203,9 @@ impl<'a> Quotes<'a> {
     }
 
     /// Checks if a string contains characters that require shell quoting.
+    ///
+    /// # Parameters
+    /// - `text`: The text to inspect.
     fn has_special_chars(text: &str) -> bool {
         text.chars().any(|c| {
             c.is_whitespace()
@@ -240,7 +241,7 @@ impl<'a> Quotes<'a> {
     ///
     /// # Parameters
     ///
-    /// * `text` - The text segment to quote
+    /// - `text`: The text segment to quote.
     ///
     /// # Returns
     ///
@@ -259,7 +260,7 @@ impl<'a> Quotes<'a> {
     ///
     /// # Parameters
     ///
-    /// * `text` - The text to wrap in single quotes
+    /// - `text`: The text to wrap in single quotes.
     ///
     /// # Returns
     ///
@@ -285,7 +286,7 @@ impl<'a> Quotes<'a> {
     ///
     /// # Parameters
     ///
-    /// * `text` - The text to wrap in double quotes
+    /// - `text`: The text to wrap in double quotes.
     ///
     /// # Returns
     ///

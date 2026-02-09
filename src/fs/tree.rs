@@ -29,24 +29,34 @@ use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
 use std::path::PathBuf;
 
-/// A node in a directory tree.
+/// A node in a directory tree, holding an entry and its recursive children.
 #[derive(Debug, Clone)]
 pub struct TreeNode {
     pub entry: Entry,
     pub children: Vec<TreeNode>,
 }
 
-/// Builds a tree representation of a directory.
+/// Builds a recursive tree representation of a directory.
 pub struct TreeBuilder {
     path: PathBuf,
 }
 
 impl TreeBuilder {
+    /// Creates a new tree builder rooted at the given path.
+    ///
+    /// # Parameters
+    /// - `path`: The root directory to build the tree from.
     pub fn new(path: PathBuf) -> Self {
         Self { path }
     }
 
-    /// Builds the complete tree structure.
+    /// Builds the complete tree structure starting from the root path.
+    ///
+    /// # Parameters
+    /// - `args`: CLI arguments controlling filters, metadata, and sorting.
+    ///
+    /// # Returns
+    /// A [`TreeNode`] representing the root, with recursively populated children.
     pub fn build(&self, args: &Args) -> TreeNode {
         // Create the root entry (requires stat since we only have a path)
         let mut root_entry = Entry::from_path(self.path.clone(), args.long);
@@ -54,10 +64,17 @@ impl TreeBuilder {
         self.build_node(root_entry, args)
     }
 
-    /// Recursively builds a tree node from an existing Entry.
+    /// Recursively builds a tree node from an existing entry.
     ///
-    /// Takes an Entry directly to avoid redundant stat calls - child entries
-    /// are already created efficiently via `from_dir_entry()` in `DirReader::list()`.
+    /// Takes an [`Entry`] directly to avoid redundant stat calls — child entries
+    /// are already created efficiently via `from_dir_entry()` in [`DirReader::list`].
+    ///
+    /// # Parameters
+    /// - `entry`: The pre-built entry for this node.
+    /// - `args`: CLI arguments controlling filters, metadata, and sorting.
+    ///
+    /// # Returns
+    /// A [`TreeNode`] with children populated recursively if the entry is a directory.
     fn build_node(&self, entry: Entry, args: &Args) -> TreeNode {
         let is_dir = entry.is_dir();
         let path = entry.path().clone();

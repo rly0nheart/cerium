@@ -28,65 +28,29 @@ use crate::display::output::populate::Populate;
 use crate::fs::entry::Entry;
 use std::sync::Arc;
 
-/// Builds row data by extracting and formatting column values from filesystem entries.
-///
-/// `Row` is a pure data builder that knows how to extract values from entries
-/// but does NOT handle rendering, styling, or output. This separation eliminates
-/// circular dependencies and makes the code more testable.
-///
-/// # Responsibilities
-///
-/// * Extract column values from entries via the Populate system
-/// * Provide a simple interface for accessing formatted column data
-///
-/// # Non-Responsibilities (handled by renderers)
-///
-/// * Styling and colour application
-/// * Padding and alignment
-/// * Tree connectors and formatting
-/// * Output to stdout
+/// Extracts and formats column values from a filesystem entry.
 pub(crate) struct Row<'a> {
-    /// The filesystem entry this row represents
     pub entry: &'a Entry,
-    /// Command-line arguments controlling formatting options
     pub(crate) args: &'a Args,
 }
 
 impl<'a> Row<'a> {
-    /// Creates a new `Row` wrapping the given filesystem entry.
+    /// Creates a new [`Row`] for the given entry.
     ///
     /// # Parameters
-    ///
-    /// * `entry` - A reference to the filesystem entry to wrap
-    /// * `args` - Command-line arguments controlling formatting
-    ///
-    /// # Returns
-    ///
-    /// A new `Row` instance
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// let row = Row::new(&entry, &args);
-    /// let size = row.value(&Column::Size);
-    /// ```
+    /// - `entry`: The filesystem entry to wrap.
+    /// - `args`: Command-line arguments controlling formatting.
     pub(crate) fn new(entry: &'a Entry, args: &'a Args) -> Self {
         Self { entry, args }
     }
 
-    /// Retrieves the formatted value for a specific column.
-    ///
-    /// This method delegates to the `Populate` system to extract and format
-    /// the appropriate data from the entry (size, permissions, timestamps, etc.)
-    /// based on the column type.
+    /// Returns the formatted value for a specific column.
     ///
     /// # Parameters
-    ///
-    /// * `column` - The column to retrieve the value for
+    /// - `column`: The column to retrieve the value for.
     ///
     /// # Returns
-    ///
-    /// An `Arc<str>` containing the formatted column value (without styling)
+    /// An `Arc<str>` containing the formatted column value (without styling).
     pub(crate) fn value(&self, column: &Column) -> Arc<str> {
         let populate = Populate::new(self.entry, column, self.args);
         populate.value()

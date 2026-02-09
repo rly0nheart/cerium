@@ -29,22 +29,29 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 static HYPERLINKS_ENABLED: AtomicBool = AtomicBool::new(false);
 
+/// Global toggle controlling whether OSC 8 hyperlinks are emitted.
 pub struct HyperlinkSettings;
 
 impl HyperlinkSettings {
+    /// Enables hyperlink output globally.
     pub(crate) fn enable() {
         HYPERLINKS_ENABLED.store(true, Ordering::SeqCst);
     }
 
+    /// Disables hyperlink output globally.
     pub(crate) fn disable() {
         HYPERLINKS_ENABLED.store(false, Ordering::SeqCst);
     }
 
+    /// Returns whether hyperlinks are currently enabled.
     pub(crate) fn is_enabled() -> bool {
         HYPERLINKS_ENABLED.load(Ordering::SeqCst)
     }
 
-    /// Setup hyperlinks at startup based on CLI flag / terminal detection
+    /// Configures hyperlinks at startup based on CLI flag and terminal detection.
+    ///
+    /// # Parameters
+    /// - `show_hyperlink`: The user-selected hyperlink mode (always, never, or auto).
     pub fn setup(show_hyperlink: ShowHyperlink) {
         match show_hyperlink {
             ShowHyperlink::Always => Self::enable(),
@@ -62,54 +69,12 @@ impl HyperlinkSettings {
 
 /// Wraps text in an OSC 8 terminal hyperlink.
 ///
-/// Terminal hyperlinks use Operating System Command (OSC) 8 escape sequences
-/// to create clickable links in supported terminals. The escape sequences are
-/// zero-width (invisible) and don't affect layout calculations.
-///
-/// # Format
-///
-/// ```text
-/// \x1b]8;;file:///path/to/file\x1b\\text\x1b]8;;\x1b\\
-/// ```
-///
-/// Format breakdown:
-/// - `\x1b]8;;` - Start hyperlink (OSC 8 introducer + empty params)
-/// - `file:///absolute/path` - The URL (file:// protocol for local files)
-/// - `\x1b\\` - String terminator (ST)
-/// - `text` - The visible text that is clickable
-/// - `\x1b]8;;\x1b\\` - End hyperlink (OSC 8 with empty URL)
-///
 /// # Parameters
-///
-/// * `text` - The visible text to make clickable
-/// * `path` - The file path to link to
+/// - `text`: The visible text to make clickable.
+/// - `path`: The file path to link to.
 ///
 /// # Returns
-///
-/// A string containing the text wrapped with OSC 8 hyperlink escape sequences.
-/// In terminals that don't support OSC 8, the escape sequences are ignored
-/// and only the text is displayed.
-///
-/// # Examples
-///
-/// ```text
-/// let path = Path::new("/home/user/file.txt");
-/// let hyperlinked = wrap_hyperlink("file.txt", path);
-/// // Displays as "file.txt" but is clickable in supported terminals
-/// ```
-///
-/// # Terminal Compatibility
-///
-/// Supported terminals (as of 2025):
-/// - iTerm2 (macOS)
-/// - VSCode integrated terminal
-/// - Kitty
-/// - WezTerm
-/// - foot
-/// - GNOME Terminal (recent versions)
-/// - Windows Terminal
-///
-/// Unsupported terminals gracefully degrade by ignoring the escape sequences.
+/// A string containing `text` wrapped with OSC 8 hyperlink escape sequences.
 pub fn wrap_hyperlink(text: &str, path: &Path) -> String {
     // Convert to absolute path if relative
     let absolute_path = if path.is_absolute() {

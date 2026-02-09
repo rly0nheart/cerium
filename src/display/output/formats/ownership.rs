@@ -29,29 +29,41 @@ use std::mem;
 use std::ptr;
 use std::sync::Arc;
 
+/// Resolved user identity with name and UID.
 #[derive(Debug)]
 struct User {
     pub name: String,
     pub uid: uid_t,
 }
 
+/// Resolved group identity with name and GID.
 #[derive(Debug)]
 struct Group {
     pub name: String,
     pub gid: gid_t,
 }
 
+/// Formats user and group ownership according to the selected [`OwnershipFormat`].
 pub(crate) struct Ownership {
     ownership_format: OwnershipFormat,
 }
 
 impl Ownership {
+    /// Creates a new [`Ownership`] formatter.
+    ///
+    /// # Parameters
+    /// - `ownership_format`: Whether to display name or numeric ID.
     pub(crate) fn new(ownership_format: OwnershipFormat) -> Self {
         Self { ownership_format }
     }
 
-    /// Lookup a user by UID.
-    /// If lookup fails, `name` will be the numeric UID.
+    /// Looks up a user by UID via `getpwuid_r`.
+    ///
+    /// # Parameters
+    /// - `user_id`: The UID to resolve.
+    ///
+    /// # Returns
+    /// A [`User`] with the resolved name, or the numeric UID as a fallback.
     fn user_by_uid(user_id: uid_t) -> User {
         unsafe {
             let mut passwd_entry: passwd = mem::zeroed();
@@ -83,8 +95,13 @@ impl Ownership {
         }
     }
 
-    /// Lookup a group by GID.
-    /// If lookup fails, `name` will be the numeric GID.
+    /// Looks up a group by GID via `getgrgid_r`.
+    ///
+    /// # Parameters
+    /// - `group_id`: The GID to resolve.
+    ///
+    /// # Returns
+    /// A [`Group`] with the resolved name, or the numeric GID as a fallback.
     fn group_by_gid(group_id: gid_t) -> Group {
         unsafe {
             let mut group_entry: group = mem::zeroed();
@@ -115,6 +132,10 @@ impl Ownership {
             gid: group_id,
         }
     }
+    /// Formats a UID as either a username or numeric ID.
+    ///
+    /// # Parameters
+    /// - `uid`: The user ID to format.
     pub(crate) fn format_user(&self, uid: u32) -> Arc<str> {
         let user = Self::user_by_uid(uid);
         match self.ownership_format {
@@ -123,6 +144,10 @@ impl Ownership {
         }
     }
 
+    /// Formats a GID as either a group name or numeric ID.
+    ///
+    /// # Parameters
+    /// - `gid`: The group ID to format.
     pub(crate) fn format_group(&self, gid: u32) -> Arc<str> {
         let group = Self::group_by_gid(gid);
         match self.ownership_format {

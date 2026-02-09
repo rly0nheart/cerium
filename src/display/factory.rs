@@ -32,53 +32,18 @@ use crate::fs::dir::DirReader;
 use crate::fs::search::Search;
 use crate::fs::tree::TreeBuilder;
 
-/// Factory for creating appropriate display modes based on command-line arguments.
-///
-/// `DisplayFactory` encapsulates all the logic for selecting which display mode
-/// (List, Grid, or Tree) to use based on the user's CLI flags and the type
-/// of directory operation (list, search, tree).
-///
-/// This separation moves display selection logic out of the CLI layer and into
-/// the output system where it belongs, making the codebase more maintainable.
-///
-/// # Responsibilities
-///
-/// * Determine which display mode to use based on Args
-/// * Create and configure the appropriate display mode
-/// * Handle special cases (find/search, tree mode, recursive mode)
-///
-/// # Examples
-///
-/// ```text
-/// let dir_reader = DirReader::from(path);
-/// let display = DisplayFactory::create(&dir_reader, args);
-/// display.print();
-/// ```
+/// Selects and creates the appropriate display mode based on CLI arguments.
 pub struct DisplayFactory;
 
 impl DisplayFactory {
     /// Creates the appropriate display mode based on the command-line arguments.
     ///
-    /// This is the main entry point for display mode selection. It examines the
-    /// args to determine the user's intent and creates the corresponding display mode.
-    ///
-    /// # Selection Logic
-    ///
-    /// 1. **Find/Search mode**: If `args.find` is non-empty, use List display
-    ///    with search results
-    /// 2. **Tree mode**: If `args.tree` is true, use Tree display
-    /// 3. **List/Grid mode**: Otherwise, determine if List or Grid is appropriate:
-    ///    - List if metadata is needed or table-specific columns are requested
-    ///    - Grid otherwise (compact view)
-    ///
     /// # Parameters
-    ///
-    /// * `dir_reader` - The directory reader to use
-    /// * `args` - Command-line arguments controlling display options
+    /// - `dir_reader`: The directory reader to use.
+    /// - `args`: Command-line arguments controlling display options.
     ///
     /// # Returns
-    ///
-    /// A boxed DisplayMode trait object ready to render output
+    /// A boxed [`DisplayMode`] trait object ready to produce output.
     pub fn create(dir_reader: &DirReader, args: Args) -> Box<dyn DisplayMode> {
         // Find/Search mode
         if !args.find.is_empty() {
@@ -124,19 +89,13 @@ impl DisplayFactory {
         }
     }
 
-    /// Determines whether the List renderer should be used instead of Grid.
-    ///
-    /// List renderer is needed when:
-    /// * Metadata columns are requested (size, dates, permissions, etc.)
-    /// * Table-specific columns are requested (magic, head, tail, oneline)
+    /// Checks whether the List renderer should be used instead of Grid.
     ///
     /// # Parameters
-    ///
-    /// * `args` - Command-line arguments to examine
+    /// - `args`: Command-line arguments to examine.
     ///
     /// # Returns
-    ///
-    /// `true` if List renderer should be used, `false` for Grid
+    /// `true` if metadata or table-specific columns are requested.
     fn needs_list_renderer(args: &Args) -> bool {
         Args::is_args_requesting_metadata(args) || Args::is_args_requesting_table_column(args)
     }

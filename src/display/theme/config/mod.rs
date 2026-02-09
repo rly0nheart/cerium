@@ -58,7 +58,10 @@ pub fn load_theme() -> Theme {
     load_config().unwrap_or_else(|_| Theme::default())
 }
 
-/// Attempts to load and parse the config file directly as a Theme
+/// Attempts to load and parse the config file directly as a [`Theme`].
+///
+/// # Returns
+/// The parsed [`Theme`], or an error if the file cannot be read or parsed.
 fn load_config() -> Result<Theme, Box<dyn std::error::Error>> {
     let config_path = get_config_path()?;
     let contents = fs::read_to_string(config_path)?;
@@ -66,7 +69,10 @@ fn load_config() -> Result<Theme, Box<dyn std::error::Error>> {
     Ok(theme)
 }
 
-/// Gets the path to the config file (~/.config/cerium.toml)
+/// Returns the path to the config file (`~/.config/cerium.toml`).
+///
+/// # Returns
+/// The config file path, or an error if the home directory cannot be determined.
 fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     let config_dir = std::env::var_os("XDG_CONFIG_HOME")
         .map(PathBuf::from)

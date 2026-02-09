@@ -24,15 +24,26 @@ SOFTWARE.
 
 use crate::display::layout::width::Width;
 
+/// Text alignment direction within a column.
 #[derive(Debug, Copy, Clone)]
 pub enum Alignment {
     Left,
     Right,
 }
 
+/// Pads strings to a target width according to an [`Alignment`].
 pub struct Align;
 
 impl Align {
+    /// Pads a string to the target width using the given alignment.
+    ///
+    /// # Parameters
+    /// - `value`: The string to pad (may contain ANSI codes).
+    /// - `width`: The target display width.
+    /// - `alignment`: Whether to left- or right-align the value.
+    ///
+    /// # Returns
+    /// The padded string.
     pub fn pad(value: &String, width: usize, alignment: Alignment) -> String {
         let visible = Width::measure_ansi_text(value);
         let padding = width.saturating_sub(visible);

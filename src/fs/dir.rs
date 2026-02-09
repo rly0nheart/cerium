@@ -29,19 +29,36 @@ use crate::fs::glob::Glob;
 use std::fs;
 use std::path::PathBuf;
 
+/// Reads and lists directory contents, applying filtering, hiding, and sorting
+/// based on CLI arguments.
 pub struct DirReader {
     path: PathBuf,
 }
 
 impl DirReader {
+    /// Creates a new `DirReader` for the given path.
+    ///
+    /// # Parameters
+    /// - `path`: The directory (or file) path to read.
     pub fn from(path: PathBuf) -> Self {
         Self { path }
     }
 
+    /// Returns a reference to the underlying path.
     pub fn path(&self) -> &PathBuf {
         &self.path
     }
 
+    /// Lists directory entries, applying filters and sorting from the CLI arguments.
+    ///
+    /// If the path is a single file (or broken symlink), returns a one-element list.
+    ///
+    /// # Parameters
+    /// - `args`: CLI arguments controlling visibility (hidden files, dirs/files only,
+    ///   pruning), hide patterns, and sort order.
+    ///
+    /// # Returns
+    /// A `Vec<Entry>` of filtered and sorted directory entries.
     pub fn list(&self, args: &Args) -> Vec<Entry> {
         let mut entries: Vec<Entry> = Vec::new();
 
@@ -94,6 +111,13 @@ impl DirReader {
         entries
     }
 
+    /// Computes the total size (in bytes) of all files under this directory, recursively.
+    ///
+    /// # Parameters
+    /// - `include_hidden`: Whether to count hidden (dot-prefixed) files and directories.
+    ///
+    /// # Returns
+    /// The cumulative file size in bytes, or `0` if the path is not a directory.
     pub fn true_size(&self, include_hidden: bool) -> u64 {
         fn dir_size(path: &PathBuf, include_hidden: bool) -> u64 {
             let mut size = 0;
@@ -131,6 +155,15 @@ impl DirReader {
         }
     }
 
+    /// Removes entries whose names match any of the given glob patterns.
+    ///
+    /// # Parameters
+    /// - `entries`: The entry list to filter in place.
+    /// - `hide_patterns`: Glob patterns to match against entry names (e.g. `"*.bak"`, `"._*"`).
+    /// - `verbose`: If `true`, logs invalid patterns and reports when nothing matched.
+    ///
+    /// # Returns
+    /// The number of entries removed.
     fn hide_entries(
         &self,
         entries: &mut Vec<Entry>,
@@ -173,6 +206,13 @@ impl DirReader {
         removed
     }
 
+    /// Sorts entries in place according to `args.sort`, reversing if `args.reverse` is set.
+    ///
+    /// Loads metadata for all entries when sorting by size, timestamps, or inode.
+    ///
+    /// # Parameters
+    /// - `entries`: The slice of entries to sort.
+    /// - `args`: CLI arguments specifying the sort field and direction.
     fn sort(&self, entries: &mut [Entry], args: &Args) {
         // Load metadata for all entries if we're sorting by metadata fields
         let needs_metadata = matches!(

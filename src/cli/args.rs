@@ -33,6 +33,7 @@ use crate::cli::flags::HashAlgorithm;
 use clap::{Parser, ValueHint};
 use std::path::PathBuf;
 
+/// Parsed command-line arguments controlling listing behaviour and output formatting.
 #[derive(Parser, Debug, Clone)]
 #[command(name = crate::NAME, author = crate::AUTHORS, version, about=crate::DESCRIPTION)]
 pub struct Args {
@@ -249,14 +250,13 @@ pub struct Args {
 }
 
 impl Args {
-    /// Checks if table-specific columns are requested.
+    /// Checks if any table-specific columns are requested.
     ///
-    /// Table-specific columns are those that only make sense in tabular layout,
-    /// such as magic (file type), head/tail (byte preview), or oneline mode.
+    /// # Parameters
+    /// - `args`: Parsed command-line arguments to inspect.
     ///
     /// # Returns
-    ///
-    /// `true` if any table-specific columns are requested
+    /// `true` if any table-only columns (magic, checksum, xattr, acl, context, mountpoint, or oneline) are requested.
     pub(crate) fn is_args_requesting_table_column(args: &Args) -> bool {
         #[cfg(all(feature = "magic", not(target_os = "android")))]
         let magic = args.magic;
@@ -278,14 +278,13 @@ impl Args {
             || args.oneline
     }
 
-    /// Determines whether specified args requests entry metadata
+    /// Checks whether the specified arguments request entry metadata.
     ///
     /// # Parameters
+    /// - `args`: Parsed command-line arguments to inspect.
     ///
-    /// * `args` Parsed command-line args
     /// # Returns
-    ///
-    /// True if any of the passed args request metadata, otherwise False.
+    /// `true` if any metadata-displaying flag (long, size, dates, permissions, etc.) is set.
     pub fn is_args_requesting_metadata(args: &Args) -> bool {
         args.long
             || args.size

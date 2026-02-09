@@ -30,20 +30,30 @@ use std::sync::Arc;
 use std::time::SystemTime;
 
 impl Format<Option<SystemTime>> for Date {
+    /// Formats an optional [`SystemTime`] according to the configured date format.
     fn format(&self, input: Option<SystemTime>) -> Arc<str> {
         self.format_date(input)
     }
 }
 
+/// Formats timestamps according to the selected [`DateFormat`].
 pub(crate) struct Date {
     date_format: DateFormat,
 }
 
 impl Date {
+    /// Creates a new [`Date`] formatter.
+    ///
+    /// # Parameters
+    /// - `date_format`: The display format to use.
     pub(crate) fn new(date_format: DateFormat) -> Self {
         Self { date_format }
     }
 
+    /// Dispatches to the appropriate date formatting method.
+    ///
+    /// # Parameters
+    /// - `system_time`: The timestamp to format, or `None` for a placeholder.
     fn format_date(&self, system_time: Option<SystemTime>) -> Arc<str> {
         match self.date_format {
             DateFormat::Humanly => self.humanised(system_time),
@@ -58,10 +68,18 @@ impl Date {
         }
     }
 
+    /// Formats the timestamp as a human-readable relative duration.
+    ///
+    /// # Parameters
+    /// - `system_time`: The timestamp to format.
     fn humanised(&self, system_time: Option<SystemTime>) -> Arc<str> {
         Arc::from(HumanDuration::from(system_time).to_string())
     }
 
+    /// Formats the timestamp using the locale date format.
+    ///
+    /// # Parameters
+    /// - `system_time`: The timestamp to format, or `None` for `"-"`.
     fn locale(system_time: Option<SystemTime>) -> Arc<str> {
         match system_time {
             Some(st) => {

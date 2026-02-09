@@ -36,6 +36,9 @@ pub struct TermGrid {
 
 impl TermGrid {
     /// Creates a new empty grid with the given options.
+    ///
+    /// # Parameters
+    /// - `options`: Layout configuration (direction and column filling).
     pub fn new(options: GridOptions) -> Self {
         Self {
             cells: Vec::new(),
@@ -44,14 +47,20 @@ impl TermGrid {
     }
 
     /// Adds a cell to the grid.
+    ///
+    /// # Parameters
+    /// - `cell`: The cell to append.
     pub fn add(&mut self, cell: Cell) {
         self.cells.push(cell);
     }
 
     /// Attempts to fit the grid into the given terminal width.
     ///
-    /// Returns `Some(GridDisplay)` with the best-fitting layout (maximising columns),
-    /// or `None` only if there are no cells.
+    /// # Parameters
+    /// - `width`: The available terminal width in columns.
+    ///
+    /// # Returns
+    /// `Some(GridDisplay)` with the best-fitting layout, or `None` if there are no cells.
     pub fn fit_into_width(&self, width: usize) -> Option<GridDisplay> {
         if self.cells.is_empty() {
             return Some(GridDisplay {
@@ -83,6 +92,9 @@ impl TermGrid {
     }
 
     /// Fits the grid into exactly the specified number of columns.
+    ///
+    /// # Parameters
+    /// - `num_columns`: The desired column count (clamped to at least 1).
     pub fn fit_into_columns(&self, num_columns: usize) -> GridDisplay {
         let num_columns = num_columns.max(1);
 
@@ -112,6 +124,10 @@ impl TermGrid {
     }
 
     /// Calculates the width of each column.
+    ///
+    /// # Parameters
+    /// - `num_columns`: Number of columns in the layout.
+    /// - `num_rows`: Number of rows in the layout.
     fn calculate_column_widths(&self, num_columns: usize, num_rows: usize) -> Vec<usize> {
         let mut widths = vec![0usize; num_columns];
 
@@ -161,6 +177,10 @@ impl GridDisplay {
     }
 
     /// Returns the cell at the given row and column position, if any.
+    ///
+    /// # Parameters
+    /// - `row`: The row index.
+    /// - `col`: The column index.
     fn cell_at(&self, row: usize, col: usize) -> Option<&Cell> {
         let num_rows = if self.num_columns > 0 {
             self.cells.len().div_ceil(self.num_columns)
@@ -177,6 +197,10 @@ impl GridDisplay {
     }
 
     /// Pads the cell content to the specified width based on alignment.
+    ///
+    /// # Parameters
+    /// - `cell`: The cell to pad.
+    /// - `width`: The target column width.
     fn pad_cell(&self, cell: &Cell, width: usize) -> String {
         let padding = width.saturating_sub(cell.width);
 
@@ -188,6 +212,7 @@ impl GridDisplay {
 }
 
 impl Display for GridDisplay {
+    /// Writes the grid layout to the formatter, one row per line.
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         if self.cells.is_empty() || self.num_columns == 0 {
             return Ok(());

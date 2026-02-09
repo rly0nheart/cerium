@@ -26,15 +26,24 @@ use crate::display::theme::config::Theme;
 use clap::builder::Styles;
 use clap::builder::styling::{Color, RgbColor, Style};
 
+/// CLI help styling configuration backed by the active theme.
 pub struct HelpStyle<'a> {
     theme: &'a Theme,
 }
 
 impl<'a> HelpStyle<'a> {
+    /// Creates a new help style from the given theme.
+    ///
+    /// # Parameters
+    /// - `theme`: The active theme to derive help colours from.
     pub fn new(theme: &'a Theme) -> Self {
         Self { theme }
     }
 
+    /// Builds clap [`Styles`] for CLI help output using the active theme colours.
+    ///
+    /// # Returns
+    /// A [`Styles`] instance with header, usage, literal, and placeholder colours applied.
     pub fn get_styles(&self) -> Styles {
         use nu_ansi_term::Color as Colour;
 

@@ -25,41 +25,10 @@ SOFTWARE.
 use std::os::unix::io::AsRawFd;
 use std::{env, io};
 
-/// Checks if coloured output should be enabled based on environment variables
-/// and terminal capabilities.
-///
-/// Follows common conventions for colour detection:
-/// 1. NO_COLOR environment variable disables colours (universal override)
-/// 2. FORCE_COLOR or CLICOLOR_FORCE explicitly enables colours
-/// 3. CLICOLOR=0 disables colours
-/// 4. TERM environment variable indicates terminal capabilities
-/// 5. COLORTERM indicates modern colour support
-/// 6. Falls back to TTY detection
+/// Checks if coloured output should be enabled based on environment variables and terminal capabilities.
 ///
 /// # Returns
-///
-/// `true` if coloured output should be enabled, `false` otherwise
-///
-/// # Environment Variables
-///
-/// * `NO_COLOR` - If set (any value), disables colours
-/// * `FORCE_COLOR` - If set to non-zero, enables colours
-/// * `CLICOLOR_FORCE` - If set to non-zero, enables colours
-/// * `CLICOLOR` - If set to "0", disables colours
-/// * `TERM` - Terminal type (e.g., "xterm-256color", "dumb")
-/// * `COLORTERM` - Indicates colour terminal support
-///
-/// # Examples
-///
-/// ```no_run
-/// use cerium::display::output::terminal::colours_enabled;
-///
-/// if colours_enabled() {
-///     println!("\x1b[31mRed text\x1b[0m");
-/// } else {
-///     println!("Plain text");
-/// }
-/// ```
+/// `true` if coloured output should be enabled, `false` otherwise.
 pub fn colours_enabled() -> bool {
     // Check if NO_COLOR is set (universal override to disable colours)
     if env::var("NO_COLOR").is_ok() {
@@ -115,31 +84,7 @@ pub fn colours_enabled() -> bool {
     is_tty()
 }
 
-/// Checks if standard output is connected to a TTY (terminal).
-///
-/// This is useful for determining whether the program is running interactively
-/// in a terminal or if its output is being redirected to a file or pipe.
-///
-/// # Returns
-///
-/// `true` if stdout is connected to a TTY, `false` otherwise
-///
-/// # Platform Support
-///
-/// This function uses Unix-specific system calls (isatty) and is available
-/// on Unix-like systems.
-///
-/// # Examples
-///
-/// ```no_run
-/// use cerium::display::output::terminal::is_tty;
-///
-/// if is_tty() {
-///     println!("Running interactively");
-/// } else {
-///     println!("Output is redirected");
-/// }
-/// ```
+/// Checks if standard output is connected to a TTY.
 pub fn is_tty() -> bool {
     {
         let fd = io::stdout().as_raw_fd();

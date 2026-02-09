@@ -30,17 +30,24 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 impl Format<u32> for Permission {
+    /// Formats a mode bitmask according to the configured permission format.
     fn format(&self, input: u32) -> Arc<str> {
         self.format_permission(input)
     }
 }
 
+/// Formats file permission mode bits as symbolic, octal, or hex strings.
 pub struct Permission {
     permission_flag: PermissionFormat,
     path: PathBuf,
 }
 
 impl Permission {
+    /// Creates a new [`Permission`] formatter.
+    ///
+    /// # Parameters
+    /// - `permission_flag`: The display format (symbolic, octal, or hex).
+    /// - `path`: The entry path (used for xattr detection).
     pub fn new(permission_flag: PermissionFormat, path: PathBuf) -> Self {
         Self {
             permission_flag,
@@ -48,8 +55,10 @@ impl Permission {
         }
     }
 
-    /// Symbolic ("drwxr-xr-t@") or octal/hex formatting derived from libc's mode bits.
-    /// The '@' suffix indicates extended attributes are present.
+    /// Formats a mode bitmask as symbolic, octal, or hex.
+    ///
+    /// # Parameters
+    /// - `mode`: The raw permission mode bits from stat.
     fn format_permission(&self, mode: u32) -> Arc<str> {
         let file_type = Permissions::file_type_char(mode);
         let permission = Permissions::from_mode(mode, &self.path);

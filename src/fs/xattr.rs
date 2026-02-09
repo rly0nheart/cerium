@@ -27,18 +27,18 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
 use std::sync::Arc;
 
+/// Utilities for listing extended attributes on files via `listxattr`.
 pub struct Xattr;
 
 impl Xattr {
-    /// Lists extended attributes for a file.
+    /// Lists extended attribute names for a file as a display string.
     ///
     /// # Parameters
-    ///
-    /// * `path` - Path to the file
+    /// - `path`: Path to the file to query.
     ///
     /// # Returns
-    ///
-    /// Comma-separated list of xattr names, or "-" if none/error
+    /// A comma-separated list of xattr names (e.g. `"user.mime_type, security.selinux"`),
+    /// or `"-"` if the file has no extended attributes or an error occurs.
     pub fn list(path: &Path) -> Arc<str> {
         match Self::list_xattrs(path) {
             Ok(attrs) if !attrs.is_empty() => attrs.join(", ").into(),
@@ -46,7 +46,17 @@ impl Xattr {
         }
     }
 
-    /// Internal xattr listing using libc
+    /// Retrieves extended attribute names via a two-pass `listxattr` call.
+    ///
+    /// First call determines the buffer size, second call reads the
+    /// null-terminated attribute name list.
+    ///
+    /// # Parameters
+    /// - `path`: Path to the file to query.
+    ///
+    /// # Returns
+    /// `Ok(Vec<String>)` of attribute names (possibly empty), or `Err(())`
+    /// if the path contains a null byte or the libc call fails.
     fn list_xattrs(path: &Path) -> Result<Vec<String>, ()> {
         let path_c = CString::new(path.as_os_str().as_bytes()).map_err(|_| ())?;
 
