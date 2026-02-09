@@ -24,6 +24,7 @@ SOFTWARE.
 
 use crate::display::theme::colours::{Colour, ColourPaint, RgbColours};
 use crate::fs::symlink;
+use nu_ansi_term::Style;
 use std::path::Display;
 
 /// Applies colour styling and formatting to text values based on their content and context.
@@ -201,7 +202,8 @@ impl TextStyle {
     /// # Returns
     /// Styled header text in white, bold, and underlined.
     pub(crate) fn table_header(name: &str) -> String {
-        Colour::White.underline().bold().apply_to(name)
+        let style = Style::new();
+        style.underline().bold().apply_to(name)
     }
 
     /// Styles a summary string with bold themed numbers and italic themed labels.
@@ -220,7 +222,7 @@ impl TextStyle {
         ///
         /// # Returns
         /// Bold themed colour for numbers, italic themed colour for labels.
-        fn style_summary_chunk(chunk: &str, is_number: bool) -> String {
+        fn style_a_chunk(chunk: &str, is_number: bool) -> String {
             if is_number {
                 RgbColours::summary_number().bold().apply_to(chunk)
             } else {
@@ -230,20 +232,20 @@ impl TextStyle {
 
         let mut result = String::new();
         let mut chunk = String::new();
-        let mut in_digits = text.starts_with(|c: char| c.is_ascii_digit());
+        let mut in_digits = text.starts_with(|character: char| character.is_ascii_digit());
 
-        for ch in text.chars() {
-            let is_digit = ch.is_ascii_digit();
+        for character in text.chars() {
+            let is_digit = character.is_ascii_digit();
             if is_digit != in_digits && !chunk.is_empty() {
-                result.push_str(&style_summary_chunk(&chunk, in_digits));
+                result.push_str(&style_a_chunk(&chunk, in_digits));
                 chunk.clear();
                 in_digits = is_digit;
             }
-            chunk.push(ch);
+            chunk.push(character);
         }
 
         if !chunk.is_empty() {
-            result.push_str(&style_summary_chunk(&chunk, in_digits));
+            result.push_str(&style_a_chunk(&chunk, in_digits));
         }
 
         result
@@ -256,8 +258,9 @@ impl TextStyle {
     ///
     /// # Returns
     /// Styled path in blue, underlined.
-    pub(crate) fn path_display(path_display: Display) -> String {
-        Colour::Blue
+    pub(crate) fn path_header(path_display: Display) -> String {
+        let style = Style::new();
+        style
             .underline()
             .apply_to(path_display.to_string().as_str())
     }

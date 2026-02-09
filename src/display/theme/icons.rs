@@ -590,7 +590,7 @@ const EXTENSION_ICONS: Map<&'static str, char> = phf_map! {
     // Certificates
     "cert" | "crt" => Icons::GIST_SECRET,
     // Android
-    "android" | "apk" => Icons::OS_ANDROID,
+    "android" | "apk" | "apkm" | "xapk" => Icons::OS_ANDROID,
     // Mustache
     "hbs" | "mustache" => Icons::MUSTACHE,
     // KeePass
@@ -738,7 +738,7 @@ pub(crate) static EXTENSION_COLOURS: Map<&'static str, Colour> = phf_map! {
 };
 
 /// Default fallback values
-pub(crate) const DEFAULT_FILE_ICON: char = Icons::FILE;
+pub(crate) const DEFAULT_FILE_ICON: char = Icons::FILE_UNKNOWN;
 pub(crate) const DEFAULT_DIR_ICON: char = Icons::FOLDER;
 pub(crate) const SYMLINK_ICON: char = Icons::FILE_SYMLINK;
 
@@ -1023,7 +1023,9 @@ pub(crate) fn colour_for_entry(
             "zst" | "z" | "ar" | "arj" | "cpio" | "par" | "cab" => {
                 Some(RgbColours::theme().archive.colour)
             }
-            "deb" | "rpm" | "pkg" | "apk" => Some(RgbColours::theme().archive.colour),
+            "deb" | "rpm" | "pkg" | "apk" | "apkm" | "xapk" => {
+                Some(RgbColours::theme().archive.colour)
+            }
             "dmg" | "iso" | "img" | "qcow" | "qcow2" | "vdi" | "vmdk" | "vhd" | "tc" => {
                 Some(RgbColours::theme().archive.colour)
             }

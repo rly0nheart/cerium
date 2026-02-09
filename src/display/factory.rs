@@ -79,7 +79,7 @@ impl DisplayFactory {
 
         // Print directory title for recursive mode
         if args.recursive {
-            println!("{}:", TextStyle::path_display(dir_reader.path().display()));
+            println!("{}:", TextStyle::path_header(dir_reader.path().display()));
         }
 
         if Self::needs_list_renderer(&args) {

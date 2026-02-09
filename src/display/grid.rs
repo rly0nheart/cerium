@@ -77,9 +77,13 @@ pub(crate) struct Grid {
 }
 
 impl Summary for Grid {
-    /// Counts directories and files from the grid's entries.
+    /// Counts directories and files, recursing into subdirectories when in recursive mode.
     fn counts(&self) -> (usize, usize) {
-        crate::display::summary::count_entries(&self.entries)
+        if self.args.recursive {
+            crate::display::summary::count_entries_recursive(&self.entries, &self.args)
+        } else {
+            crate::display::summary::count_entries(&self.entries)
+        }
     }
 }
 

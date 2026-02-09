@@ -21,10 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
+use crate::cli::args::Args;
 use crate::display::styles::text::TextStyle;
+use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
 use crate::fs::tree::TreeNode;
+use humanly::HumanNumber;
 
 /// Counts directories and files in a flat slice of entries.
 ///
@@ -46,6 +48,26 @@ pub(crate) fn count_entries(entries: &[Entry]) -> (usize, usize) {
     (dirs, files)
 }
 
+/// Recursively counts directories and files by walking into subdirectories.
+///
+/// # Parameters
+/// - `entries`: The entries at the current directory level.
+/// - `args`: Command-line arguments passed to [`DirReader::list`] for each subdirectory.
+///
+/// # Returns
+/// A tuple of (directory count, file count) across all levels.
+pub(crate) fn count_entries_recursive(entries: &[Entry], args: &Args) -> (usize, usize) {
+    let (mut dirs, mut files) = count_entries(entries);
+    for entry in entries.iter().filter(|e| e.is_dir()) {
+        let dir_reader = DirReader::from(entry.path().to_path_buf());
+        let children = dir_reader.list(args);
+        let (d, f) = count_entries_recursive(&children, args);
+        dirs += d;
+        files += f;
+    }
+    (dirs, files)
+}
+
 /// Recursively counts directories and files in a tree, excluding the root.
 ///
 /// # Parameters
@@ -54,28 +76,27 @@ pub(crate) fn count_entries(entries: &[Entry]) -> (usize, usize) {
 /// # Returns
 /// A tuple of (directory count, file count) across all descendants.
 pub(crate) fn count_tree_children(root: &TreeNode) -> (usize, usize) {
+    /// Recursively counts a single tree node and all its descendants.
+    ///
+    /// # Parameters
+    /// - `node`: The node to count.
+    /// - `dirs`: Accumulator for directory count.
+    /// - `files`: Accumulator for file count.
+    fn count_tree_node(node: &TreeNode, dirs: &mut usize, files: &mut usize) {
+        if node.entry.is_dir() {
+            *dirs += 1;
+        } else {
+            *files += 1;
+        }
+        for child in &node.children {
+            count_tree_node(child, dirs, files);
+        }
+    }
     let (mut dirs, mut files) = (0, 0);
     for child in &root.children {
         count_tree_node(child, &mut dirs, &mut files);
     }
     (dirs, files)
-}
-
-/// Recursively counts a single tree node and all its descendants.
-///
-/// # Parameters
-/// - `node`: The node to count.
-/// - `dirs`: Accumulator for directory count.
-/// - `files`: Accumulator for file count.
-fn count_tree_node(node: &TreeNode, dirs: &mut usize, files: &mut usize) {
-    if node.entry.is_dir() {
-        *dirs += 1;
-    } else {
-        *files += 1;
-    }
-    for child in &node.children {
-        count_tree_node(child, dirs, files);
-    }
 }
 
 /// Provides a directory and file count summary line after listing output.
@@ -94,19 +115,25 @@ pub(crate) trait Summary {
     ///
     /// # Returns
     /// The formatted summary, or an empty string if both counts are zero.
-    fn format_summary(&self) -> String {
+    fn format(&self) -> String {
         let (dir_count, file_count) = self.counts();
 
         let dirs = match dir_count {
             0 => None,
             1 => Some("1 directory".to_string()),
-            n => Some(format!("{n} directories")),
+            number => Some(format!(
+                "{} directories",
+                HumanNumber::from(number as f64).concise()
+            )),
         };
 
         let files = match file_count {
             0 => None,
             1 => Some("1 file".to_string()),
-            n => Some(format!("{n} files")),
+            number => Some(format!(
+                "{} files",
+                HumanNumber::from(number as f64).concise()
+            )),
         };
 
         match (dirs, files) {
@@ -119,7 +146,7 @@ pub(crate) trait Summary {
 
     /// Prints the formatted and styled summary line to stdout.
     fn print_summary(&self) {
-        let text = self.format_summary();
+        let text = self.format();
         if !text.is_empty() {
             println!("\n{}.", TextStyle::summary(&text));
         }

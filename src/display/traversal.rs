@@ -70,16 +70,16 @@ pub(crate) trait RecursiveTraversal {
     /// - `entries`: The entries to display at the current level.
     /// - `title`: Optional path to display as a section header; `None` for the root call.
     fn render_recursive(&self, entries: &[Entry], title: Option<&Path>) {
-        // 1. Print section title if provided
+        // Print section title if provided
         if let Some(path) = title {
-            println!("\n{}:", TextStyle::path_display(path.display()));
+            println!("\n{}:", TextStyle::path_header(path.display()));
         }
 
-        // 2. Render current level using renderer-specific logic
+        // Render current level using renderer-specific logic
         let args = self.get_args();
         self.render_level(entries, args);
 
-        // 3. Descend into subdirectories
+        // Descend into subdirectories
         for entry in entries.iter().filter(|e| e.is_dir()) {
             let path = entry.path();
             let dir_reader = DirReader::from(path.to_path_buf());

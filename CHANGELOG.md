@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.21] - 2026-02-09
+### Added
+- `apkm` and `xapk` extensions to the Android icon
+
+### Changed
+- Show large summary numbers in human-readable format
+
+### Fixed
+- Uncounted entries when `-R` is passed
+
 ## [0.1.20] - 2026-02-09
 ### Added
 - Add directory and file count summary to all display modes
