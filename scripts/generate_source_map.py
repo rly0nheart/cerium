@@ -91,10 +91,11 @@ DESCRIPTIONS = {
     # Display styles submodule
     "display/styles": "Styling system for cells, columns, and entries.",
     "display/styles/mod.rs": "Styles module exports.",
-    "display/styles/help.rs": "CLI help styling rules.",
-    "display/styles/text.rs": "Individual text styles logic.",
     "display/styles/column.rs": "Column-specific styling rules.",
+    "display/styles/element.rs": "Structural UI element styling (tree connectors, headers, path titles).",
     "display/styles/entry.rs": "Entry-specific styling and colourisation.",
+    "display/styles/cli_help.rs": "CLI help styling rules.",
+    "display/styles/value.rs": "Data value styling (sizes, dates, permissions, names, numerics).",
 }
 
 # Descriptions for test files using relative paths to tests/

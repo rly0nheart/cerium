@@ -30,8 +30,9 @@ use crate::display::layout::width::Width;
 use crate::display::mode::DisplayMode;
 use crate::display::output::quotes::Quotes;
 use crate::display::styles::column::ColumnStyle;
+use crate::display::styles::element::ElementStyle;
 use crate::display::styles::entry::StyledEntry;
-use crate::display::styles::text::TextStyle;
+use crate::display::styles::value::ValueStyle;
 use crate::display::summary::Summary;
 use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
@@ -215,8 +216,8 @@ impl Tree {
         // Print: [connector] [name]
         println!(
             "{}{}",
-            TextStyle::tree_connector(&connector),
-            TextStyle::name(&entry_view.name, entry_view.colour),
+            ElementStyle::tree_connector(&connector),
+            ValueStyle::name(&entry_view.name, entry_view.colour),
         );
 
         // Count non-root entries (root has empty parents_last)
@@ -320,8 +321,8 @@ impl Tree {
         println!(
             "{} {}{}",
             parts.join(" "),
-            TextStyle::tree_connector(connector),
-            TextStyle::name(&entry_view.name, entry_view.colour),
+            ElementStyle::tree_connector(connector),
+            ValueStyle::name(&entry_view.name, entry_view.colour),
         );
     }
 

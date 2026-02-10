@@ -25,8 +25,9 @@ SOFTWARE.
 use crate::cli::args::Args;
 use crate::display::layout::column::Column;
 use crate::display::layout::row::Row;
+use crate::display::styles::element::ElementStyle;
 use crate::display::styles::entry::StyledEntry;
-use crate::display::styles::text::TextStyle;
+use crate::display::styles::value::ValueStyle;
 use crate::display::theme::colours::{Colour, ColourPaint, RgbColours};
 use crate::fs::entry::Entry;
 
@@ -75,11 +76,10 @@ impl ColumnStyle {
         if value == "-" {
             Colour::DarkGray.normal().apply_to(&value) // DarkGray for values that are "-"
         } else if value.parse::<f64>().is_ok() {
-            // Cyan for numeric values
-            Colour::Cyan.bold().apply_to(&value)
+            ElementStyle::numeric(&value)
         } else {
             match column {
-                Column::Name => TextStyle::name(&value, colour),
+                Column::Name => ValueStyle::name(&value, colour),
                 #[cfg(all(feature = "magic", not(target_os = "android")))]
                 Column::Magic => colour.bold().apply_to(&value),
 
@@ -89,14 +89,14 @@ impl ColumnStyle {
                 Column::Xattr => Colour::Cyan.normal().apply_to(&value),
                 Column::Acl => Colour::Green.normal().apply_to(&value),
                 Column::Mountpoint => Colour::Magenta.normal().apply_to(&value),
-                Column::Permissions => TextStyle::permissions(&value),
-                Column::BlockSize | Column::Size => TextStyle::size(&value),
+                Column::Permissions => ValueStyle::permissions(&value),
+                Column::BlockSize | Column::Size => ValueStyle::size(&value),
                 Column::User => RgbColours::hen_of_the_day().normal().apply_to(&value),
                 Column::Group => RgbColours::hen_of_the_night().normal().apply_to(&value),
                 Column::Created | Column::Modified | Column::Accessed => {
-                    TextStyle::datetime(&value)
+                    ValueStyle::datetime(&value)
                 }
-                _ => Colour::White.normal().apply_to(&value), // Anything else is white
+                _ => ElementStyle::text(&value, None),
             }
         }
     }

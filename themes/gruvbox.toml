@@ -86,5 +86,4 @@ cli_help_literal = { r = 142, g = 192, b = 124 }     # bright_aqua
 cli_help_placeholder = { r = 215, g = 153, b = 33 }  # yellow
 
 # Summary Colours
-summary_number = { r = 142, g = 192, b = 124 }      # bright_aqua
-summary_text = { r = 235, g = 219, b = 178 }        # fg (light1)
+summary = { r = 235, g = 219, b = 178 }              # fg (light1)

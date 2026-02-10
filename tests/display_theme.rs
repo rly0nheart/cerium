@@ -77,8 +77,7 @@ fn test_theme_deserialisation() {
         cli_help_usage = "green"
         cli_help_literal = "cyan"
         cli_help_placeholder = "yellow"
-        summary_number = "cyan"
-        summary_text = "white"
+        summary = "white"
     "#;
 
     let theme: Theme = toml::from_str(toml).unwrap();

@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 use crate::cli::args::Args;
-use crate::display::styles::text::TextStyle;
+use crate::display::styles::element::ElementStyle;
 use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
 use std::path::Path;
@@ -72,7 +72,7 @@ pub(crate) trait RecursiveTraversal {
     fn render_recursive(&self, entries: &[Entry], title: Option<&Path>) {
         // Print section title if provided
         if let Some(path) = title {
-            println!("\n{}:", TextStyle::path_header(path.display()));
+            println!("\n{}:", ElementStyle::path_header(path.display()));
         }
 
         // Render current level using renderer-specific logic

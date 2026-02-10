@@ -29,7 +29,7 @@ use crate::cli::flags::HashAlgorithm;
 
 use crate::display::layout::alignment::{Align, Alignment};
 use crate::display::layout::width::Width;
-use crate::display::styles::text::TextStyle;
+use crate::display::styles::element::ElementStyle;
 use std::collections::HashMap;
 
 /// Identifies a data column in the tabular output.
@@ -125,7 +125,7 @@ impl Column {
         let parts: Vec<String> = columns
             .iter()
             .map(|column| {
-                let style = TextStyle::table_header(column.header());
+                let style = ElementStyle::table_header(column.header());
                 let width = *widths
                     .get(column)
                     .unwrap_or(&Width::measure_ansi_text(column.header()));

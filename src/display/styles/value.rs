@@ -22,19 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use crate::display::styles::element::ElementStyle;
 use crate::display::theme::colours::{Colour, ColourPaint, RgbColours};
 use crate::fs::symlink;
-use nu_ansi_term::Style;
-use std::path::Display;
 
-/// Applies colour styling and formatting to text values based on their content and context.
+/// Applies colour styling and formatting to data values based on their content.
 ///
-/// `TextStyle` provides centralised styling logic for all text elements in the output,
-/// including column values, icons, tree connectors, and headers. It uses ANSI colour
-/// codes and terminal styling to create visually distinct and informative displays.
-pub(crate) struct TextStyle;
+/// `ValueStyle` provides centralised styling logic for column data values such as
+/// sizes, dates, permissions, names, and numeric fields. Each method maps a raw
+/// value to its appropriately coloured terminal representation.
+pub(crate) struct ValueStyle;
 
-impl TextStyle {
+impl ValueStyle {
     /// Styles entry size with colours based on magnitude.
     ///
     /// # Parameters
@@ -54,17 +53,6 @@ impl TextStyle {
         };
 
         colour.bold().apply_to(size)
-    }
-
-    /// Styles tree connector characters (│, ├──, ╰──) in a subdued colour.
-    ///
-    /// # Parameters
-    /// - `connector`: The connector string (box-drawing characters).
-    ///
-    /// # Returns
-    /// Dark grey styled connector text.
-    pub(crate) fn tree_connector(connector: &str) -> String {
-        Colour::DarkGray.normal().apply_to(connector)
     }
 
     /// Styles entry names with special handling for symlinks and ignored files.
@@ -185,83 +173,12 @@ impl TextStyle {
                 'S' | 'T' | 't' => Colour::Magenta.bold().apply_to(&character.to_string()),
 
                 // Numeric characters (for octal/hex)
-                '0'..='9' => Colour::Cyan.bold().apply_to(&character.to_string()),
+                '0'..='9' => ElementStyle::numeric(&character.to_string()),
 
                 // Anything else (just in case)
                 other => Colour::White.bold().apply_to(&other.to_string()),
             })
             .map(|s| s.to_string())
             .collect::<String>()
-    }
-
-    /// Styles table column headers with bold, underlined white text.
-    ///
-    /// # Parameters
-    /// - `name`: The header text (column name).
-    ///
-    /// # Returns
-    /// Styled header text in white, bold, and underlined.
-    pub(crate) fn table_header(name: &str) -> String {
-        let style = Style::new();
-        style.underline().bold().apply_to(name)
-    }
-
-    /// Styles a summary string with bold themed numbers and italic themed labels.
-    ///
-    /// # Parameters
-    /// - `text`: The formatted summary string (e.g., "3 directories and 5 files").
-    ///
-    /// # Returns
-    /// Styled text with each numeric segment in bold theme colour and the rest in italic theme colour.
-    pub(crate) fn summary(text: &str) -> String {
-        /// Styles a single chunk of summary text as either a number or a label.
-        ///
-        /// # Parameters
-        /// - `chunk`: The text fragment to style.
-        /// - `is_number`: Whether the chunk contains digits.
-        ///
-        /// # Returns
-        /// Bold themed colour for numbers, italic themed colour for labels.
-        fn style_a_chunk(chunk: &str, is_number: bool) -> String {
-            if is_number {
-                RgbColours::summary_number().bold().apply_to(chunk)
-            } else {
-                RgbColours::summary_text().italic().apply_to(chunk)
-            }
-        }
-
-        let mut result = String::new();
-        let mut chunk = String::new();
-        let mut in_digits = text.starts_with(|character: char| character.is_ascii_digit());
-
-        for character in text.chars() {
-            let is_digit = character.is_ascii_digit();
-            if is_digit != in_digits && !chunk.is_empty() {
-                result.push_str(&style_a_chunk(&chunk, in_digits));
-                chunk.clear();
-                in_digits = is_digit;
-            }
-            chunk.push(character);
-        }
-
-        if !chunk.is_empty() {
-            result.push_str(&style_a_chunk(&chunk, in_digits));
-        }
-
-        result
-    }
-
-    /// Styles directory path titles for recursive mode output.
-    ///
-    /// # Parameters
-    /// - `path_display`: The path display object (typically from `Path::display()`).
-    ///
-    /// # Returns
-    /// Styled path in blue, underlined.
-    pub(crate) fn path_header(path_display: Display) -> String {
-        let style = Style::new();
-        style
-            .underline()
-            .apply_to(path_display.to_string().as_str())
     }
 }

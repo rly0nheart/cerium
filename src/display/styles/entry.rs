@@ -24,7 +24,7 @@ SOFTWARE.
 
 use crate::cli::args::Args;
 use crate::display::output::quotes::Quotes;
-use crate::display::styles::text::TextStyle;
+use crate::display::styles::value::ValueStyle;
 use crate::display::theme::colours::{Colour, ColourPaint};
 use crate::display::theme::icons::{self, IconSettings};
 use crate::fs::entry::Entry;
@@ -131,7 +131,7 @@ impl<'a> StyledEntry<'a> {
         };
 
         // Apply text style to the entry name (without icon)
-        let styled_entry_name = TextStyle::name(&entry_name, self.style.colour);
+        let styled_entry_name = ValueStyle::name(&entry_name, self.style.colour);
         name.push_str(&styled_entry_name);
 
         EntryView {

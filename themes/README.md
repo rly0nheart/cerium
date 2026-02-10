@@ -38,7 +38,7 @@ Simply replace `~/.config/cerium.toml` with a different theme file:
 cp themes/tokyo-night.toml ~/.config/cerium.toml
 ```
 
-## Customizing Themes
+## Customising Themes
 
 Each theme file is a complete configuration. You can:
 
@@ -58,7 +58,7 @@ Each theme file is a complete configuration. You can:
    - Original author/source
    - Link to the colour palette
 
-## Color Categories
+## Colour Categories
 
 Each theme defines colours for:
 
@@ -71,5 +71,5 @@ Each theme defines colours for:
 - **Documents**: `doc_text`, `doc_markdown`, `doc_pdf`
 - **Media**: `media_image`, `media_video`, `media_audio`
 - **UI elements**: `tree_connector`, `table_header`, `path_display`, etc.
-- **Summary**: `summary_number`, `summary_text`
+- **Summary**: `summary`
 - **CLI help**: `cli_help_header`, `cli_help_usage`, etc.

@@ -21,8 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 use crate::cli::args::Args;
-use crate::display::styles::text::TextStyle;
+use crate::display::styles::element::ElementStyle;
 use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
 use crate::fs::tree::TreeNode;
@@ -123,7 +124,7 @@ pub(crate) trait Summary {
             1 => Some("1 directory".to_string()),
             number => Some(format!(
                 "{} directories",
-                HumanNumber::from(number as f64).concise()
+                HumanNumber::from(number as f64)
             )),
         };
 
@@ -132,7 +133,7 @@ pub(crate) trait Summary {
             1 => Some("1 file".to_string()),
             number => Some(format!(
                 "{} files",
-                HumanNumber::from(number as f64).concise()
+                HumanNumber::from(number as f64)
             )),
         };
 
@@ -148,7 +149,7 @@ pub(crate) trait Summary {
     fn print_summary(&self) {
         let text = self.format();
         if !text.is_empty() {
-            println!("\n{}.", TextStyle::summary(&text));
+            println!("\n{}.", ElementStyle::summary(&text));
         }
     }
 }

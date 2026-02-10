@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.22] - 2026-02-10
+### Changed
+- Extract individual element styling to a separate module
+- Rename `styles/help.rs` to `styles/cli_help.rs` for clarity
+
 ## [0.1.21] - 2026-02-09
 ### Added
 - `apkm` and `xapk` extensions to the Android icon
@@ -74,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - "empty directory" message when listing an empty directory
 
 ### Changed
-- Extracted CLI help styling to a separate module: [display/styles/help.rs](src/display/styles/help.rs)
+- Extracted CLI help styling to a separate module: [display/styles/help.rs](src/display/styles/cli_help.rs)
 - `--prune` option also omits empty files from output
 
 ## [0.1.15] - 2026-02-05

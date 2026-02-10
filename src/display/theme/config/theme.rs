@@ -111,8 +111,7 @@ pub struct Theme {
     pub mountpoint: ThemeColour,
     pub numeric: ThemeColour,
     pub placeholder: ThemeColour,
-    pub summary_number: ThemeColour,
-    pub summary_text: ThemeColour,
+    pub summary: ThemeColour,
 
     // CLI help colours
     pub cli_help_header: ThemeColour,
@@ -219,8 +218,7 @@ impl Default for Theme {
             mountpoint: purple.clone(),
             numeric: bright_blue.clone(),
             placeholder: gray.clone(),
-            summary_number: bright_aqua.clone(),
-            summary_text: fg.clone(),
+            summary: fg.clone(),
 
             // CLI help colours
             cli_help_header: bright_yellow.clone(),

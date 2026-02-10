@@ -24,7 +24,7 @@ SOFTWARE.
 
 use cerium::cli::args::Args;
 use cerium::display::factory::DisplayFactory;
-use cerium::display::styles::help;
+use cerium::display::styles::cli_help;
 use cerium::display::theme::colours::{ColourSettings, RgbColours};
 use cerium::display::theme::config;
 use cerium::display::theme::icons::IconSettings;
@@ -39,7 +39,7 @@ fn main() {
     let theme = config::load_theme();
 
     // Initialise theme system for cli help
-    let help_style = help::HelpStyle::new(&theme);
+    let help_style = cli_help::HelpStyle::new(&theme);
 
     // Apply theme colours to CLI and parse arguments
     let arg_matches = Args::command()

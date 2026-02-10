@@ -86,5 +86,4 @@ cli_help_literal = { r = 136, g = 192, b = 208 }     # nord8
 cli_help_placeholder = { r = 208, g = 135, b = 112 } # nord12
 
 # Summary Colours
-summary_number = { r = 136, g = 192, b = 208 }      # nord8 (frost)
-summary_text = { r = 216, g = 222, b = 233 }        # nord4 (snow)
+summary = { r = 216, g = 222, b = 233 }              # nord4 (snow)

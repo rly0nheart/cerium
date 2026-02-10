@@ -26,7 +26,7 @@ use crate::cli::args::Args;
 use crate::display::grid::Grid;
 use crate::display::list::List;
 use crate::display::mode::DisplayMode;
-use crate::display::styles::text::TextStyle;
+use crate::display::styles::element::ElementStyle;
 use crate::display::tree::Tree;
 use crate::fs::dir::DirReader;
 use crate::fs::search::Search;
@@ -79,7 +79,10 @@ impl DisplayFactory {
 
         // Print directory title for recursive mode
         if args.recursive {
-            println!("{}:", TextStyle::path_header(dir_reader.path().display()));
+            println!(
+                "{}:",
+                ElementStyle::path_header(dir_reader.path().display())
+            );
         }
 
         if Self::needs_list_renderer(&args) {

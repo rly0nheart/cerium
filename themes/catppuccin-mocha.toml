@@ -86,5 +86,4 @@ cli_help_literal = { r = 137, g = 220, b = 235 }     # sky
 cli_help_placeholder = { r = 250, g = 179, b = 135 } # peach
 
 # Summary Colours
-summary_number = { r = 148, g = 226, b = 213 }      # teal
-summary_text = { r = 205, g = 214, b = 244 }        # text
+summary = { r = 205, g = 214, b = 244 }              # text
