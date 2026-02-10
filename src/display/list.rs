@@ -30,12 +30,12 @@ use crate::display::layout::width::Width;
 use crate::display::mode::DisplayMode;
 use crate::display::output::quotes::Quotes;
 use crate::display::styles::column::ColumnStyle;
+use crate::display::summary;
 use crate::display::summary::Summary;
 use crate::display::traversal::RecursiveTraversal;
 use crate::fs::entry::Entry;
 use std::cell::Cell;
 use std::collections::HashMap;
-use crate::display::summary;
 
 impl DisplayMode for List {
     /// Prints the table output, either recursively or non-recursively based on args.

@@ -25,16 +25,18 @@ SOFTWARE.
 use crate::cli::args::Args;
 use crate::display::layout::alignment::Alignment;
 use crate::display::layout::column::Column;
-use crate::display::layout::term_grid::{Cell as GridCell, Direction, Filling, GridOptions, TermGrid};
+use crate::display::layout::term_grid::{
+    Cell as GridCell, Direction, Filling, GridOptions, TermGrid,
+};
 use crate::display::layout::width::Width;
 use crate::display::mode::DisplayMode;
 use crate::display::output::quotes::Quotes;
 use crate::display::styles::column::ColumnStyle;
+use crate::display::summary;
 use crate::display::summary::Summary;
 use crate::display::traversal::RecursiveTraversal;
 use crate::fs::entry::Entry;
 use std::cell::Cell;
-use crate::display::summary;
 
 impl DisplayMode for Grid {
     /// Prints the grid output, either recursively or non-recursively based on args.

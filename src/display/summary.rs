@@ -100,19 +100,13 @@ pub(crate) trait Summary {
         let dirs = match dir_count {
             0 => None,
             1 => Some("1 directory".to_string()),
-            number => Some(format!(
-                "{} directories",
-                HumanNumber::from(number as f64)
-            )),
+            number => Some(format!("{} directories", HumanNumber::from(number as f64))),
         };
 
         let files = match file_count {
             0 => None,
             1 => Some("1 file".to_string()),
-            number => Some(format!(
-                "{} files",
-                HumanNumber::from(number as f64)
-            )),
+            number => Some(format!("{} files", HumanNumber::from(number as f64))),
         };
 
         match (dirs, files) {
