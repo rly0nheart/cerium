@@ -33,7 +33,9 @@ use crate::display::styles::column::ColumnStyle;
 use crate::display::summary::Summary;
 use crate::display::traversal::RecursiveTraversal;
 use crate::fs::entry::Entry;
+use std::cell::Cell;
 use std::collections::HashMap;
+use crate::display::summary;
 
 impl DisplayMode for List {
     /// Prints the table output, either recursively or non-recursively based on args.
@@ -67,6 +69,14 @@ impl RecursiveTraversal for List {
     fn get_args(&self) -> &Args {
         &self.args
     }
+
+    fn dir_count(&self) -> &Cell<usize> {
+        &self.dir_count
+    }
+
+    fn file_count(&self) -> &Cell<usize> {
+        &self.file_count
+    }
 }
 
 /// Tabular renderer that shows filesystem entries in aligned columns.
@@ -75,15 +85,22 @@ pub(crate) struct List {
     entries: Vec<Entry>,
     /// Command-line arguments controlling display options
     args: Args,
+    /// Accumulated directory count during recursive traversal
+    dir_count: Cell<usize>,
+    /// Accumulated file count during recursive traversal
+    file_count: Cell<usize>,
 }
 
 impl Summary for List {
-    /// Counts directories and files, recursing into subdirectories when in recursive mode.
+    /// Returns directory and file counts for List view.
+    ///
+    /// In recursive mode, returns counts accumulated during traversal.
+    /// In non-recursive mode, counts the flat entry slice.
     fn counts(&self) -> (usize, usize) {
         if self.args.recursive {
-            crate::display::summary::count_entries_recursive(&self.entries, &self.args)
+            (self.dir_count.get(), self.file_count.get())
         } else {
-            crate::display::summary::count_entries(&self.entries)
+            summary::count_entries(&self.entries)
         }
     }
 }
@@ -95,7 +112,12 @@ impl List {
     /// - `entries`: The filesystem entries to display.
     /// - `args`: Command-line arguments controlling columns and formatting.
     pub(crate) fn new(entries: Vec<Entry>, args: Args) -> Self {
-        Self { entries, args }
+        Self {
+            entries,
+            args,
+            dir_count: Cell::new(0),
+            file_count: Cell::new(0),
+        }
     }
 
     /// Displays entries in a single, non-recursive table with aligned columns.

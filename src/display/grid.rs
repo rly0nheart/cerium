@@ -25,7 +25,7 @@ SOFTWARE.
 use crate::cli::args::Args;
 use crate::display::layout::alignment::Alignment;
 use crate::display::layout::column::Column;
-use crate::display::layout::term_grid::{Cell, Direction, Filling, GridOptions, TermGrid};
+use crate::display::layout::term_grid::{Cell as GridCell, Direction, Filling, GridOptions, TermGrid};
 use crate::display::layout::width::Width;
 use crate::display::mode::DisplayMode;
 use crate::display::output::quotes::Quotes;
@@ -33,6 +33,8 @@ use crate::display::styles::column::ColumnStyle;
 use crate::display::summary::Summary;
 use crate::display::traversal::RecursiveTraversal;
 use crate::fs::entry::Entry;
+use std::cell::Cell;
+use crate::display::summary;
 
 impl DisplayMode for Grid {
     /// Prints the grid output, either recursively or non-recursively based on args.
@@ -66,6 +68,14 @@ impl RecursiveTraversal for Grid {
     fn get_args(&self) -> &Args {
         &self.args
     }
+
+    fn dir_count(&self) -> &Cell<usize> {
+        &self.dir_count
+    }
+
+    fn file_count(&self) -> &Cell<usize> {
+        &self.file_count
+    }
 }
 
 /// Multi-column renderer that arranges entries to fit the terminal width.
@@ -74,15 +84,22 @@ pub(crate) struct Grid {
     entries: Vec<Entry>,
     /// Command-line arguments controlling display options
     args: Args,
+    /// Accumulated directory count during recursive traversal
+    dir_count: Cell<usize>,
+    /// Accumulated file count during recursive traversal
+    file_count: Cell<usize>,
 }
 
 impl Summary for Grid {
-    /// Counts directories and files, recursing into subdirectories when in recursive mode.
+    /// Returns directory and file counts for Grid view.
+    ///
+    /// In recursive mode, returns counts accumulated during traversal.
+    /// In non-recursive mode, counts the flat entry slice.
     fn counts(&self) -> (usize, usize) {
         if self.args.recursive {
-            crate::display::summary::count_entries_recursive(&self.entries, &self.args)
+            (self.dir_count.get(), self.file_count.get())
         } else {
-            crate::display::summary::count_entries(&self.entries)
+            summary::count_entries(&self.entries)
         }
     }
 }
@@ -94,7 +111,12 @@ impl Grid {
     /// - `entries`: The filesystem entries to display.
     /// - `args`: Command-line arguments controlling formatting.
     pub(crate) fn new(entries: Vec<Entry>, args: Args) -> Self {
-        Self { entries, args }
+        Self {
+            entries,
+            args,
+            dir_count: Cell::new(0),
+            file_count: Cell::new(0),
+        }
     }
 
     /// Displays entries in a non-recursive grid layout fitted to the terminal width.
@@ -118,13 +140,13 @@ impl Grid {
             .any(|entry| Quotes::is_quotable(entry.name()));
 
         // Convert entries into term_grid Cells
-        let cells: Vec<Cell> = entries
+        let cells: Vec<GridCell> = entries
             .iter()
             .map(|entry| {
                 let styled_column =
                     ColumnStyle::get(entry, &Column::Name, &self.args, add_alignment_space);
                 let entry_width = Width::measure_ansi_text(&styled_column);
-                Cell {
+                GridCell {
                     width: entry_width,
                     contents: styled_column,
                     alignment: Alignment::Left,

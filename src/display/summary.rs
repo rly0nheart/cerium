@@ -22,9 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use crate::cli::args::Args;
 use crate::display::styles::element::ElementStyle;
-use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
 use crate::fs::tree::TreeNode;
 use humanly::HumanNumber;
@@ -45,26 +43,6 @@ pub(crate) fn count_entries(entries: &[Entry]) -> (usize, usize) {
         } else {
             files += 1;
         }
-    }
-    (dirs, files)
-}
-
-/// Recursively counts directories and files by walking into subdirectories.
-///
-/// # Parameters
-/// - `entries`: The entries at the current directory level.
-/// - `args`: Command-line arguments passed to [`DirReader::list`] for each subdirectory.
-///
-/// # Returns
-/// A tuple of (directory count, file count) across all levels.
-pub(crate) fn count_entries_recursive(entries: &[Entry], args: &Args) -> (usize, usize) {
-    let (mut dirs, mut files) = count_entries(entries);
-    for entry in entries.iter().filter(|e| e.is_dir()) {
-        let dir_reader = DirReader::from(entry.path().to_path_buf());
-        let children = dir_reader.list(args);
-        let (d, f) = count_entries_recursive(&children, args);
-        dirs += d;
-        files += f;
     }
     (dirs, files)
 }

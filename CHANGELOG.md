@@ -22,7 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [0.1.22] - 2026-02-10
 ### Changed
 - Extract individual element styling to a separate module
-- Rename `styles/help.rs` to `styles/cli_help.rs` for clarity
+- Rename `src/display/styles/help.rs` to `cli_help.rs` for clarity
+- Rename `src/display/styles/text.rs` to `value.rs` for clarity
 
 ## [0.1.21] - 2026-02-09
 ### Added

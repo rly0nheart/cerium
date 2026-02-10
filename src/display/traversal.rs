@@ -26,6 +26,7 @@ use crate::cli::args::Args;
 use crate::display::styles::element::ElementStyle;
 use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
+use std::cell::Cell;
 use std::path::Path;
 
 /// Trait for renderers that support recursive directory traversal.
@@ -64,7 +65,16 @@ pub(crate) trait RecursiveTraversal {
     /// without requiring it to be passed as a parameter.
     fn get_args(&self) -> &Args;
 
+    /// Returns a reference to the accumulated directory count.
+    fn dir_count(&self) -> &Cell<usize>;
+
+    /// Returns a reference to the accumulated file count.
+    fn file_count(&self) -> &Cell<usize>;
+
     /// Recursively renders entries with directory titles, descending into subdirectories.
+    ///
+    /// Accumulates directory and file counts during traversal so that
+    /// the summary can be printed instantly without re-reading the filesystem.
     ///
     /// # Parameters
     /// - `entries`: The entries to display at the current level.
@@ -78,6 +88,15 @@ pub(crate) trait RecursiveTraversal {
         // Render current level using renderer-specific logic
         let args = self.get_args();
         self.render_level(entries, args);
+
+        // Accumulate counts from this level
+        for entry in entries {
+            if entry.is_dir() {
+                self.dir_count().set(self.dir_count().get() + 1);
+            } else {
+                self.file_count().set(self.file_count().get() + 1);
+            }
+        }
 
         // Descend into subdirectories
         for entry in entries.iter().filter(|e| e.is_dir()) {
