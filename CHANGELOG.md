@@ -19,12 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
-## [0.1.23] - 2026-02-10
+## [0.1.23] - 2026-02-11
 ### Added
 - New logo images
 
 ### Changed
-- Tagline
+- README.md
 
 ## [0.1.22] - 2026-02-10
 ### Changed
