@@ -1,20 +1,12 @@
-![intro](https://codeberg.org/rly0nheart/cerium/raw/branch/master/img/mockup.png)
+![logo](img/logo-word.svg)
 
-Yet, another ls-like util that is **not** trying to replace `ls`.
+**Element 58: a lighter way to list files and directories.**
 
-Cerium gets inspiration from similar tools such as lsd and eza, but with a small difference: It aims to stay small by avoiding features that introduce heavy dependencies while doing what a tool of its kind is supposed to do... list files and directories.
-
-## Availability
-|    Platform    | Tested        |        Features         |
-|:--------------:|:--------------|:-----------------------:|
-| Android/Termux | `yes`         |       `checksum`        |
-|   Linux/Unix   | `yes`         | `checksum`, `filemagic` |
-|     MacOS      | `no`          |      `not tested`       |
-
-## Development
-Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The [GitHub repository](https://github.com/rly0nheart/cerium) is a read-only mirror used solely for crates.io deployments. Issues should be opened on either GitHub or Codeberg, but pull requests should be opened only on Codeberg.
+Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on staying small with minimal dependencies while doing what it's supposed to do... **list your files and directories**.
 
 ## Table of Contents
+- [Availability](#availability)
+- [Development](#development)
 - [Installation](#installation-)
   - [With Cargo](#quick-install-with-cargo)
   - [Build from Source](#build-from-source)
@@ -37,6 +29,18 @@ Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The [
   - [Quick Start](#quick-start)
   - [Available Themes](#available-themes)
 - [License](#licence)
+
+## Availability
+|        OS        | Tested        |        Features         |
+|:----------------:|:--------------|:-----------------------:|
+| Android (Termux) | `yes`         |       `checksum`        |
+|      Fedora      | `yes`         | `checksum`, `filemagic` |
+|      Ubuntu      | `yes`         | `checksum`, `filemagic` |
+|      MacOS       | `no`          |      `not tested`       |
+
+## Development
+Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The [GitHub repository](https://github.com/rly0nheart/cerium) is a read-only mirror used solely for crates.io deployments. Issues should be opened on either GitHub or Codeberg, but pull requests should be opened only on Codeberg.
+
 
 ## Installation 
 

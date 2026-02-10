@@ -19,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.23] - 2026-02-10
+### Added
+- New logo images
+
+### Changed
+- Tagline
+
 ## [0.1.22] - 2026-02-10
 ### Changed
 - Extract individual element styling to a separate module
