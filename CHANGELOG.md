@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.24] - 2026-02-11
+### Fixed
+- Showing remote logo on crates.io
+
 ## [0.1.23] - 2026-02-11
 ### Added
 - New logo images
