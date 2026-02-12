@@ -19,6 +19,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.27] - 2026-02-12
+### Added
+- Multi-variant binary builds: `ce-linux-x86_64` (no features), `ce-linux-x86_64-checksum`, `ce-linux-x86_64-magic`, `ce-linux-x86_64-all`
+- `--features <value>` option in `install.sh` to select a feature variant (`checksum`, `magic`, `all`)
+
+### Changed
+- Update README to include installation via binary
+- Publish and nightly workflows now build and release all 4 feature variants
+- `install.sh` installs a no-dependency binary by default; libmagic is only installed when `--features magic` or `--features all` is specified
+
+### Removed
+- `--skip-libmagic` option from `install.sh`
+
 ## [0.1.26] - 2026-02-12
 ### Fixed
 - Another failed workflow run

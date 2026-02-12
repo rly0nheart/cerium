@@ -14,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repo
+      # Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Setup Rust
+      # Setup Rust
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      # Step 3: Install toml-cli to read Cargo.toml
+      # Install toml-cli to read Cargo.toml
       - name: Install toml-cli
         run: cargo install toml-cli
 
-      # Step 4: Get crate name and version
+      # Get crate name and version
       - name: Get crate info
         id: crate
         run: |
@@ -36,7 +36,7 @@ jobs:
           echo "name=$NAME" >> $GITHUB_OUTPUT
           echo "Found crate $NAME version $VERSION"
 
-      # Step 5: Check if version exists on crates.io
+      # Check if version exists on crates.io
       - name: Check crates.io
         id: check_crates
         run: |
@@ -51,24 +51,48 @@ jobs:
             echo "publish=false" >> $GITHUB_OUTPUT
           fi
 
-      # Step 6: Install libmagic
+      # Install libmagic
       - name: Install libmagic
         if: steps.check_crates.outputs.publish == 'true'
         run: |
           chmod +x scripts/libmagic.sh
           ./scripts/libmagic.sh
 
-      # Step 7: Run tests
+      # Run tests
       - name: Run tests
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo test --all-features
 
-      # Step 8: Build release binary
-      - name: Build release binary
+      # Build release binaries (all 4 feature variants)
+      - name: Build minimal binary
+        if: steps.check_crates.outputs.publish == 'true'
+        run: cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Prepare minimal artifact
+        if: steps.check_crates.outputs.publish == 'true'
+        run: cp target/x86_64-unknown-linux-gnu/release/ce /tmp/ce-minimal
+
+      - name: Build checksum binary
+        if: steps.check_crates.outputs.publish == 'true'
+        run: cargo build --release --features checksum --target x86_64-unknown-linux-gnu
+
+      - name: Prepare checksum artifact
+        if: steps.check_crates.outputs.publish == 'true'
+        run: cp target/x86_64-unknown-linux-gnu/release/ce /tmp/ce-checksum
+
+      - name: Build magic binary
+        if: steps.check_crates.outputs.publish == 'true'
+        run: cargo build --release --features magic --target x86_64-unknown-linux-gnu
+
+      - name: Prepare magic artifact
+        if: steps.check_crates.outputs.publish == 'true'
+        run: cp target/x86_64-unknown-linux-gnu/release/ce /tmp/ce-magic
+
+      - name: Build all-features binary
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo build --release --all-features --target x86_64-unknown-linux-gnu
 
-      # Step 9: Extract changelog for this version
+      # Extract changelog for this version
       - name: Extract changelog
         if: steps.check_crates.outputs.publish == 'true'
         id: changelog
@@ -92,7 +116,7 @@ jobs:
           echo "$NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # Step 10: Tag the commit with the version if publishing
+      # Tag the commit with the version if publishing
       - name: Tag version
         if: steps.check_crates.outputs.publish == 'true'
         run: |
@@ -109,21 +133,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 11: Publish to crates.io if version is new
+      # Publish to crates.io if version is new
       - name: Publish to crates.io
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
-      # Step 12: Prepare release assets
+      # Prepare release assets
       - name: Prepare release assets
         if: steps.check_crates.outputs.publish == 'true'
         run: |
           mkdir -p release
-          cp target/x86_64-unknown-linux-gnu/release/ce release/ce-linux-x86_64
+          cp /tmp/ce-minimal release/ce-linux-x86_64
+          cp /tmp/ce-checksum release/ce-linux-x86_64-checksum
+          cp /tmp/ce-magic release/ce-linux-x86_64-magic
+          cp target/x86_64-unknown-linux-gnu/release/ce release/ce-linux-x86_64-all
 
-      # Step 13: Create GitHub release with binary
+      # Create GitHub release with binary
       - name: Create GitHub release
         if: steps.check_crates.outputs.publish == 'true'
         run: |

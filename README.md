@@ -8,7 +8,8 @@ Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on
 - [Availability](#availability)
 - [Development](#development)
 - [Installation](#installation-)
-  - [With Cargo](#quick-install-with-cargo)
+  - [Prebuilt Binary](#prebuilt-binary)
+  - [With Cargo](#with-cargo)
   - [Build from Source](#build-from-source)
 - [Features (optional)](#features-optional)
   - [Magic](#magic)
@@ -42,9 +43,40 @@ Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on
 Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The [GitHub repository](https://github.com/rly0nheart/cerium) is a read-only mirror used solely for crates.io deployments. Issues should be opened on either GitHub or Codeberg, but pull requests should be opened only on Codeberg.
 
 
-## Installation 
+## Installation
 
-### Quick Install (with Cargo)
+### Prebuilt Binary
+
+```bash
+curl -fsSL https://codeberg.org/rly0nheart/cerium/raw/branch/master/scripts/install.sh | bash
+```
+
+**Options:**
+
+| Option               | Description                                            |
+|----------------------|--------------------------------------------------------|
+| `--nightly`          | Install the latest nightly build instead of stable     |
+| `--dir <path>`       | Installation directory (default: `/usr/local/bin`)     |
+| `--features <value>` | Feature variant to install: `checksum`, `magic`, `all` |
+
+> [!NOTE]
+> The `magic` and `all` variants require libmagic at runtime, which the installer will attempt to install automatically. Without `--features`, a no-dependency binary is installed.
+
+```bash
+# Nightly build
+curl -fsSL .../install.sh | bash -s -- --nightly
+
+# Custom install directory
+curl -fsSL .../install.sh | bash -s -- --dir ~/.local/bin
+
+# Install with checksum support
+curl -fsSL .../install.sh | bash -s -- --features checksum
+
+# Install with all features (requires libmagic for the filemagic feature)
+curl -fsSL .../install.sh | bash -s -- --features all
+```
+
+### With Cargo
 
 ```shell
 # Standard installation with all features

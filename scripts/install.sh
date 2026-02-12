@@ -27,27 +27,39 @@ GITHUB_REPO="${CERIUM_REPO:-rly0nheart/cerium}"
 INSTALL_DIR="${CERIUM_INSTALL_DIR:-/usr/local/bin}"
 BIN_NAME="ce"
 NIGHTLY=false
+FEATURES=""
 
 usage() {
     echo "Usage: install.sh [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  --nightly       Install the latest nightly build instead of stable"
-    echo "  --dir <path>    Installation directory (default: /usr/local/bin)"
-    echo "  --skip-libmagic Skip libmagic installation"
-    echo "  -h, --help      Show this help message"
+    echo "  --nightly            Install the latest nightly build instead of stable"
+    echo "  --dir <path>         Installation directory (default: /usr/local/bin)"
+    echo "  --features <value>   Feature variant to install: checksum, magic, all"
+    echo "  -h, --help           Show this help message"
 }
 
-for arg in "$@"; do
-    case "$arg" in
-        --nightly)       NIGHTLY=true ;;
-        --skip-libmagic) SKIP_LIBMAGIC=true ;;
-        --dir)           shift; INSTALL_DIR="$1" ;;
-        -h|--help)       usage; exit 0 ;;
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --nightly)    NIGHTLY=true ;;
+        --features)   shift; FEATURES="${1:-}" ;;
+        --dir)        shift; INSTALL_DIR="${1:-$INSTALL_DIR}" ;;
+        -h|--help)    usage; exit 0 ;;
     esac
+    shift
 done
 
-SKIP_LIBMAGIC="${SKIP_LIBMAGIC:-false}"
+# Validate features value
+if [ -n "$FEATURES" ]; then
+    case "$FEATURES" in
+        checksum|magic|all) ;;
+        *)
+            echo "error: invalid --features value: ${FEATURES}"
+            echo "valid values: checksum, magic, all"
+            exit 1
+            ;;
+    esac
+fi
 
 # --- Detect platform ---
 
@@ -176,11 +188,19 @@ sys.exit(1)
 
     echo "latest release: ${TAG}"
 
+    # Build asset name based on features
+    if [ -n "$FEATURES" ]; then
+        ASSET_SUFFIX="-${FEATURES}"
+    else
+        ASSET_SUFFIX=""
+    fi
+
     # Look for a matching binary asset: try ce-os-arch first, then cerium-os-arch
     DOWNLOAD_URL=""
     for prefix in "$BIN_NAME" "cerium"; do
-        ASSET_PATTERN="${prefix}-${OS}-${ARCH}"
-        DOWNLOAD_URL=$(echo "$RELEASE_JSON" | grep -o "\"browser_download_url\": *\"[^\"]*${ASSET_PATTERN}[^\"]*\"" | head -1 | grep -o 'https://[^"]*') || true
+        ASSET_PATTERN="${prefix}-${OS}-${ARCH}${ASSET_SUFFIX}"
+        # Use exact match (end of URL) to avoid e.g. ce-linux-x86_64 matching ce-linux-x86_64-checksum
+        DOWNLOAD_URL=$(echo "$RELEASE_JSON" | grep -o "\"browser_download_url\": *\"[^\"]*/${ASSET_PATTERN}\"" | head -1 | grep -o 'https://[^"]*') || true
 
         if [ -n "$DOWNLOAD_URL" ]; then
             break
@@ -208,8 +228,8 @@ sys.exit(1)
 
     echo "* download complete"
 
-    # Install libmagic runtime (non-fatal)
-    if [ "$SKIP_LIBMAGIC" = false ]; then
+    # Install libmagic runtime when needed (non-fatal)
+    if [ "$FEATURES" = "magic" ] || [ "$FEATURES" = "all" ]; then
         install_libmagic || echo "warning: libmagic not installed; file type detection (--magic) will not work"
     fi
 
