@@ -31,12 +31,12 @@ use filemagic::Magic as FileMagic;
 ///
 /// # Examples
 ///
-/// ```
-/// let result = output::text::clip_2nd_comma("text/plain, ASCII text, with CRLF line terminators".to_string());
-/// // Returns: "text/plain, ASCII text"
+/// ```text
+/// clip_2nd_comma("text/plain, ASCII text, with CRLF line terminators")
+/// // => "text/plain, ASCII text"
 ///
-/// let result = output::text::clip_2nd_comma("application/pdf".to_string());
-/// // Returns: "application/pdf"
+/// clip_2nd_comma("application/pdf")
+/// // => "application/pdf"
 /// ```
 fn clip_2nd_comma(text: String) -> Arc<str> {
     let mut parts = text.splitn(3, ',');

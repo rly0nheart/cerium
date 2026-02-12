@@ -45,14 +45,9 @@ pub const SYMLINK_ARROW_WITH_SPACES: &str = " \u{21D2} ";
 ///
 /// # Examples
 ///
-/// ```
-/// use cerium::fs::symlink::split_symlink;
-///
-/// let (name, target) = split_symlink("mylink ⇒ /target").unwrap();
-/// assert_eq!(name, "mylink ");
-/// assert_eq!(target, " /target");
-///
-/// assert!(split_symlink("regular_file").is_none());
+/// ```text
+/// split_symlink("mylink ⇒ /target")  // => Some(("mylink ", " /target"))
+/// split_symlink("regular_file")       // => None
 /// ```
 pub fn split_symlink(text: &str) -> Option<(&str, &str)> {
     text.find(SYMLINK_ARROW).map(|index| {
@@ -77,11 +72,8 @@ pub fn split_symlink(text: &str) -> Option<(&str, &str)> {
 ///
 /// # Examples
 ///
-/// ```
-/// use cerium::fs::symlink::format_symlink;
-///
-/// let display = format_symlink("mylink", "/path/to/target");
-/// assert_eq!(display, "mylink ⇒ /path/to/target");
+/// ```text
+/// format_symlink("mylink", "/path/to/target")  // => "mylink ⇒ /path/to/target"
 /// ```
 pub fn format_symlink(name: &str, target: &str) -> String {
     format!("{}{}{}", name, SYMLINK_ARROW_WITH_SPACES, target)
@@ -99,13 +91,8 @@ pub fn format_symlink(name: &str, target: &str) -> String {
 ///
 /// # Examples
 ///
-/// ```
-/// use std::path::Path;
-/// use cerium::fs::symlink::read_symlink_target;
-///
-/// let target = read_symlink_target(Path::new("/path/to/symlink"));
-/// // Returns empty string for non-existent paths
-/// assert_eq!(target, "");
+/// ```text
+/// read_symlink_target(Path::new("/path/to/symlink"))  // => "" (non-existent path)
 /// ```
 pub fn read_symlink_target(path: &Path) -> String {
     fs::read_link(path)

@@ -18,8 +18,8 @@ jobs:
 
       - name: Install libmagic
         run: |
-          chmod +x scripts/install-libmagic.sh
-          ./scripts/install-libmagic.sh
+          chmod +x scripts/libmagic.sh
+          ./scripts/libmagic.sh
 
       - name: Build Cerium
         run: cargo build --verbose

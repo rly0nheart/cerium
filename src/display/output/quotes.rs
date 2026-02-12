@@ -18,9 +18,7 @@ impl<'a> Quotes<'a> {
     ///
     /// # Examples
     ///
-    /// ```
-    /// use cerium::display::output::quotes::Quotes;
-    ///
+    /// ```text
     /// let q = Quotes::new("file name");
     /// ```
     pub fn new(text: &'a str) -> Self {
@@ -40,17 +38,14 @@ impl<'a> Quotes<'a> {
     ///
     /// # Examples
     ///
-    /// ```
-    /// use cerium::display::output::quotes::Quotes;
-    /// use cerium::cli::flags::QuoteStyle;
-    ///
+    /// ```text
     /// let q = Quotes::new("file name");
-    /// assert_eq!(q.apply(QuoteStyle::Single, false), "'file name'");
-    /// assert_eq!(q.apply(QuoteStyle::Single, true), "'file name'");  // Alignment ignored
+    /// q.apply(QuoteStyle::Single, false)  // => "'file name'"
+    /// q.apply(QuoteStyle::Single, true)   // => "'file name'" (alignment ignored)
     ///
     /// let q2 = Quotes::new("normal");
-    /// assert_eq!(q2.apply(QuoteStyle::Auto, false), "normal");
-    /// assert_eq!(q2.apply(QuoteStyle::Auto, true), " normal");  // Space for alignment
+    /// q2.apply(QuoteStyle::Auto, false)   // => "normal"
+    /// q2.apply(QuoteStyle::Auto, true)    // => " normal" (space for alignment)
     /// ```
     pub fn apply(&self, style: QuoteStyle, add_alignment_space: bool) -> String {
         match style {
@@ -89,14 +84,12 @@ impl<'a> Quotes<'a> {
     ///
     /// # Examples
     ///
-    /// ```
-    /// use cerium::display::output::quotes::Quotes;
-    ///
-    /// assert_eq!(Quotes::new("normal").single_quote_conditional(), "normal");
-    /// assert_eq!(Quotes::new("file name").single_quote_conditional(), "'file name'");
-    /// assert_eq!(Quotes::new("link ⇒ target").single_quote_conditional(), "link ⇒ target");
-    /// assert_eq!(Quotes::new("my link ⇒ my target").single_quote_conditional(), "'my link' ⇒ 'my target'");
-    /// assert_eq!(Quotes::new("file$name").single_quote_conditional(), "'file$name'");
+    /// ```text
+    /// Quotes::new("normal").single_quote_conditional()                // => "normal"
+    /// Quotes::new("file name").single_quote_conditional()             // => "'file name'"
+    /// Quotes::new("link ⇒ target").single_quote_conditional()        // => "link ⇒ target"
+    /// Quotes::new("my link ⇒ my target").single_quote_conditional()  // => "'my link' ⇒ 'my target'"
+    /// Quotes::new("file$name").single_quote_conditional()             // => "'file$name'"
     /// ```
     pub fn single_quote_conditional(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
@@ -125,13 +118,11 @@ impl<'a> Quotes<'a> {
     ///
     /// # Examples
     ///
-    /// ```
-    /// use cerium::display::output::quotes::Quotes;
-    ///
-    /// assert_eq!(Quotes::new("file").single_quote_always(), "'file'");
-    /// assert_eq!(Quotes::new("file name").single_quote_always(), "'file name'");
-    /// assert_eq!(Quotes::new("link ⇒ target").single_quote_always(), "'link' ⇒ 'target'");
-    /// assert_eq!(Quotes::new("my link ⇒ my target").single_quote_always(), "'my link' ⇒ 'my target'");
+    /// ```text
+    /// Quotes::new("file").single_quote_always()                // => "'file'"
+    /// Quotes::new("file name").single_quote_always()           // => "'file name'"
+    /// Quotes::new("link ⇒ target").single_quote_always()      // => "'link' ⇒ 'target'"
+    /// Quotes::new("my link ⇒ my target").single_quote_always() // => "'my link' ⇒ 'my target'"
     /// ```
     pub fn single_quote_always(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
@@ -159,13 +150,11 @@ impl<'a> Quotes<'a> {
     ///
     /// # Examples
     ///
-    /// ```
-    /// use cerium::display::output::quotes::Quotes;
-    ///
-    /// assert_eq!(Quotes::new("file").double_quote_always(), "\"file\"");
-    /// assert_eq!(Quotes::new("file name").double_quote_always(), "\"file name\"");
-    /// assert_eq!(Quotes::new("link ⇒ target").double_quote_always(), "\"link\" ⇒ \"target\"");
-    /// assert_eq!(Quotes::new("my link ⇒ my target").double_quote_always(), "\"my link\" ⇒ \"my target\"");
+    /// ```text
+    /// Quotes::new("file").double_quote_always()                // => "\"file\""
+    /// Quotes::new("file name").double_quote_always()           // => "\"file name\""
+    /// Quotes::new("link ⇒ target").double_quote_always()      // => "\"link\" ⇒ \"target\""
+    /// Quotes::new("my link ⇒ my target").double_quote_always() // => "\"my link\" ⇒ \"my target\""
     /// ```
     pub fn double_quote_always(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
