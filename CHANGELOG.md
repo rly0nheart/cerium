@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.26] - 2026-02-12
+### Fixed
+- Another failed workflow run
+
 ## [0.1.25] - 2026-02-12
 ### Fixed
 - Adding built binary to GitHub releases
