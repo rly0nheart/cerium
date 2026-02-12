@@ -166,43 +166,42 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create nightly release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.info.outputs.tag }}
-          name: ${{ steps.info.outputs.tag }}
-          body: |
-            ## Nightly Build
+        run: |
+          TAG="${{ steps.info.outputs.tag }}"
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --prerelease \
+            --notes "## Nightly Build
 
-            **Date:** ${{ steps.info.outputs.date }}
-            **Version:** ${{ steps.info.outputs.version }}
-            **Commit:** ${{ steps.info.outputs.commit }}
+          **Date:** ${{ steps.info.outputs.date }}
+          **Version:** ${{ steps.info.outputs.version }}
+          **Commit:** ${{ steps.info.outputs.commit }}
 
-            ---
+          ---
 
-            ${{ steps.changelog.outputs.header }}
+          ${{ steps.changelog.outputs.header }}
 
-            ${{ steps.changelog.outputs.commits }}
+          ${{ steps.changelog.outputs.commits }}
 
-            ---
+          ---
 
-            ### Test Results
+          ### Test Results
 
-            ${{ needs.test.outputs.test_results }}
+          ${{ needs.test.outputs.test_results }}
 
-            ---
+          ---
 
-            ### Downloads
+          ### Downloads
 
-            | Platform | Architecture | File |
-            |----------|--------------|------|
-            | Linux | x86_64 | `ce-linux-x86_64` |
+          | Platform | Architecture | File |
+          |----------|--------------|------|
+          | Linux | x86_64 | \`ce-linux-x86_64\` |
 
-            ---
+          ---
 
-            > **Warning:** This is an automated nightly build and may be unstable.
-            > For stable releases, please use the [latest stable release](../../releases/latest).
-          files: release/*
-          prerelease: true
-          make_latest: false
+          > **Warning:** This is an automated nightly build and may be unstable.
+          > For stable releases, please use the [latest stable release](../../releases/latest)." \
+            release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

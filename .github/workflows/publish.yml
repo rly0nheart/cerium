@@ -126,12 +126,14 @@ jobs:
       # Step 13: Create GitHub release with binary
       - name: Create GitHub release
         if: steps.check_crates.outputs.publish == 'true'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.crate.outputs.version }}
-          name: v${{ steps.crate.outputs.version }}
-          body: ${{ steps.changelog.outputs.notes }}
-          files: release/*
-          make_latest: true
+        run: |
+          VERSION=${{ steps.crate.outputs.version }}
+          # Delete stale release from a previous failed run
+          gh release delete "$VERSION" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$VERSION" \
+            --title "v${VERSION}" \
+            --notes "${{ steps.changelog.outputs.notes }}" \
+            --latest \
+            release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
