@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.25] - 2026-02-12
+### Fixed
+- Adding built binary to GitHub releases
+
+### Added
+- `install.sh` script binary installations
+
+### Changed
+- Rename `scripts/install-libmagic.sh` to `scripts/libmagic.sh`
+
 ## [0.1.24] - 2026-02-11
 ### Fixed
 - Showing remote logo on crates.io

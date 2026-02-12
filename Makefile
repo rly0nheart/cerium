@@ -27,13 +27,13 @@ RESET  := \\033[0m
 
 BINARY_NAME := ce
 INSTALL_PATH := ~/.cargo/bin/$(BINARY_NAME)
-SETUP_SCRIPT := scripts/install-libmagic.sh
+SETUP_SCRIPT := scripts/libmagic.sh
 SOURCE_MAP_GENERATOR_SCRIPT := scripts/generate_source_map.py
 
 # Default target
 default: build
 
-# Run the setup script (scripts/install-libmagic.sh) and source map generator (scripts/generate_source_map.py)
+# Run the setup script (scripts/libmagic.sh) and source map generator (scripts/generate_source_map.py)
 setup:
 	@# Ensure the script is executable
 	@test -x $(SETUP_SCRIPT) || chmod +x $(SETUP_SCRIPT)

@@ -166,9 +166,9 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create nightly release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v1
         with:
-          tag: ${{ steps.info.outputs.tag }}
+          tag_name: ${{ steps.info.outputs.tag }}
           name: ${{ steps.info.outputs.tag }}
           body: |
             ## Nightly Build
@@ -201,8 +201,8 @@ jobs:
 
             > **Warning:** This is an automated nightly build and may be unstable.
             > For stable releases, please use the [latest stable release](../../releases/latest).
-          artifacts: release/*
+          files: release/*
           prerelease: true
-          makeLatest: false
+          make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

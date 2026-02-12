@@ -77,7 +77,7 @@ make install
 
 Content-based file type identification using libmagic. Shows actual file types regardless of extension.
 
-**Requirements:** libmagic library (`scripts/install-libmagic.sh`)
+**Requirements:** libmagic library (`scripts/libmagic.sh`)
 
 ```bash
 ce --magic
