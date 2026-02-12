@@ -55,8 +55,8 @@ jobs:
       - name: Install libmagic
         if: steps.check_crates.outputs.publish == 'true'
         run: |
-          chmod +x scripts/install-libmagic.sh
-          ./scripts/install-libmagic.sh
+          chmod +x scripts/libmagic.sh
+          ./scripts/libmagic.sh
 
       # Step 7: Run tests
       - name: Run tests

@@ -33,8 +33,8 @@ jobs:
 
       - name: Install libmagic
         run: |
-          chmod +x scripts/install-libmagic.sh
-          ./scripts/install-libmagic.sh
+          chmod +x scripts/libmagic.sh
+          ./scripts/libmagic.sh
 
       - name: Run tests
         id: test
@@ -87,8 +87,8 @@ jobs:
 
       - name: Install libmagic
         run: |
-          chmod +x scripts/install-libmagic.sh
-          ./scripts/install-libmagic.sh
+          chmod +x scripts/libmagic.sh
+          ./scripts/libmagic.sh
 
       - name: Build
         run: cargo build --release --all-features --target x86_64-unknown-linux-gnu
