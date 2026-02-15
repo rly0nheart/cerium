@@ -61,8 +61,6 @@ if [ -n "$FEATURES" ]; then
     esac
 fi
 
-# --- Detect platform ---
-
 detect_os() {
     case "$(uname -s)" in
         Linux*)  echo "linux" ;;
@@ -83,8 +81,6 @@ detect_arch() {
             ;;
     esac
 }
-
-# --- Install libmagic runtime library ---
 
 install_libmagic() {
     echo "~ checking libmagic installation..."
@@ -127,8 +123,6 @@ install_libmagic() {
 
     echo "* libmagic installed successfully"
 }
-
-# --- Main ---
 
 main() {
     echo ""

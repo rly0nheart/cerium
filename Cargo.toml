@@ -1,7 +1,7 @@
 [package]
 name = "cerium"
 description = "Element 58: a lighter way to list files and directories"
-version = "0.1.27"
+version = "0.1.28"
 edition = "2024"
 authors = ["Ritchie Mwewa <hi@rly0nheart.com>"]
 repository = "https://codeberg.org/rly0nheart/cerium"
