@@ -114,10 +114,10 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir -p dist
-          cp /tmp/ce-minimal dist/ce-linux-x86_64
-          cp /tmp/ce-checksum dist/ce-linux-x86_64-checksum
-          cp /tmp/ce-magic dist/ce-linux-x86_64-magic
-          cp target/x86_64-unknown-linux-gnu/release/ce dist/ce-linux-x86_64-all
+          cp /tmp/ce-minimal dist/ce-linux-x86_64.nightly
+          cp /tmp/ce-checksum dist/ce-linux-x86_64-checksum.nightly
+          cp /tmp/ce-magic dist/ce-linux-x86_64-magic.nightly
+          cp target/x86_64-unknown-linux-gnu/release/ce dist/ce-linux-x86_64-all.nightly
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -215,16 +215,17 @@ jobs:
 
           ### Downloads
 
-          | Features | Runtime deps | File |
-          |----------|--------------|------|
-          | — | none | \`ce-linux-x86_64\` |
-          | checksum | none | \`ce-linux-x86_64-checksum\` |
-          | magic | libmagic | \`ce-linux-x86_64-magic\` |
-          | checksum, magic | libmagic | \`ce-linux-x86_64-all\` |
+          | Features        | Runtime deps | File                                 |
+          |-----------------|--------------|--------------------------------------|
+          | -               |    -         | \`ce-linux-x86_64.nightly\`          |
+          | checksum        |    -         | \`ce-linux-x86_64-checksum.nightly\` |
+          | magic           | libmagic     | \`ce-linux-x86_64-magic.nightly\`    |
+          | checksum, magic | libmagic     | \`ce-linux-x86_64-all.nightly\`      |
 
           ---
 
-          > **Warning:** This is an automated nightly build and may be unstable.
+          > [!Note] 
+          > This is an automated nightly build and may be unstable.
           > For stable releases, please use the [latest stable release](../../releases/latest)." \
             release/*
         env:

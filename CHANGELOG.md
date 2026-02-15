@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.28] - 2026-02-16
+### Changed
+- Tag nightly binaries with ".nightly" 
+
 ## [0.1.27] - 2026-02-12
 ### Added
 - Multi-variant binary builds: `ce-linux-x86_64` (no features), `ce-linux-x86_64-checksum`, `ce-linux-x86_64-magic`, `ce-linux-x86_64-all`
