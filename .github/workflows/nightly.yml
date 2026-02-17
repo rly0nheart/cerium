@@ -27,6 +27,8 @@ jobs:
       test_passed: ${{ steps.test.outputs.passed || steps.skip_test.outputs.passed }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: dev
 
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -79,6 +81,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: dev
 
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -133,6 +137,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: dev
           fetch-depth: 0
 
       - name: Download all artifacts
