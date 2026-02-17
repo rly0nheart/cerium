@@ -1,6 +1,6 @@
 ![logo](https://codeberg.org/rly0nheart/cerium/raw/branch/master/img/logo-word.svg)
 
-**Element 58: a lighter way to list files and directories.**
+**A lighter way to list files and directories.**
 
 Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on staying small with minimal dependencies while doing what it's supposed to do... **list your files and directories**.
 

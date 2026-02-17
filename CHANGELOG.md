@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.29] - 2026-02-18
+### Changed
+- Build nightly releases on dev branch
+
 ## [0.1.28] - 2026-02-16
 ### Changed
 - Tag nightly binaries with ".nightly" 
