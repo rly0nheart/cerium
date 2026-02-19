@@ -1,6 +1,6 @@
 # Contributing to Cerium
 
-Thank you for your interest in contributing to Cerium! This guide will help you get started.
+Thanks for your interest in contributing to Cerium! This guide will help you get started.
 
 ---
 
