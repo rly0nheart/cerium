@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # MIT License
 
@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -euo pipefail
+set -eu
 
 GITHUB_REPO="${CERIUM_REPO:-rly0nheart/cerium}"
 INSTALL_DIR="${CERIUM_INSTALL_DIR:-/usr/local/bin}"
@@ -83,7 +83,7 @@ detect_arch() {
 }
 
 install_libmagic() {
-    echo "~ checking libmagic installation..."
+    echo "- checking libmagic installation..."
 
     # Check if libmagic is already available
     if ldconfig -p 2>/dev/null | grep -q libmagic; then
@@ -99,7 +99,7 @@ install_libmagic() {
         return 1
     fi
 
-    echo "~ installing libmagic for: ${DISTRO}"
+    echo "- installing libmagic for: ${DISTRO}"
 
     case "$DISTRO" in
         ubuntu|debian)
@@ -142,12 +142,21 @@ main() {
 
     # Fetch release info from GitHub (mirror)
     if [ "$NIGHTLY" = true ]; then
-        echo "~ fetching latest nightly release..."
+        echo "- fetching latest nightly release..."
         RELEASES_URL="https://api.github.com/repos/${GITHUB_REPO}/releases"
         RELEASE_JSON=$(curl -fsSL "$RELEASES_URL") || {
             echo "error: failed to fetch releases from GitHub"
             exit 1
         }
+
+        # Guard against empty or non-JSON responses
+        case "$RELEASE_JSON" in
+            '{'*|'['*) ;;
+            *)
+                echo "error: unexpected response from GitHub API"
+                exit 1
+                ;;
+        esac
 
         # Find the first prerelease (nightly) entry
         RELEASE_JSON=$(echo "$RELEASE_JSON" | python3 -c "
@@ -164,12 +173,21 @@ sys.exit(1)
             exit 1
         }
     else
-        echo "~ fetching latest stable release..."
+        echo "- fetching latest stable release..."
         RELEASE_URL="https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
         RELEASE_JSON=$(curl -fsSL "$RELEASE_URL") || {
             echo "error: failed to fetch latest release from GitHub"
             exit 1
         }
+
+        # Guard against empty or non-JSON responses
+        case "$RELEASE_JSON" in
+            '{'*|'['*) ;;
+            *)
+                echo "error: unexpected response from GitHub API"
+                exit 1
+                ;;
+        esac
     fi
 
     # Extract tag name
@@ -209,7 +227,7 @@ sys.exit(1)
     fi
 
     # Download binary to a temp directory
-    echo "~ downloading ${DOWNLOAD_URL##*/}..."
+    echo "- downloading ${DOWNLOAD_URL##*/}..."
 
     TMPDIR=$(mktemp -d)
     trap 'rm -rf "$TMPDIR"' EXIT
@@ -228,7 +246,7 @@ sys.exit(1)
     fi
 
     # Install binary
-    echo "~ installing ${BIN_NAME} to ${INSTALL_DIR}..."
+    echo "- installing ${BIN_NAME} to ${INSTALL_DIR}..."
 
     mkdir -p "$INSTALL_DIR" 2>/dev/null || sudo mkdir -p "$INSTALL_DIR"
 

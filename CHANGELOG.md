@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.1.30] - 2026-02-19
+### Changed
+- Updated `install.sh` script to be compatible with `sh`
+
 ## [0.1.29] - 2026-02-18
 ### Changed
 - Build nightly releases on dev branch

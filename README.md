@@ -1,6 +1,6 @@
 ![logo](https://codeberg.org/rly0nheart/cerium/raw/branch/master/img/logo-word.svg)
 
-**A lighter way to list files and directories.**
+**A light `ls` alternative.**
 
 Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on staying small with minimal dependencies while doing what it's supposed to do... **list your files and directories**.
 
@@ -48,7 +48,7 @@ Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The [
 ### Prebuilt Binary
 
 ```bash
-curl -fsSL https://codeberg.org/rly0nheart/cerium/raw/branch/master/scripts/install.sh | bash
+curl -fsSL https://codeberg.org/rly0nheart/cerium/raw/branch/master/scripts/install.sh | sh
 ```
 
 **Options:**
