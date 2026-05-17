@@ -24,49 +24,84 @@ SOFTWARE.
 
 //! Configuration system for Cerium theme customisation.
 //!
-//! This module handles loading theme configuration from `~/.config/cerium.toml`.
-//! If the config file doesn't exist or is invalid, it falls back silently to the
-//! built-in Gruvbox theme.
+//! Loads the theme from `~/.config/cerium.toml` (or
+//! `$XDG_CONFIG_HOME/cerium.toml`). Every key is optional and falls back
+//! per-field to the built-in Catppuccin Mocha theme, so partial overrides
+//! work. A missing config file is silent; a config that exists but can't be
+//! read or parsed produces a non-fatal warning on stderr.
 //!
 //! # Config File Format
 //!
+//! Define an optional named palette, then map semantic keys to palette
+//! references, hex strings, RGB tables, or named colours. Anything omitted
+//! keeps its Catppuccin Mocha default.
+//!
 //! ```toml
-//! size_bytes = { r = 152, g = 151, b = 26 }
-//! size_kb = { r = 184, g = 187, b = 38 }
-//! # ... more colours
+//! [palette]
+//! accent  = "#89b4fa"
+//! surface = "#1e1e2e"
+//!
+//! [colors]
+//! entry_directory = "accent"
+//! entry_file      = "#cdd6f4"
+//! code_rust       = { r = 250, g = 179, b = 135 }
+//! table_header    = "yellow"
 //! ```
+//!
+//! Semantic keys may also be placed at the top level (flat form) without a
+//! `[colors]` table.
 
 pub mod colour;
 mod theme;
 
 pub use theme::Theme;
 
+use crate::display::output::terminal;
 use std::fs;
 use std::path::PathBuf;
 
-/// Loads the theme from config file, or returns built-in Gruvbox theme.
+/// Loads the theme from the config file, falling back to the built-in
+/// Catppuccin Mocha theme.
 ///
-/// This function silently falls back to Gruvbox in the following cases:
-/// - Config file doesn't exist
-/// - Config file is invalid TOML
-/// - Any I/O error occurs
+/// Behaviour:
+/// - **No config file** (or no resolvable config dir): use the built-in
+///   default, silently.
+/// - **Config exists but can't be read or is invalid TOML**: use the
+///   built-in default, and print a non-fatal warning to stderr when stdout
+///   is an interactive terminal.
+/// - **Config exists and parses**: per-field resolution is handled by
+///   [`Theme::from_value`]; absent or unresolvable keys use their default.
 ///
 /// # Returns
 ///
-/// The loaded theme, or Gruvbox (default) as a fallback.
+/// The resolved [`Theme`].
 pub fn load_theme() -> Theme {
-    load_config().unwrap_or_else(|_| Theme::default())
-}
+    let Ok(config_path) = get_config_path() else {
+        return Theme::default();
+    };
 
-/// Attempts to load and parse the config file directly as a [`Theme`].
-///
-/// # Returns
-/// The parsed [`Theme`], or an error if the file cannot be read or parsed.
-fn load_config() -> Result<Theme, Box<dyn std::error::Error>> {
-    let config_path = get_config_path()?;
-    let contents = fs::read_to_string(config_path)?;
-    let theme: Theme = toml::from_str(&contents)?;
-    Ok(theme)
+    if !config_path.exists() {
+        return Theme::default();
+    }
+
+    let parsed = fs::read_to_string(&config_path)
+        .map_err(|e| e.to_string())
+        .and_then(|contents| toml::from_str::<Theme>(&contents).map_err(|e| e.to_string()));
+
+    match parsed {
+        Ok(theme) => theme,
+        Err(error) => {
+            // Warn only on an interactive terminal; stay silent for pipes,
+            // scripts, and command substitution.
+            if terminal::is_tty() {
+                eprintln!(
+                    "cerium: could not load theme from {} ({error}); using built-in theme.",
+                    config_path.display()
+                );
+            }
+            Theme::default()
+        }
+    }
 }
 
 /// Returns the path to the config file (`~/.config/cerium.toml`).

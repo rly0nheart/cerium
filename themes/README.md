@@ -4,16 +4,16 @@ Pre-made colour themes for Cerium. Each file is a complete, ready-to-use configu
 
 ## Available Themes
 
-| Theme                                          | Description                                        |
-|------------------------------------------------|----------------------------------------------------|
-| [gruvbox.toml](gruvbox.toml)                            | Warm retro palette by Pavel Pertsev (default)      |
-| [dracula.toml](dracula.toml)                            | Dark theme with vibrant colours by Zeno Rocha      |
-| [nord.toml](nord.toml)                         | Arctic, bluish colour palette by Arctic Ice Studio |
-| [solarized-dark.toml](solarized-dark.toml)                     | Precision colours by Ethan Schoonover              |
-| [catppuccin-mocha.toml](catppuccin-mocha.toml)                   | Soothing pastel theme                              |
-| [tokyo-night.toml](tokyo-night.toml)                        | Inspired by Downtown Tokyo at night                |
-| [one-dark.toml](one-dark.toml)                           | Atom's iconic dark theme                           |
-| [rose-pine.toml](rose-pine.toml)                          | All natural pine with soho vibes                   |
+| Theme                                          | Description                                           |
+|------------------------------------------------|-------------------------------------------------------|
+| [catppuccin-mocha.toml](catppuccin-mocha.toml)                   | Soothing pastel theme (default)                       |
+| [gruvbox.toml](gruvbox.toml)                            | Warm retro palette by Pavel Pertsev                   |
+| [dracula.toml](dracula.toml)                            | Dark theme with vibrant colours by Zeno Rocha         |
+| [nord.toml](nord.toml)                         | Arctic, bluish colour palette by Arctic Ice Studio    |
+| [solarized-dark.toml](solarized-dark.toml)                     | Precision colours by Ethan Schoonover                 |
+| [tokyo-night.toml](tokyo-night.toml)                        | Inspired by Downtown Tokyo at night                   |
+| [one-dark.toml](one-dark.toml)                           | Atom's iconic dark theme                              |
+| [rose-pine.toml](rose-pine.toml)                          | All natural pine with soho vibes                      |
 
 ## Installation
 
@@ -40,13 +40,45 @@ cp themes/tokyo-night.toml ~/.config/cerium.toml
 
 ## Customising Themes
 
-Each theme file is a complete configuration. You can:
+Every key is **optional**. Anything you don't set keeps its built-in
+**Catppuccin Mocha** default, so a config can be as small as a single line.
+A config that exists but can't be parsed prints a non-fatal warning and uses
+the default; an individual unresolvable key uses its own default.
 
-1. Copy a theme as a starting point
-2. Modify any colour values
-3. Colours support two formats:
-   - RGB: `{ r = 255, g = 128, b = 0 }`
-   - Named: `"red"`, `"blue"`, `"cyan"`, etc.
+A colour can be written four ways:
+
+- **RGB table**: `{ r = 255, g = 128, b = 0 }`
+- **Hex**: `"#ff8000"`, `"#f80"`, or `"#ff8000ff"` (alpha ignored)
+- **Named**: `"red"`, `"blue"`, `"cyan"`, … (plus `light*` variants, `darkgray`)
+- **Palette reference**: a name defined in the optional `[palette]` table
+
+### Palette layer
+
+Define base colours once in `[palette]`, then map semantic keys to them under
+`[colors]`:
+
+```toml
+[palette]
+accent  = "#89b4fa"
+surface = "#1e1e2e"
+fg      = "#cdd6f4"
+
+[colors]
+entry_directory = "accent"
+entry_symlink   = "accent"
+entry_file      = "fg"
+table_header    = "accent"
+# every other key -> Catppuccin Mocha default
+```
+
+Semantic keys may also be placed at the top level, without the `[palette]`
+and `[colors]` tables (flat form).
+
+## Matugen (wallpaper-based colours)
+
+Cerium ships a [matugen](https://github.com/InioX/matugen) template so its
+colours can follow your wallpaper. See
+[`matugen/README.md`](matugen/README.md) for setup.
 
 ## Contributing a Theme
 

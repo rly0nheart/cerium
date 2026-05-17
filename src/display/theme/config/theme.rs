@@ -22,9 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-use super::colour::ThemeColour;
+use super::colour::{ThemeColour, colour_from_value};
 use nu_ansi_term::Color as Colour;
 use serde::Deserialize;
+use std::collections::HashMap;
 
 /// Theme configuration containing all customisable colours for Cerium.
 ///
@@ -36,7 +37,7 @@ use serde::Deserialize;
 /// - File type colours (code, web, documents, media, archives)
 /// - UI colours (tree connectors, headers, paths, etc.)
 #[allow(dead_code)]
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Theme {
     // Size gradients (bytes → gigabytes)
     pub size_bytes: ThemeColour,
@@ -120,111 +121,260 @@ pub struct Theme {
     pub cli_help_placeholder: ThemeColour,
 }
 
-impl Default for Theme {
-    /// Returns the built-in Gruvbox Dark theme.
+impl<'de> Deserialize<'de> for Theme {
+    /// Deserialises a theme from the config file.
+    ///
+    /// The whole document is read into a [`toml::Value`], then
+    /// [`Theme::from_value`] applies the palette layer and per-field
+    /// fallbacks to the built-in Catppuccin Mocha default.
+    ///
+    /// # Parameters
+    /// - `deserializer`: The serde deserialiser to read from.
     ///
     /// # Returns
-    /// A [`Theme`] using the authentic Gruvbox colour palette by Pavel Pertsev (morhetz).
-    fn default() -> Self {
-        // Authentic Gruvbox Dark palette
-        let fg = color_rgb(235, 219, 178); // fg (light1)
-        let red = color_rgb(204, 36, 29); // red
-        let bright_red = color_rgb(251, 73, 52); // bright_red
-        let green = color_rgb(152, 151, 26); // green
-        let bright_green = color_rgb(184, 187, 38); // bright_green
-        let yellow = color_rgb(215, 153, 33); // yellow
-        let bright_yellow = color_rgb(250, 189, 47); // bright_yellow
-        let blue = color_rgb(69, 133, 136); // blue
-        let bright_blue = color_rgb(131, 165, 152); // bright_blue
-        let purple = color_rgb(177, 98, 134); // purple
-        let bright_purple = color_rgb(211, 134, 155); // bright_purple
-        let aqua = color_rgb(104, 157, 106); // aqua
-        let bright_aqua = color_rgb(142, 192, 124); // bright_aqua
-        let gray = color_rgb(146, 131, 116); // gray
-        let orange = color_rgb(214, 93, 14); // orange
-        let bright_orange = color_rgb(254, 128, 25); // bright_orange
+    /// A fully-populated [`Theme`]. Succeeds for any syntactically valid TOML.
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = toml::Value::deserialize(deserializer)?;
+        Ok(Theme::from_value(&value))
+    }
+}
+
+impl Theme {
+    /// Builds a theme from a parsed TOML value.
+    ///
+    /// Resolution per key:
+    /// 1. the `[palette]` table is resolved into named colours;
+    /// 2. each semantic key is looked up under `[colors]`, then at the top
+    ///    level (flat form);
+    /// 3. its value is resolved (RGB / hex / palette reference / named);
+    /// 4. anything absent or unresolvable uses the built-in Catppuccin
+    ///    Mocha default for that key.
+    ///
+    /// Always returns a complete theme.
+    ///
+    /// # Parameters
+    /// - `value`: The parsed TOML document.
+    ///
+    /// # Returns
+    /// A complete [`Theme`].
+    pub(crate) fn from_value(value: &toml::Value) -> Self {
+        let root = value.as_table();
+
+        // Palette entries don't reference each other, so they resolve against
+        // an empty map.
+        let empty = HashMap::new();
+        let palette: HashMap<String, Colour> = root
+            .and_then(|t| t.get("palette"))
+            .and_then(toml::Value::as_table)
+            .map(|table| {
+                table
+                    .iter()
+                    .filter_map(|(name, v)| {
+                        colour_from_value(v, &empty).map(|c| (name.clone(), c))
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        let colors = root
+            .and_then(|t| t.get("colors"))
+            .and_then(toml::Value::as_table);
+
+        // A key may live under [colors] or at the top level; [colors] takes
+        // precedence.
+        let pick = |name: &str, fallback: ThemeColour| -> ThemeColour {
+            let raw = colors
+                .and_then(|t| t.get(name))
+                .or_else(|| root.and_then(|t| t.get(name)));
+            match raw.and_then(|v| colour_from_value(v, &palette)) {
+                Some(colour) => ThemeColour { colour },
+                None => fallback,
+            }
+        };
+
+        let d = Theme::default();
 
         Theme {
-            // Size gradients (green tones - smallest to largest)
+            size_bytes: pick("size_bytes", d.size_bytes),
+            size_kb: pick("size_kb", d.size_kb),
+            size_mb: pick("size_mb", d.size_mb),
+            size_gb: pick("size_gb", d.size_gb),
+
+            date_recent: pick("date_recent", d.date_recent),
+            date_hours: pick("date_hours", d.date_hours),
+            date_days: pick("date_days", d.date_days),
+            date_weeks: pick("date_weeks", d.date_weeks),
+            date_months: pick("date_months", d.date_months),
+            date_old: pick("date_old", d.date_old),
+
+            perm_read: pick("perm_read", d.perm_read),
+            perm_write: pick("perm_write", d.perm_write),
+            perm_execute: pick("perm_execute", d.perm_execute),
+            perm_none: pick("perm_none", d.perm_none),
+            perm_special: pick("perm_special", d.perm_special),
+            perm_filetype: pick("perm_filetype", d.perm_filetype),
+
+            entry_directory: pick("entry_directory", d.entry_directory),
+            entry_symlink: pick("entry_symlink", d.entry_symlink),
+            entry_file: pick("entry_file", d.entry_file),
+
+            user: pick("user", d.user),
+            group: pick("group", d.group),
+
+            code_rust: pick("code_rust", d.code_rust),
+            code_python: pick("code_python", d.code_python),
+            code_javascript: pick("code_javascript", d.code_javascript),
+            code_c: pick("code_c", d.code_c),
+            code_go: pick("code_go", d.code_go),
+            code_java: pick("code_java", d.code_java),
+            code_ruby: pick("code_ruby", d.code_ruby),
+            code_php: pick("code_php", d.code_php),
+            code_lua: pick("code_lua", d.code_lua),
+
+            web_html: pick("web_html", d.web_html),
+            web_css: pick("web_css", d.web_css),
+            web_json: pick("web_json", d.web_json),
+            web_xml: pick("web_xml", d.web_xml),
+            web_yaml: pick("web_yaml", d.web_yaml),
+
+            doc_text: pick("doc_text", d.doc_text),
+            doc_markdown: pick("doc_markdown", d.doc_markdown),
+            doc_pdf: pick("doc_pdf", d.doc_pdf),
+
+            media_image: pick("media_image", d.media_image),
+            media_video: pick("media_video", d.media_video),
+            media_audio: pick("media_audio", d.media_audio),
+
+            archive: pick("archive", d.archive),
+
+            tree_connector: pick("tree_connector", d.tree_connector),
+            table_header: pick("table_header", d.table_header),
+            path_display: pick("path_display", d.path_display),
+            checksum: pick("checksum", d.checksum),
+            magic: pick("magic", d.magic),
+            xattr: pick("xattr", d.xattr),
+            acl: pick("acl", d.acl),
+            mountpoint: pick("mountpoint", d.mountpoint),
+            numeric: pick("numeric", d.numeric),
+            placeholder: pick("placeholder", d.placeholder),
+            summary: pick("summary", d.summary),
+
+            cli_help_header: pick("cli_help_header", d.cli_help_header),
+            cli_help_usage: pick("cli_help_usage", d.cli_help_usage),
+            cli_help_literal: pick("cli_help_literal", d.cli_help_literal),
+            cli_help_placeholder: pick("cli_help_placeholder", d.cli_help_placeholder),
+        }
+    }
+}
+
+impl Default for Theme {
+    /// Returns the built-in Catppuccin Mocha theme.
+    ///
+    /// # Returns
+    /// A [`Theme`] using the Catppuccin Mocha palette
+    /// (<https://github.com/catppuccin/catppuccin>).
+    fn default() -> Self {
+        // Catppuccin Mocha palette
+        let text = color_rgb(205, 214, 244);
+        let red = color_rgb(243, 139, 168);
+        let maroon = color_rgb(235, 160, 172);
+        let peach = color_rgb(250, 179, 135);
+        let yellow = color_rgb(249, 226, 175);
+        let green = color_rgb(166, 227, 161);
+        let teal = color_rgb(148, 226, 213);
+        let sky = color_rgb(137, 220, 235);
+        let sapphire = color_rgb(116, 199, 236);
+        let blue = color_rgb(137, 180, 250);
+        let lavender = color_rgb(180, 190, 254);
+        let mauve = color_rgb(203, 166, 247);
+        let pink = color_rgb(245, 194, 231);
+        let overlay0 = color_rgb(108, 112, 134);
+        let surface2 = color_rgb(88, 91, 112);
+
+        Theme {
+            // Size gradients (smallest to largest)
             size_bytes: green.clone(),
-            size_kb: bright_green.clone(),
-            size_mb: bright_aqua.clone(),
-            size_gb: bright_yellow.clone(),
+            size_kb: green.clone(),
+            size_mb: teal.clone(),
+            size_gb: yellow.clone(),
 
-            // Date gradients (blue/aqua tones - recent to old)
-            date_recent: bright_aqua.clone(),
-            date_hours: aqua.clone(),
-            date_days: bright_blue.clone(),
-            date_weeks: blue.clone(),
-            date_months: blue.clone(),
-            date_old: gray.clone(),
+            // Date gradients (recent to old)
+            date_recent: sky.clone(),
+            date_hours: sapphire.clone(),
+            date_days: blue.clone(),
+            date_weeks: lavender.clone(),
+            date_months: overlay0.clone(),
+            date_old: surface2.clone(),
 
-            // Permission colours (traffic light pattern)
+            // Permission colours
             perm_read: yellow.clone(),
             perm_write: red.clone(),
             perm_execute: green.clone(),
-            perm_none: gray.clone(),
-            perm_special: purple.clone(),
+            perm_none: overlay0.clone(),
+            perm_special: pink.clone(),
             perm_filetype: blue.clone(),
 
             // Entry types
-            entry_directory: bright_blue.clone(),
-            entry_symlink: bright_aqua.clone(),
-            entry_file: fg.clone(),
+            entry_directory: blue.clone(),
+            entry_symlink: sky.clone(),
+            entry_file: text.clone(),
 
             // User/Group
-            user: bright_yellow.clone(),
-            group: bright_orange.clone(),
+            user: yellow.clone(),
+            group: peach.clone(),
 
             // Code file types
-            code_rust: orange.clone(),
-            code_python: blue.clone(),
-            code_javascript: bright_yellow.clone(),
-            code_c: aqua.clone(),
-            code_go: bright_blue.clone(),
-            code_java: bright_orange.clone(),
+            code_rust: peach.clone(),
+            code_python: sapphire.clone(),
+            code_javascript: yellow.clone(),
+            code_c: teal.clone(),
+            code_go: sky.clone(),
+            code_java: peach.clone(),
             code_ruby: red.clone(),
-            code_php: purple.clone(),
+            code_php: mauve.clone(),
             code_lua: blue.clone(),
 
             // Web file types
-            web_html: bright_red.clone(),
-            web_css: purple.clone(),
-            web_json: bright_purple.clone(),
-            web_xml: fg.clone(),
-            web_yaml: aqua.clone(),
+            web_html: maroon.clone(),
+            web_css: mauve.clone(),
+            web_json: pink.clone(),
+            web_xml: text.clone(),
+            web_yaml: teal.clone(),
 
             // Document types
-            doc_text: fg.clone(),
-            doc_markdown: fg.clone(),
-            doc_pdf: bright_red.clone(),
+            doc_text: text.clone(),
+            doc_markdown: text.clone(),
+            doc_pdf: red.clone(),
 
             // Media types
-            media_image: bright_purple.clone(),
-            media_video: bright_orange.clone(),
-            media_audio: bright_aqua.clone(),
+            media_image: pink.clone(),
+            media_video: peach.clone(),
+            media_audio: green.clone(),
 
             // Archive types
             archive: yellow.clone(),
 
             // UI colours
-            tree_connector: gray.clone(),
-            table_header: bright_yellow.clone(),
+            tree_connector: overlay0.clone(),
+            table_header: yellow.clone(),
             path_display: blue.clone(),
-            checksum: bright_aqua.clone(),
-            magic: bright_purple.clone(),
-            xattr: aqua.clone(),
+            checksum: teal.clone(),
+            magic: pink.clone(),
+            xattr: sky.clone(),
             acl: green.clone(),
-            mountpoint: purple.clone(),
-            numeric: bright_blue.clone(),
-            placeholder: gray.clone(),
-            summary: fg.clone(),
+            mountpoint: mauve.clone(),
+            numeric: sky.clone(),
+            placeholder: overlay0.clone(),
+            summary: text.clone(),
 
             // CLI help colours
-            cli_help_header: bright_yellow.clone(),
-            cli_help_usage: bright_green.clone(),
-            cli_help_literal: bright_aqua.clone(),
-            cli_help_placeholder: yellow.clone(),
+            cli_help_header: yellow.clone(),
+            cli_help_usage: green.clone(),
+            cli_help_literal: sky.clone(),
+            cli_help_placeholder: peach.clone(),
         }
     }
 }

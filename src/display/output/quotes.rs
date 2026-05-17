@@ -4,7 +4,7 @@ use crate::fs::symlink::{SYMLINK_ARROW_WITH_SPACES, split_symlink};
 /// A text quoter that handles shell-safe quoting with symlink support.
 ///
 /// This struct provides methods for quoting text in various styles, with special
-/// handling for symlinks (indicated by the ⇒ arrow).
+/// handling for symlinks (indicated by the -> arrow).
 pub struct Quotes<'a> {
     text: &'a str,
 }
@@ -67,7 +67,7 @@ impl<'a> Quotes<'a> {
 
     /// Wraps text in single quotes if it contains special characters or whitespace.
     ///
-    /// For symlinks (indicated by the ⇒ arrow), quotes are applied to each side
+    /// For symlinks (indicated by the -> arrow), quotes are applied to each side
     /// independently, leaving the arrow unquoted.
     ///
     /// # Returns
@@ -87,8 +87,8 @@ impl<'a> Quotes<'a> {
     /// ```text
     /// Quotes::new("normal").single_quote_conditional()                // => "normal"
     /// Quotes::new("file name").single_quote_conditional()             // => "'file name'"
-    /// Quotes::new("link ⇒ target").single_quote_conditional()        // => "link ⇒ target"
-    /// Quotes::new("my link ⇒ my target").single_quote_conditional()  // => "'my link' ⇒ 'my target'"
+    /// Quotes::new("link -> target").single_quote_conditional()        // => "link -> target"
+    /// Quotes::new("my link -> my target").single_quote_conditional()  // => "'my link' -> 'my target'"
     /// Quotes::new("file$name").single_quote_conditional()             // => "'file$name'"
     /// ```
     pub fn single_quote_conditional(&self) -> String {
@@ -107,7 +107,7 @@ impl<'a> Quotes<'a> {
 
     /// Wraps text in single quotes unconditionally.
     ///
-    /// Always adds single quotes around the input text. For symlinks (indicated by the ⇒ arrow),
+    /// Always adds single quotes around the input text. For symlinks (indicated by the -> arrow),
     /// quotes are applied to each side independently, leaving the arrow unquoted.
     ///
     /// # Returns
@@ -121,8 +121,8 @@ impl<'a> Quotes<'a> {
     /// ```text
     /// Quotes::new("file").single_quote_always()                // => "'file'"
     /// Quotes::new("file name").single_quote_always()           // => "'file name'"
-    /// Quotes::new("link ⇒ target").single_quote_always()      // => "'link' ⇒ 'target'"
-    /// Quotes::new("my link ⇒ my target").single_quote_always() // => "'my link' ⇒ 'my target'"
+    /// Quotes::new("link -> target").single_quote_always()      // => "'link' -> 'target'"
+    /// Quotes::new("my link -> my target").single_quote_always() // => "'my link' -> 'my target'"
     /// ```
     pub fn single_quote_always(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
@@ -140,7 +140,7 @@ impl<'a> Quotes<'a> {
 
     /// Wraps text in double quotes unconditionally.
     ///
-    /// Always adds double quotes around the input text. For symlinks (indicated by the ⇒ arrow),
+    /// Always adds double quotes around the input text. For symlinks (indicated by the -> arrow),
     /// quotes are applied to each side independently.
     ///
     /// # Returns
@@ -153,8 +153,8 @@ impl<'a> Quotes<'a> {
     /// ```text
     /// Quotes::new("file").double_quote_always()                // => "\"file\""
     /// Quotes::new("file name").double_quote_always()           // => "\"file name\""
-    /// Quotes::new("link ⇒ target").double_quote_always()      // => "\"link\" ⇒ \"target\""
-    /// Quotes::new("my link ⇒ my target").double_quote_always() // => "\"my link\" ⇒ \"my target\""
+    /// Quotes::new("link -> target").double_quote_always()      // => "\"link\" -> \"target\""
+    /// Quotes::new("my link -> my target").double_quote_always() // => "\"my link\" -> \"my target\""
     /// ```
     pub fn double_quote_always(&self) -> String {
         if let Some((left, right)) = split_symlink(self.text) {
@@ -172,7 +172,7 @@ impl<'a> Quotes<'a> {
 
     /// Checks if text needs shell quoting (contains special characters or whitespace).
     ///
-    /// For symlinks (indicated by the ⇒ arrow), each part is checked separately,
+    /// For symlinks (indicated by the -> arrow), each part is checked separately,
     /// matching the behaviour of `single_quote_conditional()`.
     ///
     /// # Parameters

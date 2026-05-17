@@ -236,13 +236,23 @@ ce -t --prune --hide=.git,target --icons=always
 
 ## Themes
 
-Cerium supports customisable themes via a TOML configuration file. By default, it uses the Gruvbox colour palette.
+Cerium supports customisable themes via a TOML configuration file
+(`~/.config/cerium.toml`). By default, it uses the Catppuccin Mocha palette.
+
+Every key is optional and falls back per-field to the default, so a config
+can override just a few colours. Colours accept RGB tables, hex strings,
+named colours, or references into an optional `[palette]` table. A
+[matugen](https://github.com/InioX/matugen) template is included so colours
+can follow your wallpaper.
 
 ### Quick Start
 
 ```bash
 # Apply a pre-made theme
 cp themes/dracula.toml ~/.config/cerium.toml
+
+# Or override just one colour
+echo 'entry_directory = "#89b4fa"' > ~/.config/cerium.toml
 ```
 
 ### Available Themes

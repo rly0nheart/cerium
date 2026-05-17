@@ -19,6 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.2.0] - 2026-05-17
+
+### Added
+- `-F`/`--classify` appends a type indicator to entry names (`/` directory, `*` executable, `@` symlink, `|` FIFO, `=` socket), mirroring GNU `ls`
+- `--file-type` like `--classify` but never appends `*` to executables
+- `--slash` appends `/` to directories only (GNU `ls -p`; `-p` is already taken by `--permissions`)
+- Theme config `[palette]` table: define named colours once and reference them from semantic keys
+- Hex colour values in theme config (`"#rrggbb"`, `"#rgb"`, `"#rrggbbaa"`)
+- Matugen template (`themes/matugen/`) so colours can follow the wallpaper
+- Non-fatal stderr warning when a config file exists but fails to parse (interactive terminals only)
+
+### Changed
+- Every theme config key is now optional; unset/unresolvable keys fall back per-field to the built-in theme, so partial overrides work
+- Default built-in theme is now Catppuccin Mocha (was Gruvbox)
+- Symlink display arrow changed from `⇒` to `->`
+
 ## [0.1.30] - 2026-02-19
 ### Changed
 - Updated `install.sh` script to be compatible with `sh`
