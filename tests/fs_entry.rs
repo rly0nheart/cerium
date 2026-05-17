@@ -60,7 +60,7 @@ fn test_entry_new_symlink_without_target() {
     assert!(!entry.is_dir());
     assert!(!entry.is_file());
     // Name should not contain arrow when show_link_target is false
-    assert!(!entry.name().contains("⇒"));
+    assert!(!entry.name().contains("->"));
 }
 
 #[test]
@@ -76,7 +76,7 @@ fn test_entry_new_symlink_with_target() {
 
     assert!(entry.is_symlink());
     // Name should contain arrow and target when show_link_target is true
-    assert!(entry.name().contains("⇒"));
+    assert!(entry.name().contains("->"));
     assert!(entry.name().contains("link.txt"));
     assert!(entry.name().contains("target.txt"));
 }

@@ -46,6 +46,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+pub(crate) mod classify;
 pub mod factory;
 pub(crate) mod grid;
 pub mod layout;

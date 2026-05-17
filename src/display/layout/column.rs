@@ -154,8 +154,9 @@ impl Selector {
         if args.long {
             for column in [
                 Column::Permissions,
-                Column::Size,
                 Column::User,
+                Column::Group,
+                Column::Size,
                 Column::Modified,
             ] {
                 if !columns.contains(&column) {

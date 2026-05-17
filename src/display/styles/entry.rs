@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 use crate::cli::args::Args;
+use crate::display::classify;
 use crate::display::output::quotes::Quotes;
 use crate::display::styles::value::ValueStyle;
 use crate::display::theme::colours::{Colour, ColourPaint};
@@ -133,6 +134,14 @@ impl<'a> StyledEntry<'a> {
         // Apply text style to the entry name (without icon)
         let styled_entry_name = ValueStyle::name(&entry_name, self.style.colour);
         name.push_str(&styled_entry_name);
+
+        // Append the `-F`/`--file-type`/`--slash` indicator last and
+        // deliberately *unstyled*: `ls` never colours it, and keeping it
+        // outside the styled span also lets width measurement count it for
+        // grid/column alignment.
+        if let Some(symbol) = classify::indicator(self.entry, args) {
+            name.push(symbol);
+        }
 
         EntryView {
             name: Arc::from(name.as_str()),

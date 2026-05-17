@@ -24,20 +24,26 @@ SOFTWARE.
 use std::fs;
 use std::path::Path;
 
-/// The arrow character used to separate symlink name from target: ⇒
-pub const SYMLINK_ARROW: char = '\u{21D2}';
+/// The arrow used to separate a symlink name from its target: ->
+pub const SYMLINK_ARROW: &str = "->";
 
-/// The arrow as a string with spaces for display: " ⇒ "
-pub const SYMLINK_ARROW_WITH_SPACES: &str = " \u{21D2} ";
+/// The arrow as a string with spaces for display: " -> "
+pub const SYMLINK_ARROW_WITH_SPACES: &str = " -> ";
 
 /// Splits a symlink display string into name and target parts.
 ///
-/// If the text contains the arrow separator, returns `Some((name, target))`.
-/// Otherwise, returns `None`.
+/// Detection keys off the spaced separator `" -> "` so that filenames merely
+/// containing `->` aren't misread as symlinks. Genuine symlink display
+/// strings always contain the spaced form because [`format_symlink`] builds
+/// them with [`SYMLINK_ARROW_WITH_SPACES`].
+///
+/// If the text contains the spaced arrow separator, returns
+/// `Some((name, target))` with the separator (and its surrounding spaces)
+/// removed. Otherwise, returns `None`.
 ///
 /// # Parameters
 ///
-/// - `text`: The symlink display string (e.g., "name ⇒ target").
+/// - `text`: The symlink display string (e.g., "name -> target").
 ///
 /// # Returns
 ///
@@ -46,20 +52,20 @@ pub const SYMLINK_ARROW_WITH_SPACES: &str = " \u{21D2} ";
 /// # Examples
 ///
 /// ```text
-/// split_symlink("mylink ⇒ /target")  // => Some(("mylink ", " /target"))
+/// split_symlink("mylink -> /target")  // => Some(("mylink", "/target"))
 /// split_symlink("regular_file")       // => None
 /// ```
 pub fn split_symlink(text: &str) -> Option<(&str, &str)> {
-    text.find(SYMLINK_ARROW).map(|index| {
+    text.find(SYMLINK_ARROW_WITH_SPACES).map(|index| {
         let (left, right_with_arrow) = text.split_at(index);
-        let right = &right_with_arrow[SYMLINK_ARROW.len_utf8()..];
+        let right = &right_with_arrow[SYMLINK_ARROW_WITH_SPACES.len()..];
         (left, right)
     })
 }
 
 /// Formats a symlink display name with the target.
 ///
-/// Creates the standard symlink display format: `"name ⇒ target"`
+/// Creates the standard symlink display format: `"name -> target"`
 ///
 /// # Parameters
 ///
@@ -68,12 +74,12 @@ pub fn split_symlink(text: &str) -> Option<(&str, &str)> {
 ///
 /// # Returns
 ///
-/// A formatted string in the format `"name ⇒ target"`
+/// A formatted string in the format `"name -> target"`
 ///
 /// # Examples
 ///
 /// ```text
-/// format_symlink("mylink", "/path/to/target")  // => "mylink ⇒ /path/to/target"
+/// format_symlink("mylink", "/path/to/target")  // => "mylink -> /path/to/target"
 /// ```
 pub fn format_symlink(name: &str, target: &str) -> String {
     format!("{}{}{}", name, SYMLINK_ARROW_WITH_SPACES, target)

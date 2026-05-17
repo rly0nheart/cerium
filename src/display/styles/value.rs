@@ -58,7 +58,7 @@ impl ValueStyle {
     /// Styles entry names with special handling for symlinks and ignored files.
     ///
     /// # Parameters
-    /// - `name`: The entry name (may contain symlink arrow `⇒`).
+    /// - `name`: The entry name (may contain symlink arrow `->`).
     /// - `colour`: The base colour for the entry.
     ///
     /// # Returns

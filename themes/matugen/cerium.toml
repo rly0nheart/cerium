@@ -1,0 +1,116 @@
+# Cerium theme template for matugen
+# https://github.com/InioX/matugen
+#
+# This is a *matugen template*, not a ready-to-use config. matugen renders the
+# `{{colors.*}}` placeholders into real hex values and writes the result to
+# ~/.config/cerium.toml, so Cerium's colours follow your wallpaper.
+#
+# Setup:
+#   1. cp themes/matugen/cerium.toml ~/.config/matugen/templates/cerium.toml
+#   2. Add to ~/.config/matugen/config.toml:
+#
+#        [templates.cerium]
+#        input_path  = '~/.config/matugen/templates/cerium.toml'
+#        output_path = '~/.config/cerium.toml'
+#
+#   3. Regenerate: `matugen image /path/to/wallpaper.png`
+#
+# Every Cerium key is optional — anything you delete here falls back to the
+# built-in Catppuccin Mocha colour for that key. Edit the [colors] mappings
+# freely; they only reference the [palette] names below.
+
+# Material You roles, resolved by matugen from the source image.
+[palette]
+primary            = "{{colors.primary.default.hex}}"
+on_primary         = "{{colors.on_primary.default.hex}}"
+primary_container  = "{{colors.primary_container.default.hex}}"
+secondary          = "{{colors.secondary.default.hex}}"
+tertiary           = "{{colors.tertiary.default.hex}}"
+error              = "{{colors.error.default.hex}}"
+surface            = "{{colors.surface.default.hex}}"
+on_surface         = "{{colors.on_surface.default.hex}}"
+on_surface_variant = "{{colors.on_surface_variant.default.hex}}"
+outline            = "{{colors.outline.default.hex}}"
+
+# Cerium semantic keys -> palette references.
+[colors]
+# Size gradient (small -> large)
+size_bytes = "on_surface_variant"
+size_kb    = "secondary"
+size_mb    = "tertiary"
+size_gb    = "primary"
+
+# Date gradient (recent -> old)
+date_recent = "primary"
+date_hours  = "secondary"
+date_days   = "tertiary"
+date_weeks  = "on_surface_variant"
+date_months = "outline"
+date_old    = "outline"
+
+# Permissions
+perm_read     = "secondary"
+perm_write    = "error"
+perm_execute  = "tertiary"
+perm_none     = "outline"
+perm_special  = "primary"
+perm_filetype = "primary"
+
+# Entry types
+entry_directory = "primary"
+entry_symlink   = "tertiary"
+entry_file      = "on_surface"
+
+# Ownership
+user  = "secondary"
+group = "tertiary"
+
+# Code files
+code_rust       = "primary"
+code_python     = "secondary"
+code_javascript = "tertiary"
+code_c          = "secondary"
+code_go         = "tertiary"
+code_java       = "primary"
+code_ruby       = "error"
+code_php        = "primary"
+code_lua        = "secondary"
+
+# Web files
+web_html = "primary"
+web_css  = "secondary"
+web_json = "tertiary"
+web_xml  = "on_surface"
+web_yaml = "secondary"
+
+# Documents
+doc_text     = "on_surface"
+doc_markdown = "on_surface"
+doc_pdf      = "error"
+
+# Media
+media_image = "tertiary"
+media_video = "primary"
+media_audio = "secondary"
+
+# Archives
+archive = "secondary"
+
+# UI elements
+tree_connector = "outline"
+table_header   = "primary"
+path_display   = "primary"
+checksum       = "tertiary"
+magic          = "primary"
+xattr          = "secondary"
+acl            = "tertiary"
+mountpoint     = "primary"
+numeric        = "secondary"
+placeholder    = "outline"
+summary        = "on_surface"
+
+# CLI help
+cli_help_header      = "primary"
+cli_help_usage       = "tertiary"
+cli_help_literal     = "secondary"
+cli_help_placeholder = "on_surface_variant"

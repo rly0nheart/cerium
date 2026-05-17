@@ -23,8 +23,8 @@ SOFTWARE.
 */
 
 use crate::cli::flags::{
-    DateFormat, NumberFormat, OwnershipFormat, PermissionFormat, QuoteStyle, ShowColour,
-    ShowHyperlink, ShowIcons, SizeFormat, SortBy,
+    DateFormat, IndicatorStyle, NumberFormat, OwnershipFormat, PermissionFormat, QuoteStyle,
+    ShowColour, ShowHyperlink, ShowIcons, SizeFormat, SortBy,
 };
 
 #[cfg(feature = "checksum")]
@@ -182,6 +182,18 @@ pub struct Args {
     #[arg(short = 'Z', long)]
     pub context: bool,
 
+    /// Append indicator (one of */=@|) to entry names
+    #[arg(short = 'F', long)]
+    pub classify: bool,
+
+    /// Like --classify, but do not append '*' to executables
+    #[arg(long)]
+    pub file_type: bool,
+
+    /// Append / indicator to directories
+    #[arg(long)]
+    pub slash: bool,
+
     /// Enable colours WHEN
     #[arg(short = 'C', long, value_enum, default_value = "auto", value_name = "WHEN", visible_aliases = ["colors"], help_heading = "Display")]
     pub colours: ShowColour,
@@ -212,7 +224,7 @@ pub struct Args {
     #[arg(
         long,
         value_enum,
-        default_value = "locale",
+        default_value = "humanly",
         help_heading = "Formatting"
     )]
     pub date_format: DateFormat,
@@ -276,6 +288,26 @@ impl Args {
             || args.context
             || args.mountpoint
             || args.oneline
+    }
+
+    /// Resolves which file-type indicator style is active.
+    ///
+    /// When several of `--classify`, `--file-type`, and `--slash` are given,
+    /// the most informative one wins (classify > file-type > slash), matching
+    /// the spirit of GNU `ls` where the broadest indicator set takes effect.
+    ///
+    /// # Returns
+    /// The effective [`IndicatorStyle`] (`None` if no indicator flag is set).
+    pub fn indicator_style(&self) -> IndicatorStyle {
+        if self.classify {
+            IndicatorStyle::Classify
+        } else if self.file_type {
+            IndicatorStyle::FileType
+        } else if self.slash {
+            IndicatorStyle::Slash
+        } else {
+            IndicatorStyle::None
+        }
     }
 
     /// Checks whether the specified arguments request entry metadata.

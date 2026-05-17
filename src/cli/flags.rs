@@ -54,6 +54,20 @@ pub enum ShowIcons {
     Never,
 }
 
+/// Controls which file-type indicator (if any) is appended to entry names,
+/// mirroring GNU `ls`'s `-F`/`--file-type`/`-p` family.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum IndicatorStyle {
+    /// No indicator is appended (default).
+    None,
+    /// Append `/` to directories only (like `ls -p`).
+    Slash,
+    /// Like [`IndicatorStyle::Classify`], but never append `*` to executables.
+    FileType,
+    /// Append one of `*/=@|` (like `ls -F`).
+    Classify,
+}
+
 /// Controls how file permissions are formatted.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum PermissionFormat {

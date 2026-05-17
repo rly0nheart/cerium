@@ -2,20 +2,20 @@ use cerium::display::theme::config::Theme;
 use nu_ansi_term::Color as Colour;
 
 #[test]
-fn test_gruvbox_theme_creation() {
+fn test_default_theme_creation() {
     let theme = Theme::default();
-    // Verify a few key authentic Gruvbox colours
-    assert!(matches!(theme.size_bytes.colour, Colour::Rgb(152, 151, 26))); // green
-    assert!(matches!(theme.perm_read.colour, Colour::Rgb(215, 153, 33))); // yellow
+    // Verify a few key authentic Catppuccin Mocha colours
+    assert!(matches!(theme.size_bytes.colour, Colour::Rgb(166, 227, 161))); // green
+    assert!(matches!(theme.perm_read.colour, Colour::Rgb(249, 226, 175))); // yellow
     assert!(matches!(
         theme.entry_directory.colour,
-        Colour::Rgb(131, 165, 152) // bright_blue
+        Colour::Rgb(137, 180, 250) // blue
     ));
     assert!(matches!(
         theme.entry_file.colour,
-        Colour::Rgb(235, 219, 178)
-    )); // fg
-    assert!(matches!(theme.code_rust.colour, Colour::Rgb(214, 93, 14))); // orange
+        Colour::Rgb(205, 214, 244) // text
+    ));
+    assert!(matches!(theme.code_rust.colour, Colour::Rgb(250, 179, 135))); // peach
 }
 
 #[test]
