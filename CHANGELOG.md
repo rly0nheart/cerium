@@ -10,8 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 ### Changed
-- Size column now shows the immediate item count for directories (e.g. `3 items`) instead of the inode size in bytes
-- Renamed `--true-size`/`-S` to `--dir-size`/`-S`; pass it to switch directories in the size column back to a recursive byte total
 
 ### Deprecated
 
@@ -20,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 ### Security
+
+## [0.2.1] - 2026-05-29
+
+### Changed
+- Size column now shows the immediate item count for directories (e.g. `3 items`) instead of the inode size in bytes
+- Renamed `--true-size`/`-S` to `--dir-size`/`-S`; pass it to switch directories in the size column back to a recursive byte total
+- Numeric segments in the size and date columns now render in bold cyan (matching the summary line), keeping unit/label text in the column's themed colour
 
 ## [0.2.0] - 2026-05-17
 
