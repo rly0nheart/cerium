@@ -111,6 +111,30 @@ impl DirReader {
         entries
     }
 
+    /// Counts the entries directly contained in this directory (non-recursive).
+    ///
+    /// # Parameters
+    /// - `include_hidden`: Whether to count hidden (dot-prefixed) entries.
+    ///
+    /// # Returns
+    /// The number of immediate children, or `0` if the path is not a readable directory.
+    pub fn item_count(&self, include_hidden: bool) -> usize {
+        let Ok(entries) = fs::read_dir(&self.path) else {
+            return 0;
+        };
+
+        entries
+            .filter_map(Result::ok)
+            .filter(|entry| {
+                include_hidden
+                    || !entry
+                        .file_name()
+                        .to_string_lossy()
+                        .starts_with('.')
+            })
+            .count()
+    }
+
     /// Computes the total size (in bytes) of all files under this directory, recursively.
     ///
     /// # Parameters
@@ -118,7 +142,7 @@ impl DirReader {
     ///
     /// # Returns
     /// The cumulative file size in bytes, or `0` if the path is not a directory.
-    pub fn true_size(&self, include_hidden: bool) -> u64 {
+    pub fn dir_size(&self, include_hidden: bool) -> u64 {
         fn dir_size(path: &PathBuf, include_hidden: bool) -> u64 {
             let mut size = 0;
 

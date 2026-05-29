@@ -154,9 +154,9 @@ pub struct Args {
     #[arg(long, value_enum, value_name = "BY", default_value = "name")]
     pub sort: SortBy,
 
-    /// Display true size of directories based on their contents
+    /// Show the recursive byte size of directories in the size column instead of the item count
     #[arg(short = 'S', long)]
-    pub true_size: bool,
+    pub dir_size: bool,
 
     /// Display directories hierarchically (tree view)
     #[arg(short, long, conflicts_with = "recursive")]

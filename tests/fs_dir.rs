@@ -149,7 +149,7 @@ fn test_reverse_sort() {
 }
 
 #[test]
-fn test_true_size_with_hidden() {
+fn test_dir_size_with_hidden() {
     let temp_dir = setup_test_dir();
     let base = temp_dir.path();
 
@@ -162,15 +162,15 @@ fn test_true_size_with_hidden() {
 
     let dir_reader = DirReader::from(base.to_path_buf());
 
-    let size_with_hidden = dir_reader.true_size(true);
-    let size_without_hidden = dir_reader.true_size(false);
+    let size_with_hidden = dir_reader.dir_size(true);
+    let size_without_hidden = dir_reader.dir_size(false);
 
     assert!(size_with_hidden > size_without_hidden);
     assert!(size_with_hidden >= 11); // At least "Hello" + "Secret"
 }
 
 #[test]
-fn test_true_size_recursive() {
+fn test_dir_size_recursive() {
     let temp_dir = setup_test_dir();
     let base = temp_dir.path();
 
@@ -179,19 +179,19 @@ fn test_true_size_recursive() {
     nested.write_all(b"Nested content").unwrap();
 
     let dir_reader = DirReader::from(base.to_path_buf());
-    let size = dir_reader.true_size(true);
+    let size = dir_reader.dir_size(true);
 
     // Should include nested files
     assert!(size >= 14); // At least "Nested content"
 }
 
 #[test]
-fn test_true_size_non_directory() {
+fn test_dir_size_non_directory() {
     let temp_dir = setup_test_dir();
     let file_path = temp_dir.path().join("file1.txt");
 
     let dir_reader = DirReader::from(file_path);
-    let size = dir_reader.true_size(true);
+    let size = dir_reader.dir_size(true);
 
     assert_eq!(size, 0); // Non-directories return 0
 }

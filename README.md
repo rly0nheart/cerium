@@ -2,12 +2,15 @@
 
 **A light `ls` alternative.**
 
-Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on staying small with minimal dependencies while doing what it's supposed to do... **list your files and directories**.
+Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on
+staying small with minimal dependencies while doing what it's supposed to do...
+**list your files and directories**.
 
 ## Table of Contents
+
 - [Availability](#availability)
 - [Development](#development)
-- [Installation](#installation-)
+- [Installation](#installation)
   - [Prebuilt Binary](#prebuilt-binary)
   - [With Cargo](#with-cargo)
   - [Build from Source](#build-from-source)
@@ -32,16 +35,20 @@ Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on
 - [License](#licence)
 
 ## Availability
-|        OS        | Tested        |        Features         |
-|:----------------:|:--------------|:-----------------------:|
-| Android (Termux) | `yes`         |       `checksum`        |
-|      Fedora      | `yes`         | `checksum`, `filemagic` |
-|      Ubuntu      | `yes`         | `checksum`, `filemagic` |
-|      MacOS       | `no`          |      `not tested`       |
+
+|        OS        | Tested |        Features         |
+|:----------------:|:------:|:-----------------------:|
+| Android (Termux) | `yes`  |       `checksum`        |
+|      Fedora      | `yes`  | `checksum`, `filemagic` |
+|      Ubuntu      | `yes`  | `checksum`, `filemagic` |
+|      MacOS       |  `no`  |      `not tested`       |
 
 ## Development
-Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The [GitHub repository](https://github.com/rly0nheart/cerium) is a read-only mirror used solely for crates.io deployments. Issues should be opened on either GitHub or Codeberg, but pull requests should be opened only on Codeberg.
 
+Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The
+[GitHub repository](https://github.com/rly0nheart/cerium) is a read-only mirror
+used solely for crates.io deployments. Issues should be opened on either GitHub
+or Codeberg, but pull requests should be opened only on Codeberg.
 
 ## Installation
 
@@ -53,10 +60,10 @@ curl -fsSL https://codeberg.org/rly0nheart/cerium/raw/branch/master/scripts/inst
 
 **Options:**
 
-| Option               | Description                                            |
-|----------------------|--------------------------------------------------------|
-| `--nightly`          | Install the latest nightly build instead of stable     |
-| `--dir <path>`       | Installation directory (default: `/usr/local/bin`)     |
+|        Option        |                      Description                       |
+|:--------------------:|:------------------------------------------------------:|
+|     `--nightly`      |   Install the latest nightly build instead of stable   |
+|    `--dir <path>`    |   Installation directory (default: `/usr/local/bin`)   |
 | `--features <value>` | Feature variant to install: `checksum`, `magic`, `all` |
 
 > [!NOTE]
@@ -107,7 +114,8 @@ make install
 
 ### Magic
 
-Content-based file type identification using libmagic. Shows actual file types regardless of extension.
+Content-based file type identification using libmagic. Shows actual file types
+regardless of extension.
 
 **Requirements:** libmagic library (`scripts/libmagic.sh`)
 
@@ -175,7 +183,7 @@ ce [OPTIONS] [PATH]
 --sort <BY>            name, size, created, accessed, modified, extension, inode
 -r, --reverse          Reverse order
 -R, --recursive        Recurse into subdirectories
--S, --true-size        Calculate actual directory sizes
+-S, --dir-size         Show recursive byte size of directories instead of item count
 ```
 
 ### Formatting
@@ -220,7 +228,7 @@ ce -lb --block-size                       # Block usage
 
 ```bash
 ce --magic --checksum sha256              # Type detection + checksums
-ce -RS --true-size                        # Recursive with actual directory sizes
+ce -RS --dir-size                         # Recursive with directory byte totals
 ce --hide=target,node_modules -t          # Tree excluding build artifacts
 ce --permission-format=octal -p           # Octal permissions
 ce --ownership-format=id -ug              # Numeric UIDs/GIDs
@@ -239,11 +247,11 @@ ce -t --prune --hide=.git,target --icons=always
 Cerium supports customisable themes via a TOML configuration file
 (`~/.config/cerium.toml`). By default, it uses the Catppuccin Mocha palette.
 
-Every key is optional and falls back per-field to the default, so a config
-can override just a few colours. Colours accept RGB tables, hex strings,
-named colours, or references into an optional `[palette]` table. A
-[matugen](https://github.com/InioX/matugen) template is included so colours
-can follow your wallpaper.
+Every key is optional and falls back per-field to the default, so a config can
+override just a few colours. Colours accept RGB tables, hex strings, named
+colours, or references into an optional `[palette]` table. A
+[matugen](https://github.com/InioX/matugen) template is included so colours can
+follow your wallpaper.
 
 ### Quick Start
 
@@ -257,7 +265,10 @@ echo 'entry_directory = "#89b4fa"' > ~/.config/cerium.toml
 
 ### Available Themes
 
-See [`themes/README.md`](themes/README.md) for the full list of pre-made themes, installation instructions, and customisation guide.
+See [`themes/README.md`](themes/README.md) for the full list of pre-made themes,
+installation instructions, and customisation guide.
 
 ## Licence
-MIT Licence. See [choosealicense](https://choosealicense.com/licenses/mit/) for more details.
+
+MIT Licence. See [choosealicense](https://choosealicense.com/licenses/mit/) for
+more details.

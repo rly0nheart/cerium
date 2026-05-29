@@ -97,7 +97,10 @@ impl ElementStyle {
         let mut in_digits = text.starts_with(|character: char| character.is_ascii_digit());
 
         for character in text.chars() {
-            let is_digit = character.is_ascii_digit();
+            // Keep '.' and ',' attached to an active digit run so decimals and thousands
+            // separators (e.g. "25.9", "1,024") render as a single numeric chunk.
+            let is_digit = character.is_ascii_digit()
+                || (in_digits && (character == '.' || character == ','));
             if is_digit != in_digits && !chunk.is_empty() {
                 if in_digits {
                     result.push_str(&Self::numeric(&chunk));
