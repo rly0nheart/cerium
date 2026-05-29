@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 ### Changed
+- Size column now shows the immediate item count for directories (e.g. `3 items`) instead of the inode size in bytes
+- Renamed `--true-size`/`-S` to `--dir-size`/`-S`; pass it to switch directories in the size column back to a recursive byte total
 
 ### Deprecated
 
