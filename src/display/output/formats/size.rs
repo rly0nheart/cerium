@@ -52,6 +52,15 @@ impl Size {
             SizeFormat::Bytes => bytes.to_string().into(),
         }
     }
+
+    /// Formats a directory item count, e.g. `"0 items"`, `"1 item"`, `"3 items"`.
+    pub(crate) fn format_item_count(count: usize) -> Arc<str> {
+        if count == 1 {
+            "1 item".into()
+        } else {
+            format!("{} items", count).into()
+        }
+    }
 }
 
 impl Format<u64> for Size {

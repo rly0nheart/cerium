@@ -52,7 +52,7 @@ impl ValueStyle {
             RgbColours::pine_glade()
         };
 
-        colour.bold().apply_to(size)
+        ElementStyle::text(size, Some(colour))
     }
 
     /// Styles entry names with special handling for symlinks and ignored files.
@@ -141,7 +141,7 @@ impl ValueStyle {
             RgbColours::frost_glimmer()
         };
 
-        colour.bold().apply_to(datetime)
+        ElementStyle::text(datetime, Some(colour))
     }
 
     /// Styles Unix permission strings with character-by-character colour coding.

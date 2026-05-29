@@ -29,7 +29,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::SystemTime;
 
-static TRUE_SIZE_CACHE: OnceLock<Mutex<HashMap<(PathBuf, bool), u64>>> = OnceLock::new();
+static DIR_SIZE_CACHE: OnceLock<Mutex<HashMap<(PathBuf, bool), u64>>> = OnceLock::new();
 static SIZE_DISPLAY_CACHE: OnceLock<Mutex<HashMap<u64, Arc<str>>>> = OnceLock::new();
 
 #[cfg(all(feature = "magic", not(target_os = "android")))]
@@ -130,12 +130,12 @@ impl Cache {
     ///
     /// # Returns
     /// The cached or freshly computed total size in bytes.
-    pub(crate) fn true_size(
+    pub(crate) fn dir_size(
         path: &Path,
         include_hidden: bool,
         compute: impl FnOnce() -> u64,
     ) -> u64 {
-        let cache = TRUE_SIZE_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+        let cache = DIR_SIZE_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
 
         if let Some(cached) = Self::getter(cache, &(path.to_path_buf(), include_hidden)) {
             return cached;

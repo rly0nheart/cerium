@@ -128,14 +128,20 @@ impl<'a> Populate<'a> {
                 })
             }
             Column::Size => {
-                let size_bytes = if self.entry.is_dir() && self.args.true_size {
-                    Cache::true_size(self.entry.path(), self.args.all, || {
-                        DirReader::from(path.to_owned()).true_size(self.args.all)
-                    })
+                if self.entry.is_dir() {
+                    if self.args.dir_size {
+                        let size_bytes = Cache::dir_size(self.entry.path(), self.args.all, || {
+                            DirReader::from(path.to_owned()).dir_size(self.args.all)
+                        });
+                        Cache::size(size_bytes, |s| size.format(s))
+                    } else {
+                        let count = DirReader::from(path.to_owned()).item_count(self.args.all);
+                        Size::format_item_count(count)
+                    }
                 } else {
-                    metadata.map(|meta| meta.size).unwrap_or_default()
-                };
-                Cache::size(size_bytes, |s| size.format(s))
+                    let size_bytes = metadata.map(|meta| meta.size).unwrap_or_default();
+                    Cache::size(size_bytes, |s| size.format(s))
+                }
             }
             Column::Created => Cache::date(
                 metadata
