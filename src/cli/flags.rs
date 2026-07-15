@@ -28,14 +28,14 @@ use clap::ValueEnum;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum DateFormat {
     Locale,
-    Humanly,
+    Human,
     Timestamp,
 }
 
 /// Controls how numeric values (hard links, blocks) are formatted.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum NumberFormat {
-    Humanly,
+    Human,
     Natural,
 }
 

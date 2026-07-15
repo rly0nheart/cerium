@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+use std::cmp::Reverse;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
@@ -73,7 +74,7 @@ impl Mountpoint {
             .collect();
 
         // Sort by path length (longest first) to ensure we match the most specific mount
-        mounts.sort_by(|a, b| b.0.as_os_str().len().cmp(&a.0.as_os_str().len()));
+        mounts.sort_by_key(|m| Reverse(m.0.as_os_str().len()));
 
         Ok(mounts)
     }

@@ -224,7 +224,7 @@ pub struct Args {
     #[arg(
         long,
         value_enum,
-        default_value = "humanly",
+        default_value = "human",
         help_heading = "Formatting"
     )]
     pub date_format: DateFormat,
@@ -233,7 +233,7 @@ pub struct Args {
     #[arg(
         long,
         value_enum,
-        default_value = "humanly",
+        default_value = "human",
         help_heading = "Formatting"
     )]
     pub number_format: NumberFormat,

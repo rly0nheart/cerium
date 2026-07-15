@@ -218,7 +218,7 @@ ce --find=*.rs --sort=size -r             # Find Rust files, sort by size
 ### Metadata Inspection
 
 ```bash
-ce -pugm --date-format=humanly            # Permissions, ownership, modified date, human dates
+ce -pugm --date-format=human              # Permissions, ownership, modified date, human dates
 ce -i --hard-links --sort=inode           # Inodes and hard links
 ce --acl -x                               # ACLs and extended attributes
 ce -lb --block-size                       # Block usage
@@ -237,7 +237,7 @@ ce --ownership-format=id -ug              # Numeric UIDs/GIDs
 ### Combined Operations
 
 ```bash
-ce -laH --date-format=humanly --size-format=binary
+ce -laH --date-format=human --size-format=binary
 ce --find=.pdf --checksum md5 --sort=modified -r
 ce -t --prune --hide=.git,target --icons=always
 ```
