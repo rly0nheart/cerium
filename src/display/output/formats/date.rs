@@ -25,7 +25,7 @@ SOFTWARE.
 use crate::cli::flags::DateFormat;
 use crate::display::output::formats::format::Format;
 use chrono::{DateTime, Local};
-use humanly::HumanDuration;
+use human::HumanRelative;
 use std::sync::Arc;
 use std::time::SystemTime;
 
@@ -56,7 +56,10 @@ impl Date {
     /// - `system_time`: The timestamp to format, or `None` for a placeholder.
     fn format_date(&self, system_time: Option<SystemTime>) -> Arc<str> {
         match self.date_format {
-            DateFormat::Humanly => self.humanised(system_time),
+            DateFormat::Human => match system_time {
+                Some(st) => self.humanised(st),
+                None => "-".into(),
+            },
             DateFormat::Locale => Self::locale(system_time),
             DateFormat::Timestamp => match system_time {
                 Some(st) => match st.duration_since(SystemTime::UNIX_EPOCH) {
@@ -72,8 +75,8 @@ impl Date {
     ///
     /// # Parameters
     /// - `system_time`: The timestamp to format.
-    fn humanised(&self, system_time: Option<SystemTime>) -> Arc<str> {
-        Arc::from(HumanDuration::from(system_time).to_string())
+    fn humanised(&self, system_time: SystemTime) -> Arc<str> {
+        Arc::from(HumanRelative::new(system_time).to_string())
     }
 
     /// Formats the timestamp using the locale date format.

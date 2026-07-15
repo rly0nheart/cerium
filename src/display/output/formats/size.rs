@@ -24,7 +24,7 @@ SOFTWARE.
 
 use crate::cli::flags::SizeFormat;
 use crate::display::output::formats::format::Format;
-use humanly::HumanSize;
+use human::HumanSize;
 use std::sync::Arc;
 
 /// Formats byte sizes according to the selected [`SizeFormat`].
@@ -47,8 +47,8 @@ impl Size {
     /// - `bytes`: The byte count to format.
     pub(crate) fn format_size(&self, bytes: u64) -> Arc<str> {
         match self.size_mode {
-            SizeFormat::Binary => HumanSize::from(bytes).binary().concise().into(),
-            SizeFormat::Decimal => HumanSize::from(bytes).decimal().concise().into(),
+            SizeFormat::Binary => HumanSize::from(bytes).binary().short().to_string().into(),
+            SizeFormat::Decimal => HumanSize::from(bytes).decimal().short().to_string().into(),
             SizeFormat::Bytes => bytes.to_string().into(),
         }
     }

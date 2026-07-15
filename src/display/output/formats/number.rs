@@ -24,7 +24,7 @@ SOFTWARE.
 
 use crate::cli::flags::NumberFormat;
 use crate::display::output::formats::format::Format;
-use humanly::HumanNumber;
+use human::HumanNumber;
 use std::sync::Arc;
 
 impl Format<u64> for Number {
@@ -54,7 +54,7 @@ impl Number {
     /// - `number`: The value to format.
     fn format_number(&self, number: u64) -> Arc<str> {
         match self.number_format {
-            NumberFormat::Humanly => HumanNumber::from(number as f64).concise().into(),
+            NumberFormat::Human => HumanNumber::from(number as f64).short().to_string().into(),
             NumberFormat::Natural => number.to_string().into(),
         }
     }

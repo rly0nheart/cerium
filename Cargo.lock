@@ -106,14 +106,14 @@ dependencies = [
 
 [[package]]
 name = "cerium"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "chrono",
  "clap",
  "crc32fast",
  "filemagic",
- "humanly",
  "libc",
+ "libhuman",
  "md5",
  "nu-ansi-term",
  "phf",
@@ -323,12 +323,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
-name = "humanly"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aa79f7214a082ff4ec063a2a00298bd42f86ee709ecc5324b61ef97f757edaf"
-
-[[package]]
 name = "iana-time-zone"
 version = "0.1.65"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -403,6 +397,12 @@ name = "libc"
 version = "0.2.182"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6800badb6cb2082ffd7b6a67e6125bb39f18782f793520caee8cb8846be06112"
+
+[[package]]
+name = "libhuman"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75b4ee8596cdf55193daede81b1072374f71e24a6c4614d74c270cc03720493d"
 
 [[package]]
 name = "linux-raw-sys"

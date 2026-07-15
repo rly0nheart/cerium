@@ -25,7 +25,7 @@ SOFTWARE.
 use crate::display::styles::element::ElementStyle;
 use crate::fs::entry::Entry;
 use crate::fs::tree::TreeNode;
-use humanly::HumanNumber;
+use human::HumanNumber;
 
 /// Counts directories and files in a flat slice of entries.
 ///
