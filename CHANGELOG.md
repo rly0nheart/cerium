@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
-## [0.3.0] - 2026-08-14
+## [0.3.1] - 2026-08-14
 
 ### Changed
 - Theme files use sections. Roles follow [lsd](https://github.com/lsd-rs/lsd)

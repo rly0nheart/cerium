@@ -16,17 +16,17 @@ make test     # run the test suite
 
 The Makefile covers the rest:
 
-| Command         | Description                                      |
-|-----------------|--------------------------------------------------|
+| Command         | Description                                       |
+|-----------------|---------------------------------------------------|
 | `make setup`    | Install libmagic for the `magic` feature          |
-| `make build`    | Build the release binary                         |
-| `make run`      | Run cerium (pass args with `ARGS="..."`)         |
-| `make fmt`      | Format code with `cargo fmt`                     |
-| `make lint`     | Run Clippy with strict warnings (`-D warnings`)  |
-| `make test`     | Run all tests                                    |
-| `make install`  | Install the binary to `~/.cargo/bin/ce`          |
-| `make clean`    | Remove build artefacts                           |
-| `make rebuild`  | Clean and rebuild from scratch                   |
+| `make build`    | Build the release binary                          |
+| `make run`      | Run cerium (pass args with `ARGS="..."`)          |
+| `make fmt`      | Format code with `cargo fmt`                      |
+| `make lint`     | Run Clippy with strict warnings (`-D warnings`)   |
+| `make test`     | Run all tests                                     |
+| `make install`  | Install the binary to `~/.cargo/bin/ce`           |
+| `make clean`    | Remove build artefacts                            |
+| `make rebuild`  | Clean and rebuild from scratch                    |
 
 ## Architecture
 

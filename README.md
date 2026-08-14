@@ -1,4 +1,4 @@
-![logo](https://codeberg.org/rly0nheart/cerium/raw/branch/master/img/logo-word.svg)
+![logo](https://codeberg.org/rly0nheart/cerium/raw/branch/master/img/logo.svg)
 
 **A light `ls` alternative.**
 
