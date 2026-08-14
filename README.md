@@ -11,9 +11,9 @@ features.
 - [Availability](#availability)
 - [Development](#development)
 - [Installation](#installation)
+  - [Prebuilt binary](#prebuilt-binary)
+  - [#With Cargo](#with-cargo)
 - [Optional features](#optional-features)
-- [Usage](#usage)
-- [Examples](#examples)
 - [Themes](#themes)
 - [Licence](#licence)
 
