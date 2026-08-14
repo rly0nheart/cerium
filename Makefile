@@ -1,4 +1,9 @@
-# MIT License
+# Run the setup script (scripts/libmagic.sh)
+setup:
+	@# Ensure the script is executable
+	@test -x $(SETUP_SCRIPT) || chmod +x $(SETUP_SCRIPT)
+	@echo -e "     $(GREEN)Running$(RESET) $(SETUP_SCRIPT)"
+	@./$(SETUP_SCRIPT)# MIT License
 
 # Copyright (c) 2025 Ritchie Mwewa
 
@@ -28,19 +33,16 @@ RESET  := \\033[0m
 BINARY_NAME := ce
 INSTALL_PATH := ~/.cargo/bin/$(BINARY_NAME)
 SETUP_SCRIPT := scripts/libmagic.sh
-SOURCE_MAP_GENERATOR_SCRIPT := scripts/generate_source_map.py
 
 # Default target
 default: build
 
-# Run the setup script (scripts/libmagic.sh) and source map generator (scripts/generate_source_map.py)
+# Run the setup script (scripts/libmagic.sh)
 setup:
 	@# Ensure the script is executable
 	@test -x $(SETUP_SCRIPT) || chmod +x $(SETUP_SCRIPT)
 	@echo -e "     $(GREEN)Running$(RESET) $(SETUP_SCRIPT)"
 	@./$(SETUP_SCRIPT)
-	@echo -e "     $(GREEN)Running$(RESET) $(SOURCE_MAP_GENERATOR_SCRIPT)"
-	@python3 $(SOURCE_MAP_GENERATOR_SCRIPT)
 
 # Build target — depends on setup
 build: setup

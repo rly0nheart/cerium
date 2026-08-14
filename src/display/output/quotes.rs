@@ -1,299 +1,104 @@
+// SPDX-License-Identifier: MIT
+
+//! Shell-safe quoting of entry names.
+//!
+//! A symlink renders as `link -> target`, so each side is quoted on its own
+//! and the arrow is left bare.
+
 use crate::cli::flags::QuoteStyle;
 use crate::fs::symlink::{SYMLINK_ARROW_WITH_SPACES, split_symlink};
 
-/// A text quoter that handles shell-safe quoting with symlink support.
+/// Characters that force quoting: shell metacharacters, globs, and brackets.
+const SPECIAL: &[char] = &[
+    '\\', '\'', '"', '`', '$', '&', '|', ';', '<', '>', '(', ')', '[', ']', '{', '}', '*', '?',
+    '!', '#', '~', '%', '^',
+];
+
+/// Quotes `text` in the given style.
 ///
-/// This struct provides methods for quoting text in various styles, with special
-/// handling for symlinks (indicated by the -> arrow).
-pub struct Quotes<'a> {
-    text: &'a str,
+/// # Parameters
+/// - `text`: The name to quote, possibly a `link -> target` pair.
+/// - `style`: The quoting style to apply.
+/// - `add_alignment_space`: Under [`QuoteStyle::Auto`], pads unquoted names by
+///   one space so they line up with quoted ones in the same listing.
+pub fn apply(text: &str, style: QuoteStyle, add_alignment_space: bool) -> String {
+    match style {
+        QuoteStyle::Never => text.to_string(),
+        QuoteStyle::Single => each_side(text, |part| wrap(part, '\'')),
+        QuoteStyle::Double => each_side(text, |part| wrap(part, '"')),
+        QuoteStyle::Auto => {
+            let quoted = each_side(text, |part| {
+                if has_special_chars(part) {
+                    wrap(part, '\'')
+                } else {
+                    part.to_string()
+                }
+            });
+
+            if add_alignment_space && !quoted.starts_with('\'') {
+                format!(" {}", quoted)
+            } else {
+                quoted
+            }
+        }
+    }
 }
 
-impl<'a> Quotes<'a> {
-    /// Creates a new Quote instance for the given text.
-    ///
-    /// # Parameters
-    ///
-    /// - `text`: The text to be quoted.
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// let q = Quotes::new("file name");
-    /// ```
-    pub fn new(text: &'a str) -> Self {
-        Self { text }
-    }
-
-    /// Applies the specified quote style to the text with smart alignment handling.
-    ///
-    /// # Parameters
-    ///
-    /// - `style`: The quoting style to apply.
-    /// - `add_alignment_space`: Whether to add a leading space for unquoted entries (Auto mode only).
-    ///
-    /// # Returns
-    ///
-    /// A `String` with the appropriate quoting applied
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// let q = Quotes::new("file name");
-    /// q.apply(QuoteStyle::Single, false)  // => "'file name'"
-    /// q.apply(QuoteStyle::Single, true)   // => "'file name'" (alignment ignored)
-    ///
-    /// let q2 = Quotes::new("normal");
-    /// q2.apply(QuoteStyle::Auto, false)   // => "normal"
-    /// q2.apply(QuoteStyle::Auto, true)    // => " normal" (space for alignment)
-    /// ```
-    pub fn apply(&self, style: QuoteStyle, add_alignment_space: bool) -> String {
-        match style {
-            QuoteStyle::Single => self.single_quote_always(),
-            QuoteStyle::Double => self.double_quote_always(),
-            QuoteStyle::Auto => {
-                let quoted = self.single_quote_conditional();
-                // Auto mode: add alignment space if text wasn't quoted and alignment is needed
-                // This ensures unquoted entries align with quoted entries in the same directory
-                if add_alignment_space && !quoted.starts_with('\'') {
-                    format!(" {}", quoted)
-                } else {
-                    quoted
-                }
-            }
-            QuoteStyle::Never => self.text.into(),
+/// Reports whether `text` needs shell quoting.
+///
+/// # Parameters
+/// - `text`: The name to inspect, possibly a `link -> target` pair.
+pub(crate) fn is_quotable(text: &str) -> bool {
+    match split_symlink(text) {
+        Some((left, right)) => {
+            has_special_chars(left.trim_end()) || has_special_chars(right.trim_start())
         }
+        None => has_special_chars(text),
     }
+}
 
-    /// Wraps text in single quotes if it contains special characters or whitespace.
-    ///
-    /// For symlinks (indicated by the -> arrow), quotes are applied to each side
-    /// independently, leaving the arrow unquoted.
-    ///
-    /// # Returns
-    ///
-    /// A `String` with the text quoted if necessary. Unquoted text is returned as-is.
-    ///
-    /// # Special Characters
-    ///
-    /// The following characters trigger quoting:
-    /// - Whitespace (spaces, tabs, newlines)
-    /// - Shell metacharacters: `\`, `'`, `"`, `` ` ``, `$`, `&`, `|`, `;`
-    /// - Glob characters: `*`, `?`
-    /// - Other special characters: `<`, `>`, `(`, `)`, `[`, `]`, `{`, `}`, `!`, `#`, `~`, `%`, `^`
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// Quotes::new("normal").single_quote_conditional()                // => "normal"
-    /// Quotes::new("file name").single_quote_conditional()             // => "'file name'"
-    /// Quotes::new("link -> target").single_quote_conditional()        // => "link -> target"
-    /// Quotes::new("my link -> my target").single_quote_conditional()  // => "'my link' -> 'my target'"
-    /// Quotes::new("file$name").single_quote_conditional()             // => "'file$name'"
-    /// ```
-    pub fn single_quote_conditional(&self) -> String {
-        if let Some((left, right)) = split_symlink(self.text) {
-            let quoted_left = Self::quote_if_quotable(left.trim_end());
-            let quoted_right = Self::quote_if_quotable(right.trim_start());
+/// Applies `quote` to each side of a symlink, or to the whole name.
+///
+/// # Parameters
+/// - `text`: The name to process.
+/// - `quote`: Called with each part that needs quoting.
+fn each_side(text: &str, quote: impl Fn(&str) -> String) -> String {
+    match split_symlink(text) {
+        Some((left, right)) => format!(
+            "{}{}{}",
+            quote(left.trim_end()),
+            SYMLINK_ARROW_WITH_SPACES,
+            quote(right.trim_start())
+        ),
+        None => quote(text),
+    }
+}
 
-            format!(
-                "{}{}{}",
-                quoted_left, SYMLINK_ARROW_WITH_SPACES, quoted_right
-            )
-        } else {
-            Self::quote_if_quotable(self.text)
+/// Reports whether a string holds whitespace or a shell metacharacter.
+///
+/// # Parameters
+/// - `text`: The text to inspect.
+fn has_special_chars(text: &str) -> bool {
+    text.chars()
+        .any(|character| character.is_whitespace() || SPECIAL.contains(&character))
+}
+
+/// Wraps text in `quote`, escaping any occurrence of it inside.
+///
+/// # Parameters
+/// - `text`: The text to wrap.
+/// - `quote`: The quote character to surround it with.
+fn wrap(text: &str, quote: char) -> String {
+    let mut quoted = String::with_capacity(text.len() + 2);
+    quoted.push(quote);
+
+    for character in text.chars() {
+        if character == quote {
+            quoted.push('\\');
         }
+        quoted.push(character);
     }
 
-    /// Wraps text in single quotes unconditionally.
-    ///
-    /// Always adds single quotes around the input text. For symlinks (indicated by the -> arrow),
-    /// quotes are applied to each side independently, leaving the arrow unquoted.
-    ///
-    /// # Returns
-    ///
-    /// A `String` with the text wrapped in single quotes. For symlinks, both the
-    /// link name and target are quoted separately with the arrow between them.
-    /// Single quotes within the text are escaped as `\'`.
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// Quotes::new("file").single_quote_always()                // => "'file'"
-    /// Quotes::new("file name").single_quote_always()           // => "'file name'"
-    /// Quotes::new("link -> target").single_quote_always()      // => "'link' -> 'target'"
-    /// Quotes::new("my link -> my target").single_quote_always() // => "'my link' -> 'my target'"
-    /// ```
-    pub fn single_quote_always(&self) -> String {
-        if let Some((left, right)) = split_symlink(self.text) {
-            let quoted_left = Self::add_single_quotes(left.trim_end());
-            let quoted_right = Self::add_single_quotes(right.trim_start());
-
-            format!(
-                "{}{}{}",
-                quoted_left, SYMLINK_ARROW_WITH_SPACES, quoted_right
-            )
-        } else {
-            Self::add_single_quotes(self.text)
-        }
-    }
-
-    /// Wraps text in double quotes unconditionally.
-    ///
-    /// Always adds double quotes around the input text. For symlinks (indicated by the -> arrow),
-    /// quotes are applied to each side independently.
-    ///
-    /// # Returns
-    ///
-    /// A `String` with the text wrapped in double quotes. For symlinks, both the
-    /// link name and target are quoted separately with the arrow between them.
-    ///
-    /// # Examples
-    ///
-    /// ```text
-    /// Quotes::new("file").double_quote_always()                // => "\"file\""
-    /// Quotes::new("file name").double_quote_always()           // => "\"file name\""
-    /// Quotes::new("link -> target").double_quote_always()      // => "\"link\" -> \"target\""
-    /// Quotes::new("my link -> my target").double_quote_always() // => "\"my link\" -> \"my target\""
-    /// ```
-    pub fn double_quote_always(&self) -> String {
-        if let Some((left, right)) = split_symlink(self.text) {
-            let quoted_left = Self::add_double_quotes(left.trim_end());
-            let quoted_right = Self::add_double_quotes(right.trim_start());
-
-            format!(
-                "{}{}{}",
-                quoted_left, SYMLINK_ARROW_WITH_SPACES, quoted_right
-            )
-        } else {
-            Self::add_double_quotes(self.text)
-        }
-    }
-
-    /// Checks if text needs shell quoting (contains special characters or whitespace).
-    ///
-    /// For symlinks (indicated by the -> arrow), each part is checked separately,
-    /// matching the behaviour of `single_quote_conditional()`.
-    ///
-    /// # Parameters
-    ///
-    /// - `text`: The text to check.
-    ///
-    /// # Returns
-    ///
-    /// `true` if the text needs quoting, `false` otherwise
-    pub(crate) fn is_quotable(text: &str) -> bool {
-        // Handle symlinks by checking each part separately
-        if let Some((left, right)) = split_symlink(text) {
-            Self::has_special_chars(left.trim_end()) || Self::has_special_chars(right.trim_start())
-        } else {
-            Self::has_special_chars(text)
-        }
-    }
-
-    /// Checks if a string contains characters that require shell quoting.
-    ///
-    /// # Parameters
-    /// - `text`: The text to inspect.
-    fn has_special_chars(text: &str) -> bool {
-        text.chars().any(|c| {
-            c.is_whitespace()
-                || matches!(
-                    c,
-                    '\\' | '\''
-                        | '"'
-                        | '`'
-                        | '$'
-                        | '&'
-                        | '|'
-                        | ';'
-                        | '<'
-                        | '>'
-                        | '('
-                        | ')'
-                        | '['
-                        | ']'
-                        | '{'
-                        | '}'
-                        | '*'
-                        | '?'
-                        | '!'
-                        | '#'
-                        | '~'
-                        | '%'
-                        | '^'
-                )
-        })
-    }
-
-    /// Helper function that quotes a single text segment with single quotes if needed.
-    ///
-    /// # Parameters
-    ///
-    /// - `text`: The text segment to quote.
-    ///
-    /// # Returns
-    ///
-    /// The text wrapped in single quotes if it contains special characters,
-    /// or the original text if no quoting is necessary. Single quotes within
-    /// the text are escaped as `\'`.
-    fn quote_if_quotable(text: &str) -> String {
-        if Self::has_special_chars(text) {
-            Self::add_single_quotes(text)
-        } else {
-            text.to_string()
-        }
-    }
-
-    /// Adds single quotes around text, escaping any single quotes within.
-    ///
-    /// # Parameters
-    ///
-    /// - `text`: The text to wrap in single quotes.
-    ///
-    /// # Returns
-    ///
-    /// The text wrapped in single quotes with internal single quotes escaped as `\'`
-    fn add_single_quotes(text: &str) -> String {
-        let mut quoted = String::with_capacity(text.len() + 2);
-        quoted.push('\'');
-
-        for character in text.chars() {
-            if character == '\'' {
-                quoted.push('\\');
-                quoted.push('\'');
-            } else {
-                quoted.push(character);
-            }
-        }
-
-        quoted.push('\'');
-        quoted
-    }
-
-    /// Adds double quotes around text, escaping any double quotes within.
-    ///
-    /// # Parameters
-    ///
-    /// - `text`: The text to wrap in double quotes.
-    ///
-    /// # Returns
-    ///
-    /// The text wrapped in double quotes with internal double quotes escaped as `\"`
-    fn add_double_quotes(text: &str) -> String {
-        let mut quoted = String::with_capacity(text.len() + 2);
-        quoted.push('"');
-
-        for character in text.chars() {
-            if character == '"' {
-                quoted.push('\\');
-                quoted.push('"');
-            } else {
-                quoted.push(character);
-            }
-        }
-
-        quoted.push('"');
-        quoted
-    }
+    quoted.push(quote);
+    quoted
 }

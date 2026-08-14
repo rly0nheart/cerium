@@ -1,26 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 #[cfg(feature = "checksum")]
 use crate::cli::flags::HashAlgorithm;
@@ -44,112 +22,83 @@ use crc32fast::Hasher;
 use std::sync::Arc;
 
 #[cfg(feature = "checksum")]
-/// Computes a hash digest for a file using a specified algorithm.
-pub struct Checksum<'a> {
-    path: &'a Path,
-    algorithm: HashAlgorithm,
+/// Hashes a file and hex-encodes the digest.
+///
+/// # Parameters
+/// - `path`: The file to hash.
+/// - `algorithm`: The hash algorithm to use.
+///
+/// # Returns
+/// The hex-encoded digest, or `"-"` for directories and unreadable files.
+pub(crate) fn compute(path: &Path, algorithm: HashAlgorithm) -> Arc<str> {
+    if path.is_dir() {
+        return "-".into();
+    }
+
+    match digest(path, algorithm) {
+        Ok(hash) => hash.into(),
+        Err(_) => "-".into(),
+    }
 }
 
 #[cfg(feature = "checksum")]
-impl<'a> Checksum<'a> {
-    /// Creates a new [`Checksum`] for the given path and algorithm.
-    ///
-    /// # Parameters
-    /// - `path`: The file to hash.
-    /// - `algorithm`: The hash algorithm to use.
-    pub(crate) fn new(path: &'a Path, algorithm: HashAlgorithm) -> Self {
-        Self { path, algorithm }
+/// Runs the selected algorithm over the file.
+///
+/// # Parameters
+/// - `path`: The file to hash.
+/// - `algorithm`: The hash algorithm to use.
+///
+/// # Returns
+/// The hex-encoded digest, or an I/O error if the file cannot be read.
+fn digest(path: &Path, algorithm: HashAlgorithm) -> io::Result<String> {
+    match algorithm {
+        HashAlgorithm::Md5 => {
+            let mut context = md5::Context::new();
+            stream(path, |chunk| context.consume(chunk))?;
+            Ok(format!("{:x}", context.finalize()))
+        }
+        HashAlgorithm::Crc32 => {
+            let mut hasher = Hasher::new();
+            stream(path, |chunk| hasher.update(chunk))?;
+            Ok(format!("{:08x}", hasher.finalize()))
+        }
+        HashAlgorithm::Sha224 => sha::<Sha224>(path),
+        HashAlgorithm::Sha256 => sha::<Sha256>(path),
+        HashAlgorithm::Sha384 => sha::<Sha384>(path),
+        HashAlgorithm::Sha512 => sha::<Sha512>(path),
     }
+}
 
-    /// Computes the checksum for the file.
-    ///
-    /// # Returns
-    /// The hex-encoded hash digest, or `"-"` for directories or on error.
-    pub(crate) fn compute(&self) -> Arc<str> {
-        // Skip directories
-        if self.path.is_dir() {
-            return "-".into();
-        }
+#[cfg(feature = "checksum")]
+/// Hex-encodes the SHA-2 digest of the file for the given variant.
+///
+/// # Parameters
+/// - `path`: The file to hash.
+fn sha<D: Digest>(path: &Path) -> io::Result<String> {
+    let mut hasher = D::new();
+    stream(path, |chunk| hasher.update(chunk))?;
+    Ok(hasher
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect())
+}
 
-        match self.compute_hash() {
-            Ok(hash) => hash.into(),
-            Err(_) => "-".into(),
-        }
-    }
+#[cfg(feature = "checksum")]
+/// Reads the file in chunks, handing each to `consume`.
+///
+/// # Parameters
+/// - `path`: The file to read.
+/// - `consume`: Called with every chunk read, in order.
+fn stream(path: &Path, mut consume: impl FnMut(&[u8])) -> io::Result<()> {
+    let mut file = fs::File::open(path)?;
+    let mut buffer = [0u8; 8192];
 
-    /// Dispatches to the selected hash algorithm and returns the hex-encoded digest.
-    fn compute_hash(&self) -> io::Result<String> {
-        match self.algorithm {
-            HashAlgorithm::Md5 => {
-                let data = fs::read(self.path)?;
-                let digest = md5::compute(&data);
-                Ok(format!("{:x}", digest))
-            }
-            HashAlgorithm::Crc32 => {
-                let mut hasher = Hasher::new();
-                let mut file = fs::File::open(self.path)?;
-                let mut buffer = [0u8; 8192];
-                loop {
-                    let n = file.read(&mut buffer)?;
-                    if n == 0 {
-                        break;
-                    }
-                    hasher.update(&buffer[..n]);
-                }
-                Ok(format!("{:08x}", hasher.finalize()))
-            }
-            HashAlgorithm::Sha224 => {
-                let mut hasher = Sha224::new();
-                let mut file = fs::File::open(self.path)?;
-                let mut buffer = [0u8; 8192];
-                loop {
-                    let n = file.read(&mut buffer)?;
-                    if n == 0 {
-                        break;
-                    }
-                    hasher.update(&buffer[..n]);
-                }
-                Ok(format!("{:x}", hasher.finalize()))
-            }
-            HashAlgorithm::Sha256 => {
-                let mut hasher = Sha256::new();
-                let mut file = fs::File::open(self.path)?;
-                let mut buffer = [0u8; 8192];
-                loop {
-                    let n = file.read(&mut buffer)?;
-                    if n == 0 {
-                        break;
-                    }
-                    hasher.update(&buffer[..n]);
-                }
-                Ok(format!("{:x}", hasher.finalize()))
-            }
-            HashAlgorithm::Sha384 => {
-                let mut hasher = Sha384::new();
-                let mut file = fs::File::open(self.path)?;
-                let mut buffer = [0u8; 8192];
-                loop {
-                    let n = file.read(&mut buffer)?;
-                    if n == 0 {
-                        break;
-                    }
-                    hasher.update(&buffer[..n]);
-                }
-                Ok(format!("{:x}", hasher.finalize()))
-            }
-            HashAlgorithm::Sha512 => {
-                let mut hasher = Sha512::new();
-                let mut file = fs::File::open(self.path)?;
-                let mut buffer = [0u8; 8192];
-                loop {
-                    let n = file.read(&mut buffer)?;
-                    if n == 0 {
-                        break;
-                    }
-                    hasher.update(&buffer[..n]);
-                }
-                Ok(format!("{:x}", hasher.finalize()))
-            }
+    loop {
+        let read = file.read(&mut buffer)?;
+        if read == 0 {
+            return Ok(());
         }
+        consume(&buffer[..read]);
     }
 }

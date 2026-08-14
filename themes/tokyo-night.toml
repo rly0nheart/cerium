@@ -5,85 +5,77 @@
 # Usage: Copy this file to ~/.config/cerium.toml
 
 
-# Size Gradients (green tones)
-size_bytes = { r = 158, g = 206, b = 106 }      # green
-size_kb = { r = 158, g = 206, b = 106 }         # green
-size_mb = { r = 125, g = 207, b = 255 }         # cyan
-size_gb = { r = 224, g = 175, b = 104 }         # yellow
+user          = { r = 224, g = 175, b = 104 }  # yellow
+group         = { r = 255, g = 158, b = 100 }  # orange
+tree-edge     = { r = 86, g = 95, b = 137 }  # comment
+header        = { r = 224, g = 175, b = 104 }  # yellow
+path          = { r = 122, g = 162, b = 247 }  # blue
+numeric       = { r = 125, g = 207, b = 255 }  # cyan
+punctuation   = { r = 86, g = 95, b = 137 }  # comment
+summary       = { r = 169, g = 177, b = 214 }  # fg
+checksum      = { r = 125, g = 207, b = 255 }  # cyan
+magic         = { r = 255, g = 158, b = 221 }  # magenta
+mountpoint    = { r = 255, g = 158, b = 221 }  # magenta
 
-# Date Gradients (blue/purple tones - recent to old)
-date_recent = { r = 125, g = 207, b = 255 }     # cyan
-date_hours = { r = 122, g = 162, b = 247 }      # blue
-date_days = { r = 187, g = 154, b = 247 }       # purple
-date_weeks = { r = 187, g = 154, b = 247 }      # purple
-date_months = { r = 86, g = 95, b = 137 }       # comment
-date_old = { r = 65, g = 72, b = 104 }          # dark4
+[size]
+none          = { r = 158, g = 206, b = 106 }  # green
+small         = { r = 158, g = 206, b = 106 }  # green
+medium        = { r = 125, g = 207, b = 255 }  # cyan
+large         = { r = 224, g = 175, b = 104 }  # yellow
 
-# Permission Colours
-perm_read = { r = 224, g = 175, b = 104 }       # yellow
-perm_write = { r = 247, g = 118, b = 142 }      # red
-perm_execute = { r = 158, g = 206, b = 106 }    # green
-perm_none = { r = 86, g = 95, b = 137 }         # comment
-perm_special = { r = 255, g = 158, b = 221 }    # magenta
-perm_filetype = { r = 122, g = 162, b = 247 }   # blue
+[date]
+minute-old    = { r = 125, g = 207, b = 255 }  # cyan
+hour-old      = { r = 122, g = 162, b = 247 }  # blue
+day-old       = { r = 187, g = 154, b = 247 }  # purple
+week-old      = { r = 187, g = 154, b = 247 }  # purple
+month-old     = { r = 86, g = 95, b = 137 }  # comment
+older         = { r = 65, g = 72, b = 104 }  # dark4
 
-# Entry Type Colours
-entry_directory = { r = 122, g = 162, b = 247 } # blue
-entry_symlink = { r = 125, g = 207, b = 255 }   # cyan
-entry_file = { r = 169, g = 177, b = 214 }      # fg
+[permission]
+read          = { r = 224, g = 175, b = 104 }  # yellow
+write         = { r = 247, g = 118, b = 142 }  # red
+exec          = { r = 158, g = 206, b = 106 }  # green
+no-access     = { r = 86, g = 95, b = 137 }  # comment
+exec-sticky   = { r = 255, g = 158, b = 221 }  # magenta
+filetype      = { r = 122, g = 162, b = 247 }  # blue
+acl           = { r = 158, g = 206, b = 106 }  # green
+context       = { r = 255, g = 158, b = 221 }  # magenta
+attribute     = { r = 125, g = 207, b = 255 }  # cyan
 
-# User and Group Colours
-user = { r = 224, g = 175, b = 104 }            # yellow
-group = { r = 255, g = 158, b = 100 }           # orange
+[filekind]
+normal        = { r = 169, g = 177, b = 214 }  # fg
+directory     = { r = 122, g = 162, b = 247 }  # blue
+symlink       = { r = 125, g = 207, b = 255 }  # cyan
 
-# Code File Type Colours
-code_rust = { r = 255, g = 158, b = 100 }       # orange
-code_python = { r = 122, g = 162, b = 247 }     # blue
-code_javascript = { r = 224, g = 175, b = 104 } # yellow
-code_c = { r = 125, g = 207, b = 255 }          # cyan
-code_go = { r = 125, g = 207, b = 255 }         # cyan
-code_java = { r = 255, g = 158, b = 100 }       # orange
-code_ruby = { r = 247, g = 118, b = 142 }       # red
-code_php = { r = 187, g = 154, b = 247 }        # purple
-code_lua = { r = 122, g = 162, b = 247 }        # blue
+[file_type]
+source        = { r = 224, g = 175, b = 104 }  # yellow
+build         = { r = 125, g = 207, b = 255 }  # cyan
+document      = { r = 169, g = 177, b = 214 }  # fg
+crypto        = { r = 247, g = 118, b = 142 }  # red
+image         = { r = 255, g = 158, b = 221 }  # magenta
+video         = { r = 255, g = 158, b = 100 }  # orange
+music         = { r = 158, g = 206, b = 106 }  # green
+compressed    = { r = 224, g = 175, b = 104 }  # yellow
+rust          = { r = 255, g = 158, b = 100 }  # orange
+python        = { r = 122, g = 162, b = 247 }  # blue
+javascript    = { r = 224, g = 175, b = 104 }  # yellow
+c             = { r = 125, g = 207, b = 255 }  # cyan
+go            = { r = 125, g = 207, b = 255 }  # cyan
+java          = { r = 255, g = 158, b = 100 }  # orange
+ruby          = { r = 247, g = 118, b = 142 }  # red
+php           = { r = 187, g = 154, b = 247 }  # purple
+lua           = { r = 122, g = 162, b = 247 }  # blue
+html          = { r = 247, g = 118, b = 142 }  # red
+css           = { r = 187, g = 154, b = 247 }  # purple
+json          = { r = 255, g = 158, b = 221 }  # magenta
+xml           = { r = 169, g = 177, b = 214 }  # fg
+yaml          = { r = 125, g = 207, b = 255 }  # cyan
+markdown      = { r = 169, g = 177, b = 214 }  # fg
+pdf           = { r = 247, g = 118, b = 142 }  # red
+text          = { r = 169, g = 177, b = 214 }  # fg
 
-# Web File Type Colours
-web_html = { r = 247, g = 118, b = 142 }        # red
-web_css = { r = 187, g = 154, b = 247 }         # purple
-web_json = { r = 255, g = 158, b = 221 }        # magenta
-web_xml = { r = 169, g = 177, b = 214 }         # fg
-web_yaml = { r = 125, g = 207, b = 255 }        # cyan
-
-# Document Type Colours
-doc_text = { r = 169, g = 177, b = 214 }        # fg
-doc_markdown = { r = 169, g = 177, b = 214 }    # fg
-doc_pdf = { r = 247, g = 118, b = 142 }         # red
-
-# Media File Type Colours
-media_image = { r = 255, g = 158, b = 221 }     # magenta
-media_video = { r = 255, g = 158, b = 100 }     # orange
-media_audio = { r = 158, g = 206, b = 106 }     # green
-
-# Archive Type Colours
-archive = { r = 224, g = 175, b = 104 }         # yellow
-
-# UI Element Colours
-tree_connector = { r = 86, g = 95, b = 137 }    # comment
-table_header = { r = 224, g = 175, b = 104 }    # yellow
-path_display = { r = 122, g = 162, b = 247 }    # blue
-checksum = { r = 125, g = 207, b = 255 }        # cyan
-magic = { r = 255, g = 158, b = 221 }           # magenta
-xattr = { r = 125, g = 207, b = 255 }           # cyan
-acl = { r = 158, g = 206, b = 106 }             # green
-mountpoint = { r = 255, g = 158, b = 221 }      # magenta
-numeric = { r = 125, g = 207, b = 255 }         # cyan
-placeholder = { r = 86, g = 95, b = 137 }       # comment
-
-# CLI Help Colours
-cli_help_header = { r = 224, g = 175, b = 104 }      # yellow
-cli_help_usage = { r = 158, g = 206, b = 106 }       # green
-cli_help_literal = { r = 125, g = 207, b = 255 }     # cyan
-cli_help_placeholder = { r = 255, g = 158, b = 100 } # orange
-
-# Summary Colours
-summary = { r = 169, g = 177, b = 214 }              # fg
+[cli_help]
+header        = { r = 224, g = 175, b = 104 }  # yellow
+usage         = { r = 158, g = 206, b = 106 }  # green
+literal       = { r = 125, g = 207, b = 255 }  # cyan
+placeholder   = { r = 255, g = 158, b = 100 }  # orange

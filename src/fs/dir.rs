@@ -1,33 +1,21 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use crate::cli::args::Args;
 use crate::cli::flags::SortBy;
 use crate::fs::entry::Entry;
 use crate::fs::glob::Glob;
+use std::ffi::OsStr;
 use std::fs;
-use std::path::PathBuf;
+use std::os::unix::ffi::OsStrExt;
+use std::path::{Path, PathBuf};
+
+/// Reports whether a filename is hidden (dot-prefixed), without allocating.
+///
+/// # Parameters
+/// - `name`: The filename to inspect.
+fn is_hidden(name: &OsStr) -> bool {
+    name.as_bytes().first() == Some(&b'.')
+}
 
 /// Reads and lists directory contents, applying filtering, hiding, and sorting
 /// based on CLI arguments.
@@ -45,7 +33,7 @@ impl DirReader {
     }
 
     /// Returns a reference to the underlying path.
-    pub fn path(&self) -> &PathBuf {
+    pub fn path(&self) -> &Path {
         &self.path
     }
 
@@ -125,13 +113,7 @@ impl DirReader {
 
         entries
             .filter_map(Result::ok)
-            .filter(|entry| {
-                include_hidden
-                    || !entry
-                        .file_name()
-                        .to_string_lossy()
-                        .starts_with('.')
-            })
+            .filter(|entry| include_hidden || !is_hidden(&entry.file_name()))
             .count()
     }
 
@@ -143,28 +125,25 @@ impl DirReader {
     /// # Returns
     /// The cumulative file size in bytes, or `0` if the path is not a directory.
     pub fn dir_size(&self, include_hidden: bool) -> u64 {
-        fn dir_size(path: &PathBuf, include_hidden: bool) -> u64 {
+        fn dir_size(path: &Path, include_hidden: bool) -> u64 {
+            let Ok(entries) = fs::read_dir(path) else {
+                return 0;
+            };
+
             let mut size = 0;
 
-            if let Ok(entries) = fs::read_dir(path) {
-                for entry in entries.filter_map(Result::ok) {
-                    let path = entry.path();
+            for entry in entries.filter_map(Result::ok) {
+                // Skip hidden files if not including them
+                if !include_hidden && is_hidden(&entry.file_name()) {
+                    continue;
+                }
 
-                    // Skip hidden files if not including them
-                    if !include_hidden
-                        && let Some(name) = path.file_name()
-                        && name.to_string_lossy().starts_with('.')
-                    {
-                        continue;
-                    }
-
-                    if let Ok(metadata) = entry.metadata() {
-                        if metadata.is_file() {
-                            size += metadata.len();
-                        } else if metadata.is_dir() {
-                            // Recursive call for subdirectory
-                            size += dir_size(&path, include_hidden);
-                        }
+                if let Ok(metadata) = entry.metadata() {
+                    if metadata.is_file() {
+                        size += metadata.len();
+                    } else if metadata.is_dir() {
+                        // Recursive call for subdirectory
+                        size += dir_size(&entry.path(), include_hidden);
                     }
                 }
             }
@@ -250,21 +229,22 @@ impl DirReader {
             }
         }
 
+        // Metadata fields are `Copy`, so plain `sort_by_key` beats caching them.
         match args.sort {
             SortBy::Size => {
-                entries.sort_by_cached_key(|entry| entry.metadata().map(|m| m.size).unwrap_or(0));
+                entries.sort_by_key(|entry| entry.metadata().map(|m| m.size).unwrap_or(0));
             }
             SortBy::Modified => {
-                entries.sort_by_cached_key(|entry| entry.metadata().map(|m| m.mtime).unwrap_or(0));
+                entries.sort_by_key(|entry| entry.metadata().map(|m| m.mtime).unwrap_or(0));
             }
             SortBy::Created => {
-                entries.sort_by_cached_key(|entry| entry.metadata().map(|m| m.ctime).unwrap_or(0));
+                entries.sort_by_key(|entry| entry.metadata().map(|m| m.ctime).unwrap_or(0));
             }
             SortBy::Accessed => {
-                entries.sort_by_cached_key(|entry| entry.metadata().map(|m| m.atime).unwrap_or(0));
+                entries.sort_by_key(|entry| entry.metadata().map(|m| m.atime).unwrap_or(0));
             }
             SortBy::Inode => {
-                entries.sort_by_cached_key(|entry| entry.metadata().map(|m| m.ino).unwrap_or(0));
+                entries.sort_by_key(|entry| entry.metadata().map(|m| m.ino).unwrap_or(0));
             }
             SortBy::Extension => {
                 entries.sort_by_cached_key(|entry| entry.extension().to_lowercase());

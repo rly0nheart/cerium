@@ -1,35 +1,10 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use crate::cli::args::Args;
-use crate::display::layout::alignment::Align;
 use crate::display::layout::column;
 use crate::display::layout::column::Column;
-use crate::display::layout::width::Width;
 use crate::display::mode::DisplayMode;
-use crate::display::output::quotes::Quotes;
-use crate::display::styles::column::ColumnStyle;
+use crate::display::output::quotes;
 use crate::display::styles::element::ElementStyle;
 use crate::display::styles::entry::StyledEntry;
 use crate::display::styles::value::ValueStyle;
@@ -38,7 +13,6 @@ use crate::fs::dir::DirReader;
 use crate::fs::entry::Entry;
 use crate::fs::tree::TreeNode;
 use std::cell::Cell;
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 /// Unicode box drawing character for vertical line with spaces (│   )
@@ -71,30 +45,54 @@ impl DisplayMode for Tree {
                 // Streaming mode: traverse and print on-demand
                 let mut parent_entry = Entry::from_path(path.clone(), self.args.long);
                 parent_entry.conditional_metadata(&self.args);
-                self.traverse_and_print(parent_entry, &Vec::new());
+                self.traverse_and_print(parent_entry, &mut Vec::new());
             }
             TreeData::Table(node) => {
-                // Table mode: use pre-built tree with width calculations
-                let mut entries = Vec::new();
-                Self::flatten(node, &mut entries);
-
-                // Add an alignment space in any entries in have got special characters and will get quoted
-                let add_alignment_space = entries.iter().any(|e| Quotes::is_quotable(e.name()));
-
+                // Table mode: render every row first, then size the columns to fit them
+                let add_alignment_space = Self::any_quotable(node);
                 let columns = column::Selector::select(&self.args);
-                let mut width_calc = Width::new();
-                let widths = width_calc.calculate(&entries, &columns, &self.args);
 
+                let mut rows = Vec::new();
+                Self::collect_rows(
+                    node,
+                    &mut Vec::new(),
+                    &columns,
+                    &self.args,
+                    add_alignment_space,
+                    &mut rows,
+                );
+
+                let widths = column::widths(
+                    &columns,
+                    rows.iter().map(|row| row.cells.as_slice()),
+                    self.args.headers,
+                );
+
+                let mut out = String::new();
                 if self.args.headers {
-                    Column::headers(&widths, &self.args);
+                    column::write_headers(&mut out, &columns, &widths);
+                }
+                for row in &rows {
+                    out.push_str(&column::row_text(&row.cells, &columns, &widths));
+                    out.push(' ');
+                    out.push_str(&row.connector);
+                    out.push_str(&row.name);
+                    out.push('\n');
                 }
 
-                Self::add_node(node, &widths, &Vec::new(), &self.args, add_alignment_space);
+                print!("{out}");
             }
         }
 
         self.print_summary();
     }
+}
+
+/// One fully rendered tree row: table columns, connector, and styled name.
+struct TreeRow {
+    cells: Vec<column::Cell>,
+    connector: String,
+    name: String,
 }
 
 /// Backing data for the tree renderer.
@@ -206,7 +204,7 @@ impl Tree {
     /// # Parameters
     /// - `entry`: The current entry to render.
     /// - `parents_last`: Boolean flags indicating whether each ancestor is the last child.
-    fn traverse_and_print(&self, entry: Entry, parents_last: &[bool]) {
+    fn traverse_and_print(&self, entry: Entry, parents_last: &mut Vec<bool>) {
         let connector = Self::draw_connector(parents_last);
 
         // Get styled entry for name display (no alignment space for tree)
@@ -217,7 +215,7 @@ impl Tree {
         println!(
             "{}{}",
             ElementStyle::tree_connector(&connector),
-            ValueStyle::name(&entry_view.name, entry_view.colour),
+            ValueStyle::name(&entry_view.name, entry_view.color),
         );
 
         // Count non-root entries (root has empty parents_last)
@@ -237,93 +235,59 @@ impl Tree {
             let count = children.len();
             for (i, mut child_entry) in children.into_iter().enumerate() {
                 child_entry.conditional_metadata(&self.args);
-                let mut new_parents = parents_last.to_owned();
-                new_parents.push(i == count - 1);
-                self.traverse_and_print(child_entry, &new_parents);
+                parents_last.push(i == count - 1);
+                self.traverse_and_print(child_entry, parents_last);
+                parents_last.pop();
             }
         }
     }
 
-    /// Flattens a tree into a linear vector of entries for width calculation.
+    /// Reports whether any entry in the tree will be quoted.
     ///
     /// # Parameters
-    /// - `node`: The root node to flatten.
-    /// - `entries`: Mutable vector to populate with entries.
-    fn flatten(node: &TreeNode, entries: &mut Vec<Entry>) {
-        entries.push(node.entry.clone());
-        for child in &node.children {
-            Self::flatten(child, entries);
-        }
+    /// - `node`: The node to inspect, along with its descendants.
+    fn any_quotable(node: &TreeNode) -> bool {
+        quotes::is_quotable(node.entry.name()) || node.children.iter().any(Self::any_quotable)
     }
 
-    /// Recursively renders a node and its children with tree connectors.
+    /// Recursively renders every node into a printable row.
     ///
     /// # Parameters
     /// - `node`: The current node to render.
-    /// - `widths`: Pre-calculated column widths for alignment.
     /// - `parents_last`: Flags indicating whether each ancestor is the last child.
+    /// - `columns`: The columns to display.
     /// - `args`: Command-line arguments controlling display options.
     /// - `add_alignment_space`: Whether to add a space for quote-alignment.
-    fn add_node(
+    /// - `rows`: Accumulator for the rendered rows, in print order.
+    fn collect_rows(
         node: &TreeNode,
-        widths: &HashMap<Column, usize>,
-        parents_last: &[bool],
+        parents_last: &mut Vec<bool>,
+        columns: &[Column],
         args: &Args,
         add_alignment_space: bool,
+        rows: &mut Vec<TreeRow>,
     ) {
-        let entry = &node.entry;
-        let connector = Self::draw_connector(parents_last);
+        let entry_view = StyledEntry::new(&node.entry).load(args, false);
 
-        // Render the row with tree connectors
-        Self::render_tree_row(entry, widths, &connector, args, add_alignment_space);
+        rows.push(TreeRow {
+            cells: column::render_row(&node.entry, columns, args, add_alignment_space),
+            connector: ElementStyle::tree_connector(&Self::draw_connector(parents_last)),
+            name: ValueStyle::name(&entry_view.name, entry_view.color),
+        });
 
         let count = node.children.len();
         for (i, child) in node.children.iter().enumerate() {
-            let mut new_parents = parents_last.to_owned();
-            new_parents.push(i == count - 1);
-            Self::add_node(child, widths, &new_parents, args, add_alignment_space);
+            parents_last.push(i == count - 1);
+            Self::collect_rows(
+                child,
+                parents_last,
+                columns,
+                args,
+                add_alignment_space,
+                rows,
+            );
+            parents_last.pop();
         }
-    }
-
-    /// Renders a single row in tree mode with connectors and column data.
-    ///
-    /// # Parameters
-    /// - `entry`: The entry to render.
-    /// - `widths`: Pre-calculated column widths for alignment.
-    /// - `connector`: Tree connector string (e.g., `"├── "`).
-    /// - `args`: Command-line arguments controlling display options.
-    /// - `add_alignment_space`: Whether to add a space for quote-alignment.
-    fn render_tree_row(
-        entry: &Entry,
-        widths: &HashMap<Column, usize>,
-        connector: &str,
-        args: &Args,
-        add_alignment_space: bool,
-    ) {
-        let columns = column::Selector::select(args);
-        let mut parts = Vec::new();
-
-        // Build column data
-        for column in &columns {
-            let styled_column = ColumnStyle::get(entry, column, args, add_alignment_space);
-            let width = *widths
-                .get(column)
-                .unwrap_or(&Width::measure_ansi_text(&styled_column));
-            let padded = Align::pad(&styled_column, width, column.alignment());
-            parts.push(padded);
-        }
-
-        // Get styled entry for name display (no alignment space for tree)
-        let styled_entry = StyledEntry::new(entry);
-        let entry_view = styled_entry.load(args, false);
-
-        // Print: [table columns] [connector] [name]
-        println!(
-            "{} {}{}",
-            parts.join(" "),
-            ElementStyle::tree_connector(connector),
-            ValueStyle::name(&entry_view.name, entry_view.colour),
-        );
     }
 
     /// Builds the connector string with box-drawing characters for a tree node.

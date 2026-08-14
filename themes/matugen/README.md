@@ -1,8 +1,8 @@
 # Matugen integration
 
-[matugen](https://github.com/InioX/matugen) generates a Material You colour
+[matugen](https://github.com/InioX/matugen) generates a Material You color
 scheme from your wallpaper. With the template in this directory, Cerium's
-colours can follow that scheme automatically.
+colors can follow that scheme automatically.
 
 ## How it works
 
@@ -39,24 +39,27 @@ Re-running matugen (e.g. from a wallpaper hook) keeps Cerium in sync.
 
 ## Customising
 
-The generated config uses Cerium's `[palette]` + `[colors]` layers:
+The generated config uses Cerium's `[palette]` layer plus its role sections:
 
 - **`[palette]`** maps Material You roles (`primary`, `surface`, `tertiary`,
-  …) to the colours matugen produced.
-- **`[colors]`** maps Cerium's semantic keys (`entry_directory`,
-  `code_rust`, …) to palette names.
+  …) to the colors matugen produced.
+- The role mappings (`[filekind]`, `[permission]`, `[file_type]`, …) point
+  Cerium's roles at those palette names.
 
-Edit the `[colors]` mappings in the template to taste — they only reference
+Edit the role mappings in the template to taste — they only reference
 palette names, so they survive re-generation. Any key you remove falls back to
-the built-in **Catppuccin Mocha** colour for that key, so a partial template is
+the built-in **Catppuccin Mocha** color for that key, so a partial template is
 fine.
 
-You can also point a key straight at a hex value or a named colour instead of a
+You can also point a key straight at a hex value or a named color instead of a
 palette reference:
 
 ```toml
-[colors]
-entry_directory = "{{colors.primary.default.hex}}"  # direct hex
-table_header    = "yellow"                            # named colour
-code_rust       = { r = 250, g = 179, b = 135 }       # RGB table
+header = "yellow"                              # named color
+
+[filekind]
+directory = "{{colors.primary.default.hex}}"   # direct hex
+
+[file_type]
+rust = { r = 250, g = 179, b = 135 }           # RGB table
 ```

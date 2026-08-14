@@ -1,26 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use libc::{
     S_IFBLK, S_IFCHR, S_IFDIR, S_IFIFO, S_IFLNK, S_IFMT, S_IFREG, S_IFSOCK, S_IRGRP, S_IROTH,
@@ -49,24 +27,19 @@ pub struct Permissions {
     pub sticky: bool,
     pub setgid: bool,
     pub setuid: bool,
-
-    pub has_xattr: bool,
 }
 
 impl Permissions {
-    /// Parses permissions from a raw `mode_t` value and checks for extended attributes.
+    /// Parses permissions from a raw `mode_t` value.
     ///
     /// # Parameters
     /// - `mode`: The `st_mode` value from a stat call.
-    /// - `path`: The file path, used to query extended attributes via `listxattr`.
     ///
     /// # Returns
     /// A fully populated [`Permissions`] struct.
-    pub fn from_mode(mode: u32, path: &Path) -> Self {
+    pub fn from_mode(mode: u32) -> Self {
         // Helper closure to check bits using libc constants
         let has_bit = |bit: u32| (mode & bit) == bit;
-
-        let has_xattr = Self::check_xattr(path);
 
         Self {
             user_read: has_bit(S_IRUSR),
@@ -84,8 +57,6 @@ impl Permissions {
             sticky: has_bit(S_ISVTX),
             setgid: has_bit(S_ISGID),
             setuid: has_bit(S_ISUID),
-
-            has_xattr,
         }
     }
 

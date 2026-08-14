@@ -1,157 +1,117 @@
-/*
-MIT License
+// SPDX-License-Identifier: MIT
 
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
-use super::colour::{ThemeColour, colour_from_value};
-use nu_ansi_term::Color as Colour;
-use serde::Deserialize;
+use super::color::{ThemeColor, color_from_value};
+use nu_ansi_term::Color;
 use std::collections::HashMap;
 
-/// Theme configuration containing all customisable colours for Cerium.
+/// Theme configuration containing every color Cerium can paint with.
 ///
-/// Colours are organised into semantic categories:
-/// - Size gradients (for file sizes from bytes to gigabytes)
-/// - Date gradients (for timestamps from recent to old)
-/// - Permission colours (read, write, execute, etc.)
-/// - Entry type colours (files, directories, symlinks)
-/// - File type colours (code, web, documents, media, archives)
-/// - UI colours (tree connectors, headers, paths, etc.)
-#[allow(dead_code)]
+/// Role names follow the conventions established by `lsd` (`permission`,
+/// `date`, `size`, `tree-edge`) and `eza` (`filekind`, `file_type`), so a
+/// theme written for those tools translates key-for-key.
 #[derive(Debug, Clone)]
 pub struct Theme {
-    // Size gradients (bytes → gigabytes)
-    pub size_bytes: ThemeColour,
-    pub size_kb: ThemeColour,
-    pub size_mb: ThemeColour,
-    pub size_gb: ThemeColour,
+    // [size] — magnitude buckets
+    pub size_none: ThemeColor,
+    pub size_small: ThemeColor,
+    pub size_medium: ThemeColor,
+    pub size_large: ThemeColor,
 
-    // Date gradients (recent → old)
-    pub date_recent: ThemeColour,
-    pub date_hours: ThemeColour,
-    pub date_days: ThemeColour,
-    pub date_weeks: ThemeColour,
-    pub date_months: ThemeColour,
-    pub date_old: ThemeColour,
+    // [date] — age buckets, youngest first
+    pub date_minute_old: ThemeColor,
+    pub date_hour_old: ThemeColor,
+    pub date_day_old: ThemeColor,
+    pub date_week_old: ThemeColor,
+    pub date_month_old: ThemeColor,
+    pub date_older: ThemeColor,
 
-    // Permission colours
-    pub perm_read: ThemeColour,
-    pub perm_write: ThemeColour,
-    pub perm_execute: ThemeColour,
-    pub perm_none: ThemeColour,
-    pub perm_special: ThemeColour,
-    pub perm_filetype: ThemeColour,
+    // [permission]
+    pub permission_read: ThemeColor,
+    pub permission_write: ThemeColor,
+    pub permission_exec: ThemeColor,
+    pub permission_no_access: ThemeColor,
+    pub permission_exec_sticky: ThemeColor,
+    pub permission_filetype: ThemeColor,
+    pub permission_acl: ThemeColor,
+    pub permission_context: ThemeColor,
+    pub permission_attribute: ThemeColor,
 
-    // Entry types
-    pub entry_directory: ThemeColour,
-    pub entry_symlink: ThemeColour,
-    pub entry_file: ThemeColour,
+    // [filekind]
+    pub filekind_normal: ThemeColor,
+    pub filekind_directory: ThemeColor,
+    pub filekind_symlink: ThemeColor,
 
-    // User/Group
-    pub user: ThemeColour,
-    pub group: ThemeColour,
+    // [file_type] — groups
+    pub file_type_source: ThemeColor,
+    pub file_type_build: ThemeColor,
+    pub file_type_document: ThemeColor,
+    pub file_type_image: ThemeColor,
+    pub file_type_video: ThemeColor,
+    pub file_type_music: ThemeColor,
+    pub file_type_compressed: ThemeColor,
+    pub file_type_crypto: ThemeColor,
 
-    // Code file types
-    pub code_rust: ThemeColour,
-    pub code_python: ThemeColour,
-    pub code_javascript: ThemeColour,
-    pub code_c: ThemeColour,
-    pub code_go: ThemeColour,
-    pub code_java: ThemeColour,
-    pub code_ruby: ThemeColour,
-    pub code_php: ThemeColour,
-    pub code_lua: ThemeColour,
+    // [file_type] — per-language and per-format refinements
+    pub file_type_rust: ThemeColor,
+    pub file_type_python: ThemeColor,
+    pub file_type_javascript: ThemeColor,
+    pub file_type_c: ThemeColor,
+    pub file_type_go: ThemeColor,
+    pub file_type_java: ThemeColor,
+    pub file_type_ruby: ThemeColor,
+    pub file_type_php: ThemeColor,
+    pub file_type_lua: ThemeColor,
+    pub file_type_html: ThemeColor,
+    pub file_type_css: ThemeColor,
+    pub file_type_json: ThemeColor,
+    pub file_type_xml: ThemeColor,
+    pub file_type_yaml: ThemeColor,
+    pub file_type_markdown: ThemeColor,
+    pub file_type_pdf: ThemeColor,
+    pub file_type_text: ThemeColor,
 
-    // Web file types
-    pub web_html: ThemeColour,
-    pub web_css: ThemeColour,
-    pub web_json: ThemeColour,
-    pub web_xml: ThemeColour,
-    pub web_yaml: ThemeColour,
+    // Top-level roles
+    pub user: ThemeColor,
+    pub group: ThemeColor,
+    pub tree_edge: ThemeColor,
+    pub header: ThemeColor,
+    pub path: ThemeColor,
+    pub numeric: ThemeColor,
+    pub punctuation: ThemeColor,
+    pub summary: ThemeColor,
+    pub checksum: ThemeColor,
+    pub magic: ThemeColor,
+    pub mountpoint: ThemeColor,
 
-    // Document types
-    pub doc_text: ThemeColour,
-    pub doc_markdown: ThemeColour,
-    pub doc_pdf: ThemeColour,
-
-    // Media types
-    pub media_image: ThemeColour,
-    pub media_video: ThemeColour,
-    pub media_audio: ThemeColour,
-
-    // Archive types
-    pub archive: ThemeColour,
-
-    // Misc UI colours
-    pub tree_connector: ThemeColour,
-    pub table_header: ThemeColour,
-    pub path_display: ThemeColour,
-    pub checksum: ThemeColour,
-    pub magic: ThemeColour,
-    pub xattr: ThemeColour,
-    pub acl: ThemeColour,
-    pub mountpoint: ThemeColour,
-    pub numeric: ThemeColour,
-    pub placeholder: ThemeColour,
-    pub summary: ThemeColour,
-
-    // CLI help colours
-    pub cli_help_header: ThemeColour,
-    pub cli_help_usage: ThemeColour,
-    pub cli_help_literal: ThemeColour,
-    pub cli_help_placeholder: ThemeColour,
-}
-
-impl<'de> Deserialize<'de> for Theme {
-    /// Deserialises a theme from the config file.
-    ///
-    /// The whole document is read into a [`toml::Value`], then
-    /// [`Theme::from_value`] applies the palette layer and per-field
-    /// fallbacks to the built-in Catppuccin Mocha default.
-    ///
-    /// # Parameters
-    /// - `deserializer`: The serde deserialiser to read from.
-    ///
-    /// # Returns
-    /// A fully-populated [`Theme`]. Succeeds for any syntactically valid TOML.
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let value = toml::Value::deserialize(deserializer)?;
-        Ok(Theme::from_value(&value))
-    }
+    // [cli_help]
+    pub cli_help_header: ThemeColor,
+    pub cli_help_usage: ThemeColor,
+    pub cli_help_literal: ThemeColor,
+    pub cli_help_placeholder: ThemeColor,
 }
 
 impl Theme {
+    /// Reads a theme from TOML source.
+    ///
+    /// # Parameters
+    /// - `source`: The config file contents.
+    ///
+    /// # Returns
+    /// A fully-populated [`Theme`] for any syntactically valid TOML, or the
+    /// parse error. Unknown or unresolvable roles keep their defaults.
+    pub fn parse(source: &str) -> Result<Self, toml::de::Error> {
+        Ok(Theme::from_value(&toml::from_str::<toml::Value>(source)?))
+    }
+
     /// Builds a theme from a parsed TOML value.
     ///
     /// Resolution per key:
-    /// 1. the `[palette]` table is resolved into named colours;
-    /// 2. each semantic key is looked up under `[colors]`, then at the top
-    ///    level (flat form);
+    /// 1. the `[palette]` table is resolved into named colors;
+    /// 2. each role is looked up by its section and key (`permission.read`),
+    ///    or at the top level for unsectioned roles;
     /// 3. its value is resolved (RGB / hex / palette reference / named);
     /// 4. anything absent or unresolvable uses the built-in Catppuccin
-    ///    Mocha default for that key.
+    ///    Mocha default for that role.
     ///
     /// Always returns a complete theme.
     ///
@@ -166,31 +126,32 @@ impl Theme {
         // Palette entries don't reference each other, so they resolve against
         // an empty map.
         let empty = HashMap::new();
-        let palette: HashMap<String, Colour> = root
-            .and_then(|t| t.get("palette"))
+        let palette: HashMap<String, Color> = root
+            .and_then(|table| table.get("palette"))
             .and_then(toml::Value::as_table)
             .map(|table| {
                 table
                     .iter()
-                    .filter_map(|(name, v)| {
-                        colour_from_value(v, &empty).map(|c| (name.clone(), c))
+                    .filter_map(|(name, value)| {
+                        color_from_value(value, &empty).map(|color| (name.clone(), color))
                     })
                     .collect()
             })
             .unwrap_or_default();
 
-        let colors = root
-            .and_then(|t| t.get("colors"))
-            .and_then(toml::Value::as_table);
+        // `path` is a dotted role name: "permission.read" reads key `read`
+        // from table `[permission]`, "user" reads the top-level key.
+        let pick = |path: &str, fallback: ThemeColor| -> ThemeColor {
+            let raw = match path.split_once('.') {
+                Some((section, key)) => root
+                    .and_then(|table| table.get(section))
+                    .and_then(toml::Value::as_table)
+                    .and_then(|table| table.get(key)),
+                None => root.and_then(|table| table.get(path)),
+            };
 
-        // A key may live under [colors] or at the top level; [colors] takes
-        // precedence.
-        let pick = |name: &str, fallback: ThemeColour| -> ThemeColour {
-            let raw = colors
-                .and_then(|t| t.get(name))
-                .or_else(|| root.and_then(|t| t.get(name)));
-            match raw.and_then(|v| colour_from_value(v, &palette)) {
-                Some(colour) => ThemeColour { colour },
+            match raw.and_then(|value| color_from_value(value, &palette)) {
+                Some(color) => ThemeColor { color },
                 None => fallback,
             }
         };
@@ -198,74 +159,75 @@ impl Theme {
         let d = Theme::default();
 
         Theme {
-            size_bytes: pick("size_bytes", d.size_bytes),
-            size_kb: pick("size_kb", d.size_kb),
-            size_mb: pick("size_mb", d.size_mb),
-            size_gb: pick("size_gb", d.size_gb),
+            size_none: pick("size.none", d.size_none),
+            size_small: pick("size.small", d.size_small),
+            size_medium: pick("size.medium", d.size_medium),
+            size_large: pick("size.large", d.size_large),
 
-            date_recent: pick("date_recent", d.date_recent),
-            date_hours: pick("date_hours", d.date_hours),
-            date_days: pick("date_days", d.date_days),
-            date_weeks: pick("date_weeks", d.date_weeks),
-            date_months: pick("date_months", d.date_months),
-            date_old: pick("date_old", d.date_old),
+            date_minute_old: pick("date.minute-old", d.date_minute_old),
+            date_hour_old: pick("date.hour-old", d.date_hour_old),
+            date_day_old: pick("date.day-old", d.date_day_old),
+            date_week_old: pick("date.week-old", d.date_week_old),
+            date_month_old: pick("date.month-old", d.date_month_old),
+            date_older: pick("date.older", d.date_older),
 
-            perm_read: pick("perm_read", d.perm_read),
-            perm_write: pick("perm_write", d.perm_write),
-            perm_execute: pick("perm_execute", d.perm_execute),
-            perm_none: pick("perm_none", d.perm_none),
-            perm_special: pick("perm_special", d.perm_special),
-            perm_filetype: pick("perm_filetype", d.perm_filetype),
+            permission_read: pick("permission.read", d.permission_read),
+            permission_write: pick("permission.write", d.permission_write),
+            permission_exec: pick("permission.exec", d.permission_exec),
+            permission_no_access: pick("permission.no-access", d.permission_no_access),
+            permission_exec_sticky: pick("permission.exec-sticky", d.permission_exec_sticky),
+            permission_filetype: pick("permission.filetype", d.permission_filetype),
+            permission_acl: pick("permission.acl", d.permission_acl),
+            permission_context: pick("permission.context", d.permission_context),
+            permission_attribute: pick("permission.attribute", d.permission_attribute),
 
-            entry_directory: pick("entry_directory", d.entry_directory),
-            entry_symlink: pick("entry_symlink", d.entry_symlink),
-            entry_file: pick("entry_file", d.entry_file),
+            filekind_normal: pick("filekind.normal", d.filekind_normal),
+            filekind_directory: pick("filekind.directory", d.filekind_directory),
+            filekind_symlink: pick("filekind.symlink", d.filekind_symlink),
+
+            file_type_source: pick("file_type.source", d.file_type_source),
+            file_type_build: pick("file_type.build", d.file_type_build),
+            file_type_document: pick("file_type.document", d.file_type_document),
+            file_type_image: pick("file_type.image", d.file_type_image),
+            file_type_video: pick("file_type.video", d.file_type_video),
+            file_type_music: pick("file_type.music", d.file_type_music),
+            file_type_compressed: pick("file_type.compressed", d.file_type_compressed),
+            file_type_crypto: pick("file_type.crypto", d.file_type_crypto),
+
+            file_type_rust: pick("file_type.rust", d.file_type_rust),
+            file_type_python: pick("file_type.python", d.file_type_python),
+            file_type_javascript: pick("file_type.javascript", d.file_type_javascript),
+            file_type_c: pick("file_type.c", d.file_type_c),
+            file_type_go: pick("file_type.go", d.file_type_go),
+            file_type_java: pick("file_type.java", d.file_type_java),
+            file_type_ruby: pick("file_type.ruby", d.file_type_ruby),
+            file_type_php: pick("file_type.php", d.file_type_php),
+            file_type_lua: pick("file_type.lua", d.file_type_lua),
+            file_type_html: pick("file_type.html", d.file_type_html),
+            file_type_css: pick("file_type.css", d.file_type_css),
+            file_type_json: pick("file_type.json", d.file_type_json),
+            file_type_xml: pick("file_type.xml", d.file_type_xml),
+            file_type_yaml: pick("file_type.yaml", d.file_type_yaml),
+            file_type_markdown: pick("file_type.markdown", d.file_type_markdown),
+            file_type_pdf: pick("file_type.pdf", d.file_type_pdf),
+            file_type_text: pick("file_type.text", d.file_type_text),
 
             user: pick("user", d.user),
             group: pick("group", d.group),
-
-            code_rust: pick("code_rust", d.code_rust),
-            code_python: pick("code_python", d.code_python),
-            code_javascript: pick("code_javascript", d.code_javascript),
-            code_c: pick("code_c", d.code_c),
-            code_go: pick("code_go", d.code_go),
-            code_java: pick("code_java", d.code_java),
-            code_ruby: pick("code_ruby", d.code_ruby),
-            code_php: pick("code_php", d.code_php),
-            code_lua: pick("code_lua", d.code_lua),
-
-            web_html: pick("web_html", d.web_html),
-            web_css: pick("web_css", d.web_css),
-            web_json: pick("web_json", d.web_json),
-            web_xml: pick("web_xml", d.web_xml),
-            web_yaml: pick("web_yaml", d.web_yaml),
-
-            doc_text: pick("doc_text", d.doc_text),
-            doc_markdown: pick("doc_markdown", d.doc_markdown),
-            doc_pdf: pick("doc_pdf", d.doc_pdf),
-
-            media_image: pick("media_image", d.media_image),
-            media_video: pick("media_video", d.media_video),
-            media_audio: pick("media_audio", d.media_audio),
-
-            archive: pick("archive", d.archive),
-
-            tree_connector: pick("tree_connector", d.tree_connector),
-            table_header: pick("table_header", d.table_header),
-            path_display: pick("path_display", d.path_display),
+            tree_edge: pick("tree-edge", d.tree_edge),
+            header: pick("header", d.header),
+            path: pick("path", d.path),
+            numeric: pick("numeric", d.numeric),
+            punctuation: pick("punctuation", d.punctuation),
+            summary: pick("summary", d.summary),
             checksum: pick("checksum", d.checksum),
             magic: pick("magic", d.magic),
-            xattr: pick("xattr", d.xattr),
-            acl: pick("acl", d.acl),
             mountpoint: pick("mountpoint", d.mountpoint),
-            numeric: pick("numeric", d.numeric),
-            placeholder: pick("placeholder", d.placeholder),
-            summary: pick("summary", d.summary),
 
-            cli_help_header: pick("cli_help_header", d.cli_help_header),
-            cli_help_usage: pick("cli_help_usage", d.cli_help_usage),
-            cli_help_literal: pick("cli_help_literal", d.cli_help_literal),
-            cli_help_placeholder: pick("cli_help_placeholder", d.cli_help_placeholder),
+            cli_help_header: pick("cli_help.header", d.cli_help_header),
+            cli_help_usage: pick("cli_help.usage", d.cli_help_usage),
+            cli_help_literal: pick("cli_help.literal", d.cli_help_literal),
+            cli_help_placeholder: pick("cli_help.placeholder", d.cli_help_placeholder),
         }
     }
 }
@@ -295,82 +257,79 @@ impl Default for Theme {
         let surface2 = color_rgb(88, 91, 112);
 
         Theme {
-            // Size gradients (smallest to largest)
-            size_bytes: green.clone(),
-            size_kb: green.clone(),
-            size_mb: teal.clone(),
-            size_gb: yellow.clone(),
+            // Size buckets (smallest to largest)
+            size_none: green.clone(),
+            size_small: green.clone(),
+            size_medium: teal.clone(),
+            size_large: yellow.clone(),
 
-            // Date gradients (recent to old)
-            date_recent: sky.clone(),
-            date_hours: sapphire.clone(),
-            date_days: blue.clone(),
-            date_weeks: lavender.clone(),
-            date_months: overlay0.clone(),
-            date_old: surface2.clone(),
+            // Date buckets (youngest to oldest)
+            date_minute_old: sky.clone(),
+            date_hour_old: sapphire.clone(),
+            date_day_old: blue.clone(),
+            date_week_old: lavender.clone(),
+            date_month_old: overlay0.clone(),
+            date_older: surface2.clone(),
 
-            // Permission colours
-            perm_read: yellow.clone(),
-            perm_write: red.clone(),
-            perm_execute: green.clone(),
-            perm_none: overlay0.clone(),
-            perm_special: pink.clone(),
-            perm_filetype: blue.clone(),
+            // Permissions
+            permission_read: yellow.clone(),
+            permission_write: red.clone(),
+            permission_exec: green.clone(),
+            permission_no_access: overlay0.clone(),
+            permission_exec_sticky: pink.clone(),
+            permission_filetype: blue.clone(),
+            permission_acl: green.clone(),
+            permission_context: mauve.clone(),
+            permission_attribute: sky.clone(),
 
-            // Entry types
-            entry_directory: blue.clone(),
-            entry_symlink: sky.clone(),
-            entry_file: text.clone(),
+            // Entry kinds
+            filekind_normal: text.clone(),
+            filekind_directory: blue.clone(),
+            filekind_symlink: sky.clone(),
 
-            // User/Group
+            // File type groups
+            file_type_source: blue.clone(),
+            file_type_build: teal.clone(),
+            file_type_document: text.clone(),
+            file_type_image: pink.clone(),
+            file_type_video: peach.clone(),
+            file_type_music: green.clone(),
+            file_type_compressed: yellow.clone(),
+            file_type_crypto: red.clone(),
+
+            // File type refinements
+            file_type_rust: peach.clone(),
+            file_type_python: sapphire.clone(),
+            file_type_javascript: yellow.clone(),
+            file_type_c: teal.clone(),
+            file_type_go: sky.clone(),
+            file_type_java: peach.clone(),
+            file_type_ruby: red.clone(),
+            file_type_php: mauve.clone(),
+            file_type_lua: blue.clone(),
+            file_type_html: maroon.clone(),
+            file_type_css: mauve.clone(),
+            file_type_json: pink.clone(),
+            file_type_xml: text.clone(),
+            file_type_yaml: teal.clone(),
+            file_type_markdown: text.clone(),
+            file_type_pdf: red.clone(),
+            file_type_text: text.clone(),
+
+            // Top-level roles
             user: yellow.clone(),
             group: peach.clone(),
-
-            // Code file types
-            code_rust: peach.clone(),
-            code_python: sapphire.clone(),
-            code_javascript: yellow.clone(),
-            code_c: teal.clone(),
-            code_go: sky.clone(),
-            code_java: peach.clone(),
-            code_ruby: red.clone(),
-            code_php: mauve.clone(),
-            code_lua: blue.clone(),
-
-            // Web file types
-            web_html: maroon.clone(),
-            web_css: mauve.clone(),
-            web_json: pink.clone(),
-            web_xml: text.clone(),
-            web_yaml: teal.clone(),
-
-            // Document types
-            doc_text: text.clone(),
-            doc_markdown: text.clone(),
-            doc_pdf: red.clone(),
-
-            // Media types
-            media_image: pink.clone(),
-            media_video: peach.clone(),
-            media_audio: green.clone(),
-
-            // Archive types
-            archive: yellow.clone(),
-
-            // UI colours
-            tree_connector: overlay0.clone(),
-            table_header: yellow.clone(),
-            path_display: blue.clone(),
+            tree_edge: overlay0.clone(),
+            header: yellow.clone(),
+            path: blue.clone(),
+            numeric: sky.clone(),
+            punctuation: overlay0.clone(),
+            summary: text.clone(),
             checksum: teal.clone(),
             magic: pink.clone(),
-            xattr: sky.clone(),
-            acl: green.clone(),
             mountpoint: mauve.clone(),
-            numeric: sky.clone(),
-            placeholder: overlay0.clone(),
-            summary: text.clone(),
 
-            // CLI help colours
+            // CLI help
             cli_help_header: yellow.clone(),
             cli_help_usage: green.clone(),
             cli_help_literal: sky.clone(),
@@ -379,7 +338,7 @@ impl Default for Theme {
     }
 }
 
-/// Creates a [`ThemeColour`] from RGB values.
+/// Creates a [`ThemeColor`] from RGB values.
 ///
 /// # Parameters
 /// - `r`: Red channel (0–255).
@@ -387,9 +346,9 @@ impl Default for Theme {
 /// - `b`: Blue channel (0–255).
 ///
 /// # Returns
-/// A [`ThemeColour`] wrapping the specified RGB colour.
-fn color_rgb(r: u8, g: u8, b: u8) -> ThemeColour {
-    ThemeColour {
-        colour: Colour::Rgb(r, g, b),
+/// A [`ThemeColor`] wrapping the specified RGB color.
+fn color_rgb(r: u8, g: u8, b: u8) -> ThemeColor {
+    ThemeColor {
+        color: Color::Rgb(r, g, b),
     }
 }

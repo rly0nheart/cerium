@@ -1,30 +1,8 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use crate::cli::flags::{
     DateFormat, IndicatorStyle, NumberFormat, OwnershipFormat, PermissionFormat, QuoteStyle,
-    ShowColour, ShowHyperlink, ShowIcons, SizeFormat, SortBy,
+    ShowColor, ShowHyperlink, ShowIcons, SizeFormat, SortBy,
 };
 
 #[cfg(feature = "checksum")]
@@ -194,9 +172,9 @@ pub struct Args {
     #[arg(long)]
     pub slash: bool,
 
-    /// Enable colours WHEN
-    #[arg(short = 'C', long, value_enum, default_value = "auto", value_name = "WHEN", visible_aliases = ["colors"], help_heading = "Display")]
-    pub colours: ShowColour,
+    /// Enable colors WHEN
+    #[arg(short = 'C', long = "color", value_enum, default_value = "auto", value_name = "WHEN", visible_aliases = ["colour", "colors", "colours"], help_heading = "Display")]
+    pub colors: ShowColor,
 
     /// Show icons WHEN
     #[arg(
@@ -221,21 +199,11 @@ pub struct Args {
 
     // Formatting section
     /// How to display dates (affects the output of --created, --modified, and --accessed)
-    #[arg(
-        long,
-        value_enum,
-        default_value = "human",
-        help_heading = "Formatting"
-    )]
+    #[arg(long, value_enum, default_value = "human", help_heading = "Formatting")]
     pub date_format: DateFormat,
 
     /// How to display numbers (affects the output of --hard-links, and --blocks)
-    #[arg(
-        long,
-        value_enum,
-        default_value = "human",
-        help_heading = "Formatting"
-    )]
+    #[arg(long, value_enum, default_value = "human", help_heading = "Formatting")]
     pub number_format: NumberFormat,
 
     /// How to display users or groups (affects the output of --user, --group, and --long)
@@ -264,30 +232,27 @@ pub struct Args {
 impl Args {
     /// Checks if any table-specific columns are requested.
     ///
-    /// # Parameters
-    /// - `args`: Parsed command-line arguments to inspect.
-    ///
     /// # Returns
     /// `true` if any table-only columns (magic, checksum, xattr, acl, context, mountpoint, or oneline) are requested.
-    pub(crate) fn is_args_requesting_table_column(args: &Args) -> bool {
+    pub(crate) fn wants_table_column(&self) -> bool {
         #[cfg(all(feature = "magic", not(target_os = "android")))]
-        let magic = args.magic;
+        let magic = self.magic;
         #[cfg(any(not(feature = "magic"), target_os = "android"))]
         let magic = false;
 
         #[cfg(feature = "checksum")]
-        let checksum = args.checksum.is_some();
+        let checksum = self.checksum.is_some();
 
         #[cfg(not(feature = "checksum"))]
         let checksum = false;
 
         magic
             || checksum
-            || args.xattr
-            || args.acl
-            || args.context
-            || args.mountpoint
-            || args.oneline
+            || self.xattr
+            || self.acl
+            || self.context
+            || self.mountpoint
+            || self.oneline
     }
 
     /// Resolves which file-type indicator style is active.
@@ -310,25 +275,22 @@ impl Args {
         }
     }
 
-    /// Checks whether the specified arguments request entry metadata.
-    ///
-    /// # Parameters
-    /// - `args`: Parsed command-line arguments to inspect.
+    /// Checks whether the arguments request entry metadata.
     ///
     /// # Returns
     /// `true` if any metadata-displaying flag (long, size, dates, permissions, etc.) is set.
-    pub fn is_args_requesting_metadata(args: &Args) -> bool {
-        args.long
-            || args.size
-            || args.created
-            || args.modified
-            || args.accessed
-            || args.permissions
-            || args.hard_links
-            || args.blocks
-            || args.block_size
-            || args.user
-            || args.group
-            || args.inode
+    pub fn wants_metadata(&self) -> bool {
+        self.long
+            || self.size
+            || self.created
+            || self.modified
+            || self.accessed
+            || self.permissions
+            || self.hard_links
+            || self.blocks
+            || self.block_size
+            || self.user
+            || self.group
+            || self.inode
     }
 }

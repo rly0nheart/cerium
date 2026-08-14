@@ -1,26 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 //! Configuration system for Cerium theme customisation.
 //!
@@ -32,26 +10,33 @@ SOFTWARE.
 //!
 //! # Config File Format
 //!
-//! Define an optional named palette, then map semantic keys to palette
-//! references, hex strings, RGB tables, or named colours. Anything omitted
-//! keeps its Catppuccin Mocha default.
+//! Define an optional named palette, then map roles to palette references,
+//! hex strings, RGB tables, or named colors. Anything omitted keeps its
+//! Catppuccin Mocha default.
+//!
+//! Role names follow the conventions of `lsd` (`permission`, `date`, `size`,
+//! `tree-edge`) and `eza` (`filekind`, `file_type`). Unsectioned roles go at
+//! the top of the file, before the first section.
 //!
 //! ```toml
+//! user      = "yellow"
+//! tree-edge = "#6c7086"
+//!
 //! [palette]
-//! accent  = "#89b4fa"
-//! surface = "#1e1e2e"
+//! accent = "#89b4fa"
 //!
-//! [colors]
-//! entry_directory = "accent"
-//! entry_file      = "#cdd6f4"
-//! code_rust       = { r = 250, g = 179, b = 135 }
-//! table_header    = "yellow"
+//! [filekind]
+//! directory = "accent"
+//! normal    = "#cdd6f4"
+//!
+//! [permission]
+//! read = "yellow"
+//!
+//! [file_type]
+//! rust = { r = 250, g = 179, b = 135 }
 //! ```
-//!
-//! Semantic keys may also be placed at the top level (flat form) without a
-//! `[colors]` table.
 
-pub mod colour;
+pub mod color;
 mod theme;
 
 pub use theme::Theme;
@@ -86,7 +71,7 @@ pub fn load_theme() -> Theme {
 
     let parsed = fs::read_to_string(&config_path)
         .map_err(|e| e.to_string())
-        .and_then(|contents| toml::from_str::<Theme>(&contents).map_err(|e| e.to_string()));
+        .and_then(|contents| Theme::parse(&contents).map_err(|e| e.to_string()));
 
     match parsed {
         Ok(theme) => theme,

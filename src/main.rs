@@ -1,35 +1,13 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use cerium::cli::args::Args;
-use cerium::display::factory::DisplayFactory;
+use cerium::display::factory;
 use cerium::display::styles::cli_help;
-use cerium::display::theme::colours::{ColourSettings, RgbColours};
+use cerium::display::theme::colors;
 use cerium::display::theme::config;
-use cerium::display::theme::icons::IconSettings;
+use cerium::display::theme::icons;
 use cerium::fs::dir::DirReader;
-use cerium::fs::hyperlink::HyperlinkSettings;
+use cerium::fs::hyperlink;
 use clap::{CommandFactory, FromArgMatches};
 use std::process;
 
@@ -41,19 +19,19 @@ fn main() {
     // Initialise theme system for cli help
     let help_style = cli_help::HelpStyle::new(&theme);
 
-    // Apply theme colours to CLI and parse arguments
+    // Apply theme colors to CLI and parse arguments
     let arg_matches = Args::command()
         .styles(help_style.get_styles())
         .get_matches();
     let args = Args::from_arg_matches(&arg_matches).expect("Failed to parse arguments");
 
     // Initialise theme system for output
-    RgbColours::init(theme);
+    colors::init(theme);
 
-    // Setup colours, icons, and hyperlinks
-    ColourSettings::setup(args.colours);
-    IconSettings::setup(args.icons);
-    HyperlinkSettings::setup(args.hyperlink);
+    // Setup colors, icons, and hyperlinks
+    colors::setup(args.colors);
+    icons::setup(args.icons);
+    hyperlink::setup(args.hyperlink);
 
     // Convert input path to PathBuf
     let path = &args.path;
@@ -61,11 +39,11 @@ fn main() {
 
     // Validate that the path exists (use lstat to handle broken symlinks)
     if std::fs::symlink_metadata(path).is_err() {
-        println!("file or directory not found: {}", &path.display());
+        println!("file or directory not found: {}", path.display());
         process::exit(1);
     }
 
     // Use the factory to create the appropriate display mode
-    let display = DisplayFactory::create(&dir_reader, args);
+    let display = factory::create(&dir_reader, args);
     display.print();
 }

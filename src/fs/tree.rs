@@ -1,26 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 //! Tree structure for hierarchical directory representation.
 
@@ -36,64 +14,50 @@ pub struct TreeNode {
     pub children: Vec<TreeNode>,
 }
 
-/// Builds a recursive tree representation of a directory.
-pub struct TreeBuilder {
-    path: PathBuf,
+/// Builds the tree rooted at `path`.
+///
+/// # Parameters
+/// - `path`: The root directory to build the tree from.
+/// - `args`: CLI arguments controlling filters, metadata, and sorting.
+///
+/// # Returns
+/// A [`TreeNode`] for the root, with children populated recursively.
+pub fn build(path: PathBuf, args: &Args) -> TreeNode {
+    // Create the root entry (requires stat since we only have a path)
+    let mut root_entry = Entry::from_path(path, args.long);
+    root_entry.conditional_metadata(args);
+    build_node(root_entry, args)
 }
 
-impl TreeBuilder {
-    /// Creates a new tree builder rooted at the given path.
-    ///
-    /// # Parameters
-    /// - `path`: The root directory to build the tree from.
-    pub fn new(path: PathBuf) -> Self {
-        Self { path }
-    }
+/// Recursively builds a tree node from an existing entry.
+///
+/// Takes an [`Entry`] directly to avoid redundant stat calls — child entries
+/// are already created efficiently via `from_dir_entry()` in [`DirReader::list`].
+///
+/// # Parameters
+/// - `entry`: The pre-built entry for this node.
+/// - `args`: CLI arguments controlling filters, metadata, and sorting.
+///
+/// # Returns
+/// A [`TreeNode`] with children populated recursively if the entry is a directory.
+fn build_node(entry: Entry, args: &Args) -> TreeNode {
+    let is_dir = entry.is_dir();
+    let path = entry.path().clone();
 
-    /// Builds the complete tree structure starting from the root path.
-    ///
-    /// # Parameters
-    /// - `args`: CLI arguments controlling filters, metadata, and sorting.
-    ///
-    /// # Returns
-    /// A [`TreeNode`] representing the root, with recursively populated children.
-    pub fn build(&self, args: &Args) -> TreeNode {
-        // Create the root entry (requires stat since we only have a path)
-        let mut root_entry = Entry::from_path(self.path.clone(), args.long);
-        root_entry.conditional_metadata(args);
-        self.build_node(root_entry, args)
-    }
+    let mut node = TreeNode {
+        entry,
+        children: Vec::new(),
+    };
 
-    /// Recursively builds a tree node from an existing entry.
-    ///
-    /// Takes an [`Entry`] directly to avoid redundant stat calls — child entries
-    /// are already created efficiently via `from_dir_entry()` in [`DirReader::list`].
-    ///
-    /// # Parameters
-    /// - `entry`: The pre-built entry for this node.
-    /// - `args`: CLI arguments controlling filters, metadata, and sorting.
-    ///
-    /// # Returns
-    /// A [`TreeNode`] with children populated recursively if the entry is a directory.
-    fn build_node(&self, entry: Entry, args: &Args) -> TreeNode {
-        let is_dir = entry.is_dir();
-        let path = entry.path().clone();
+    if is_dir {
+        let dir_reader = DirReader::from(path);
+        let entries = dir_reader.list(args);
 
-        let mut node = TreeNode {
-            entry,
-            children: Vec::new(),
-        };
-
-        if is_dir {
-            let dir_reader = DirReader::from(path);
-            let entries = dir_reader.list(args);
-
-            for child_entry in entries {
-                // Recursively build, reusing the Entry created by from_dir_entry()
-                node.children.push(self.build_node(child_entry, args));
-            }
+        for child_entry in entries {
+            // Recursively build, reusing the Entry created by from_dir_entry()
+            node.children.push(build_node(child_entry, args));
         }
-
-        node
     }
+
+    node
 }

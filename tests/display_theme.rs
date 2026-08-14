@@ -1,86 +1,97 @@
 use cerium::display::theme::config::Theme;
-use nu_ansi_term::Color as Colour;
+use nu_ansi_term::Color;
 
 #[test]
 fn test_default_theme_creation() {
     let theme = Theme::default();
-    // Verify a few key authentic Catppuccin Mocha colours
-    assert!(matches!(theme.size_bytes.colour, Colour::Rgb(166, 227, 161))); // green
-    assert!(matches!(theme.perm_read.colour, Colour::Rgb(249, 226, 175))); // yellow
+    // Verify a few key authentic Catppuccin Mocha colors
+    assert!(matches!(theme.size_none.color, Color::Rgb(166, 227, 161))); // green
     assert!(matches!(
-        theme.entry_directory.colour,
-        Colour::Rgb(137, 180, 250) // blue
+        theme.permission_read.color,
+        Color::Rgb(249, 226, 175)
+    )); // yellow
+    assert!(matches!(
+        theme.filekind_directory.color,
+        Color::Rgb(137, 180, 250) // blue
     ));
     assert!(matches!(
-        theme.entry_file.colour,
-        Colour::Rgb(205, 214, 244) // text
+        theme.filekind_normal.color,
+        Color::Rgb(205, 214, 244) // text
     ));
-    assert!(matches!(theme.code_rust.colour, Colour::Rgb(250, 179, 135))); // peach
+    assert!(matches!(
+        theme.file_type_rust.color,
+        Color::Rgb(250, 179, 135)
+    )); // peach
 }
 
 #[test]
 fn test_theme_deserialisation() {
     let toml = r#"
-        size_bytes = { r = 255, g = 0, b = 0 }
-        size_kb = "green"
-        size_mb = { r = 0, g = 255, b = 0 }
-        size_gb = "blue"
-        date_recent = "white"
-        date_hours = "white"
-        date_days = "white"
-        date_weeks = "white"
-        date_months = "white"
-        date_old = "white"
-        perm_read = "yellow"
-        perm_write = "red"
-        perm_execute = "green"
-        perm_none = "darkgray"
-        perm_special = "magenta"
-        perm_filetype = "blue"
-        entry_directory = "blue"
-        entry_symlink = "cyan"
-        entry_file = "white"
         user = "white"
         group = "white"
-        code_rust = "red"
-        code_python = "blue"
-        code_javascript = "yellow"
-        code_c = "cyan"
-        code_go = "blue"
-        code_java = "red"
-        code_ruby = "red"
-        code_php = "blue"
-        code_lua = "blue"
-        web_html = "red"
-        web_css = "purple"
-        web_json = "magenta"
-        web_xml = "white"
-        web_yaml = "cyan"
-        doc_text = "white"
-        doc_markdown = "white"
-        doc_pdf = "white"
-        media_image = "magenta"
-        media_video = "red"
-        media_audio = "green"
-        archive = "yellow"
-        tree_connector = "darkgray"
-        table_header = "white"
-        path_display = "blue"
+        tree-edge = "darkgray"
+        header = "white"
+        path = "blue"
+        numeric = "cyan"
+        punctuation = "darkgray"
+        summary = "white"
         checksum = "white"
         magic = "white"
-        xattr = "cyan"
-        acl = "green"
         mountpoint = "magenta"
-        numeric = "cyan"
-        placeholder = "darkgray"
-        cli_help_header = "yellow"
-        cli_help_usage = "green"
-        cli_help_literal = "cyan"
-        cli_help_placeholder = "yellow"
-        summary = "white"
+
+        [size]
+        none = { r = 255, g = 0, b = 0 }
+        small = "green"
+        medium = { r = 0, g = 255, b = 0 }
+        large = "blue"
+
+        [date]
+        minute-old = "white"
+        hour-old = "white"
+        day-old = "white"
+        week-old = "white"
+        month-old = "white"
+        older = "white"
+
+        [permission]
+        read = "yellow"
+        write = "red"
+        exec = "green"
+        no-access = "darkgray"
+        exec-sticky = "magenta"
+        filetype = "blue"
+        acl = "green"
+        context = "magenta"
+        attribute = "cyan"
+
+        [filekind]
+        normal = "white"
+        directory = "blue"
+        symlink = "cyan"
+
+        [file_type]
+        source = "yellow"
+        build = "cyan"
+        document = "white"
+        crypto = "red"
+        image = "magenta"
+        video = "red"
+        music = "green"
+        compressed = "yellow"
+        rust = "red"
+        python = "blue"
+        markdown = "white"
+        pdf = "white"
+        text = "white"
+
+        [cli_help]
+        header = "yellow"
+        usage = "green"
+        literal = "cyan"
+        placeholder = "yellow"
     "#;
 
-    let theme: Theme = toml::from_str(toml).unwrap();
-    assert!(matches!(theme.size_bytes.colour, Colour::Rgb(255, 0, 0)));
-    assert!(matches!(theme.size_kb.colour, Colour::Green));
+    let theme = Theme::parse(toml).unwrap();
+    assert!(matches!(theme.size_none.color, Color::Rgb(255, 0, 0)));
+    assert!(matches!(theme.size_small.color, Color::Green));
 }

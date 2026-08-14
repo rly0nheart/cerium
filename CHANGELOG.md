@@ -19,6 +19,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.3.0] - 2026-08-14
+
+### Changed
+- Theme files use sections. Roles follow [lsd](https://github.com/lsd-rs/lsd)
+  (`permission`, `date`, `size`, `tree-edge`) and
+  [eza](https://github.com/eza-community/eza) (`filekind`, `file_type`).
+  **Old flat keys no longer load**; copy a theme from `themes/` again
+- Every color now comes from a theme role. `--acl`, `-Z`, `-x`, the tree
+  connectors, headers and paths read roles that were previously ignored
+- Spelling is `color`, not `colour`. The flag is `--color`, with `--colour`,
+  `--colors` and `--colours` as aliases
+- Each cell renders once instead of twice, so checksums, xattr reads and
+  directory counts run half as often
+
+### Removed
+- `chrono` and `serde` dependencies
+
+### Fixed
+- The permission cache keyed on mode alone, so one file with an extended
+  attribute made every file of that mode show `@`
+- Setuid and sticky bits rendered in the wrong color
+- Absolute dates (`--date-format=locale`) took their color from the month name
+
 ## [0.2.2] - 2026-07-15
 ## Changed
 - human units dependency, from _humanly_ to _libhuman_

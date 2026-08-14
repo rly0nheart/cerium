@@ -1,26 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 //! File-type indicators for `--classify`/`--file-type`/`--slash`.
 //!
@@ -30,14 +8,14 @@ SOFTWARE.
 
 use crate::cli::args::Args;
 use crate::cli::flags::IndicatorStyle;
-use crate::fs::entry::Entry;
+use crate::fs::entry::{Entry, Kind};
 use crate::fs::metadata::Metadata;
 use libc::{S_IFDIR, S_IFIFO, S_IFLNK, S_IFMT, S_IFREG, S_IFSOCK, S_IXGRP, S_IXOTH, S_IXUSR};
 
 /// Returns the indicator character to append after `entry`'s name, or `None`
 /// when no indicator applies (or no indicator flag is set).
 ///
-/// The result is meant to be appended *unstyled* — `ls` never colours the
+/// The result is meant to be appended *unstyled* — `ls` never colors the
 /// indicator, and neither do we.
 ///
 /// # Parameters
@@ -50,11 +28,11 @@ pub(crate) fn indicator(entry: &Entry, args: &Args) -> Option<char> {
         return None;
     }
 
-    match entry {
+    match entry.kind {
         // A real directory always gets '/', under every style.
-        Entry::Directory(_) => Some('/'),
+        Kind::Directory => Some('/'),
 
-        Entry::Symlink(_) => {
+        Kind::Symlink { .. } => {
             // Long mode renders the link as `name -> target`: classify the
             // *target* with no '@' on the link, exactly like `ls -lF`. A
             // target that can't be resolved (broken link) gets no indicator.
@@ -81,9 +59,9 @@ pub(crate) fn indicator(entry: &Entry, args: &Args) -> Option<char> {
             }
         }
 
-        // `Entry::File` also covers FIFOs, sockets, and devices, so the mode
+        // `Kind::File` also covers FIFOs, sockets, and devices, so the mode
         // is needed both to tell those apart and to test the execute bits.
-        Entry::File(_) => {
+        Kind::File => {
             // The slash style only ever marks directories, so a file never
             // gets an indicator — skip the stat entirely.
             if style == IndicatorStyle::Slash {

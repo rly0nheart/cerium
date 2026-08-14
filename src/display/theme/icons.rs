@@ -1,71 +1,28 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use crate::cli::flags::ShowIcons;
-use crate::display::theme::colours::{Colour, RgbColours};
+use crate::display::output::terminal;
+use crate::display::output::toggle::Toggle;
+use crate::display::theme::colors::{self, Color};
 use phf::{Map, phf_map};
-use std::sync::atomic::{AtomicBool, Ordering};
 
-// Global atomic: are icons enabled?
-static ICONS_ENABLED: AtomicBool = AtomicBool::new(true);
+static ICONS: Toggle = Toggle::new(true);
 
-/// Global icon toggle controlling whether Nerd Font icons are displayed.
-pub struct IconSettings;
+/// Checks whether icon output is currently enabled.
+pub(crate) fn enabled() -> bool {
+    ICONS.is_enabled()
+}
 
-impl IconSettings {
-    /// Enables icon output globally.
-    pub(crate) fn enable() {
-        ICONS_ENABLED.store(true, Ordering::SeqCst);
-    }
-
-    /// Disables icon output globally.
-    pub(crate) fn disable() {
-        ICONS_ENABLED.store(false, Ordering::SeqCst);
-    }
-
-    /// Checks whether icon output is currently enabled.
-    pub(crate) fn enabled() -> bool {
-        ICONS_ENABLED.load(Ordering::SeqCst)
-    }
-
-    /// Configures icon output at startup based on the CLI flag and terminal detection.
-    ///
-    /// # Parameters
-    /// - `show_icons`: The user's icon preference from the CLI.
-    pub fn setup(show_icons: ShowIcons) {
-        match show_icons {
-            ShowIcons::Always => Self::enable(),
-            ShowIcons::Never => Self::disable(),
-            ShowIcons::Auto => {
-                if unsafe { libc::isatty(libc::STDOUT_FILENO) == 1 } {
-                    Self::enable()
-                } else {
-                    Self::disable()
-                }
-            }
-        }
-    }
+/// Configures icon output at startup from the CLI flag and terminal detection.
+///
+/// # Parameters
+/// - `show_icons`: The user's icon preference from the CLI.
+pub fn setup(show_icons: ShowIcons) {
+    ICONS.set(match show_icons {
+        ShowIcons::Always => true,
+        ShowIcons::Never => false,
+        ShowIcons::Auto => terminal::is_tty(),
+    });
 }
 
 /// Nerd Font icon constants for filesystem entries.
@@ -73,7 +30,6 @@ impl IconSettings {
 pub(crate) struct Icons;
 
 #[rustfmt::skip]
-#[allow(dead_code)]
 impl Icons {
     const AUDIO: char           = '\u{f001}';  // 
     const ANACONDA: char        = '\u{e715}';  // 
@@ -102,7 +58,6 @@ impl Icons {
     const EDITORCONFIG: char    = '\u{e652}';  // 
     const EMACS: char           = '\u{e632}';  // 
     const ESLINT: char          = '\u{e655}';  // 
-    const FILE: char            = '\u{f15b}';  // 
     const FILE_3D: char         = '\u{f01a7}'; // 󰆧
     const FILE_SYMLINK: char    = '\u{f1177}'; // 󱅷
     const FOLDER: char          = '\u{f07b}';  // 
@@ -287,10 +242,10 @@ const DIRECTORY_ICONS: Map<&'static str, char> = phf_map! {
     "videos"              => Icons::VIDEO,
 };
 
-/// PHF map for directory colour lookups (non-themed directories only)
-/// All directories use the default entry_directory theme colour
-pub(crate) static DIRECTORY_COLOURS: Map<&'static str, Colour> = phf_map! {
-    // All directories use themed default colour
+/// PHF map for directory color lookups (non-themed directories only)
+/// All directories use the default entry_directory theme color
+pub(crate) static DIRECTORY_COLORS: Map<&'static str, Color> = phf_map! {
+    // All directories use themed default color
 };
 
 /// PHF map for filename icon lookups (all keys must be lowercase for case-insensitive matching)
@@ -417,11 +372,11 @@ const FILENAME_ICONS: Map<&'static str, char> = phf_map! {
     "claude.md"           => Icons::ROBOT,
 };
 
-/// PHF map for filename colour lookups (non-themed files only)
+/// PHF map for filename color lookups (non-themed files only)
 /// Themed filenames will use extension-based theming
-pub(crate) static FILENAME_COLOURS: Map<&'static str, Colour> = phf_map! {
-    "Makefile"       => Colour::DarkGray,
-    "LICENSE"        => Colour::White,
+pub(crate) static FILENAME_COLORS: Map<&'static str, Color> = phf_map! {
+    "Makefile"       => Color::DarkGray,
+    "LICENSE"        => Color::White,
 };
 
 /// PHF map for extension icon lookups
@@ -729,12 +684,12 @@ const EXTENSION_ICONS: Map<&'static str, char> = phf_map! {
     "zsh-theme"      => Icons::SHELL,
 };
 
-/// PHF map for extension colour lookups (non-themed extensions only)
-/// Themed extensions are handled in the colour_for_entry function
-pub(crate) static EXTENSION_COLOURS: Map<&'static str, Colour> = phf_map! {
-    // Non-themed file types that use static colours
-    "lock"  => Colour::LightGray,
-    "log"   => Colour::White,
+/// PHF map for extension color lookups (non-themed extensions only)
+/// Themed extensions are handled in the color_for_entry function
+pub(crate) static EXTENSION_COLORS: Map<&'static str, Color> = phf_map! {
+    // Non-themed file types that use static colors
+    "lock"  => Color::LightGray,
+    "log"   => Color::White,
 };
 
 /// Default fallback values
@@ -742,20 +697,14 @@ pub(crate) const DEFAULT_FILE_ICON: char = Icons::FILE_UNKNOWN;
 pub(crate) const DEFAULT_DIR_ICON: char = Icons::FOLDER;
 pub(crate) const SYMLINK_ICON: char = Icons::FILE_SYMLINK;
 
-/// Returns the default file colour from the active theme.
-pub(crate) fn default_file_colour() -> Colour {
-    RgbColours::theme().entry_file.colour
+/// Returns the default file color from the active theme.
+pub(crate) fn default_file_color() -> Color {
+    colors::theme().filekind_normal.color
 }
 
-/// Returns the default directory colour from the active theme.
-#[allow(dead_code)]
-pub(crate) fn default_dir_colour() -> Colour {
-    RgbColours::theme().entry_directory.colour
-}
-
-/// Returns the symlink colour from the active theme.
-pub(crate) fn symlink_colour() -> Colour {
-    RgbColours::theme().entry_symlink.colour
+/// Returns the symlink color from the active theme.
+pub(crate) fn symlink_color() -> Color {
+    colors::theme().filekind_symlink.color
 }
 
 /// Looks up the icon for a filesystem entry by name, extension, and type.
@@ -806,7 +755,7 @@ pub(crate) fn icon_for_entry(
     DEFAULT_FILE_ICON
 }
 
-/// Looks up the colour for a filesystem entry by name, extension, and type.
+/// Looks up the color for a filesystem entry by name, extension, and type.
 ///
 /// # Parameters
 /// - `name`: The entry filename.
@@ -815,288 +764,300 @@ pub(crate) fn icon_for_entry(
 /// - `is_symlink`: Whether the entry is a symbolic link.
 ///
 /// # Returns
-/// The theme colour for the entry.
-pub(crate) fn colour_for_entry(
+/// The theme color for the entry.
+pub(crate) fn color_for_entry(
     name: &str,
     extension: &str,
     is_dir: bool,
     is_symlink: bool,
-) -> Colour {
+) -> Color {
     if is_symlink {
-        return symlink_colour();
+        return symlink_color();
     }
 
     if is_dir {
-        return *DIRECTORY_COLOURS
+        return *DIRECTORY_COLORS
             .get(name)
-            .unwrap_or(&RgbColours::cobalite());
+            .unwrap_or(&colors::theme().filekind_directory.color);
     }
 
     // Check filename first
-    if let Some(colour) = FILENAME_COLOURS.get(name) {
-        return *colour;
+    if let Some(color) = FILENAME_COLORS.get(name) {
+        return *color;
     }
 
     // Then check themed extensions
     if !extension.is_empty() {
-        let themed_colour = match extension {
+        let themed_color = match extension {
             // Rust
-            "rs" | "rlib" | "rmeta" => Some(RgbColours::almost_apricot()),
+            "rs" | "rlib" | "rmeta" => Some(colors::theme().file_type_rust.color),
 
             // Python
             "py" | "pyi" | "pyc" | "pyd" | "pyo" | "pyw" | "pyx" | "pxd" | "whl" => {
-                Some(RgbColours::mega_blue())
+                Some(colors::theme().file_type_python.color)
             }
 
             // JavaScript/TypeScript
             "js" | "mjs" | "cjs" | "ts" | "mts" | "cts" => {
-                Some(RgbColours::theme().code_javascript.colour)
+                Some(colors::theme().file_type_javascript.color)
             }
-            "jsx" | "tsx" => Some(RgbColours::theme().code_javascript.colour),
+            "jsx" | "tsx" => Some(colors::theme().file_type_javascript.color),
 
             // C/C++
-            "c" | "h" | "inl" | "m" => Some(RgbColours::thors_thunder()),
+            "c" | "h" | "inl" | "m" => Some(colors::theme().file_type_c.color),
             "cpp" | "cc" | "cxx" | "c++" | "hpp" | "hh" | "hxx" | "h++" | "mm" => {
-                Some(RgbColours::thors_thunder())
+                Some(colors::theme().file_type_c.color)
             }
 
             // Go
-            "go" => Some(RgbColours::malibu_blue()),
+            "go" => Some(colors::theme().file_type_go.color),
 
             // Java/Kotlin
-            "java" | "jar" | "class" | "war" | "jad" => Some(RgbColours::princeton_orange()),
-            "kt" | "kts" => Some(RgbColours::princeton_orange()),
+            "java" | "jar" | "class" | "war" | "jad" => Some(colors::theme().file_type_java.color),
+            "kt" | "kts" => Some(colors::theme().file_type_java.color),
 
             // Ruby
             "rb" | "rake" | "gemspec" | "erb" | "slim" => {
-                Some(RgbColours::theme().code_ruby.colour)
+                Some(colors::theme().file_type_ruby.color)
             }
 
             // PHP
-            "php" | "phar" => Some(RgbColours::theme().code_php.colour),
+            "php" | "phar" => Some(colors::theme().file_type_php.color),
 
             // Lua
-            "lua" | "luac" | "luau" => Some(RgbColours::theme().code_lua.colour),
+            "lua" | "luac" | "luau" => Some(colors::theme().file_type_lua.color),
 
             // Shell scripts
             "sh" | "bash" | "zsh" | "fish" | "ksh" | "csh" | "tcsh" | "nu" => {
-                Some(RgbColours::thors_thunder())
+                Some(colors::theme().file_type_c.color)
             }
 
             // C#/F#
-            "cs" | "csx" | "csproj" => Some(RgbColours::theme().code_php.colour),
+            "cs" | "csx" | "csproj" => Some(colors::theme().file_type_php.color),
             "fs" | "fsi" | "fsx" | "fsscript" | "fsproj" => {
-                Some(RgbColours::theme().code_php.colour)
+                Some(colors::theme().file_type_php.color)
             }
 
             // Rust-like / Systems
-            "zig" | "nim" | "nims" | "nimble" => Some(RgbColours::almost_apricot()),
+            "zig" | "nim" | "nims" | "nimble" => Some(colors::theme().file_type_rust.color),
 
             // Functional languages
-            "hs" | "lhs" => Some(RgbColours::theme().code_php.colour),
-            "ml" | "mli" | "mll" | "mly" => Some(RgbColours::princeton_orange()),
-            "ex" | "exs" | "eex" | "leex" => Some(RgbColours::theme().code_php.colour),
-            "erl" | "hrl" => Some(RgbColours::theme().code_ruby.colour),
-            "clj" | "cljs" | "cljc" | "edn" => Some(RgbColours::malibu_blue()),
-            "rkt" | "scm" | "ss" | "sld" => Some(RgbColours::theme().code_lua.colour),
-            "lisp" | "el" | "elc" => Some(RgbColours::theme().code_php.colour),
-            "fnl" => Some(RgbColours::theme().code_lua.colour),
-            "gleam" => Some(RgbColours::theme().code_ruby.colour),
+            "hs" | "lhs" => Some(colors::theme().file_type_php.color),
+            "ml" | "mli" | "mll" | "mly" => Some(colors::theme().file_type_java.color),
+            "ex" | "exs" | "eex" | "leex" => Some(colors::theme().file_type_php.color),
+            "erl" | "hrl" => Some(colors::theme().file_type_ruby.color),
+            "clj" | "cljs" | "cljc" | "edn" => Some(colors::theme().file_type_go.color),
+            "rkt" | "scm" | "ss" | "sld" => Some(colors::theme().file_type_lua.color),
+            "lisp" | "el" | "elc" => Some(colors::theme().file_type_php.color),
+            "fnl" => Some(colors::theme().file_type_lua.color),
+            "gleam" => Some(colors::theme().file_type_ruby.color),
 
             // Web frameworks
-            "vue" | "svelte" => Some(RgbColours::theme().code_javascript.colour),
-            "elm" => Some(RgbColours::malibu_blue()),
+            "vue" | "svelte" => Some(colors::theme().file_type_javascript.color),
+            "elm" => Some(colors::theme().file_type_go.color),
 
             // Other languages
-            "dart" => Some(RgbColours::malibu_blue()),
-            "swift" => Some(RgbColours::almost_apricot()),
-            "scala" => Some(RgbColours::theme().code_ruby.colour),
-            "groovy" | "gvy" | "gradle" => Some(RgbColours::princeton_orange()),
-            "r" | "rdata" | "rds" => Some(RgbColours::malibu_blue()),
-            "jl" => Some(RgbColours::theme().code_javascript.colour),
-            "pl" | "pm" | "pod" | "t" | "plx" => Some(RgbColours::theme().code_lua.colour),
-            "d" | "di" => Some(RgbColours::theme().code_ruby.colour),
-            "cr" => Some(RgbColours::thors_thunder()),
-            "purs" => Some(RgbColours::theme().code_php.colour),
-            "tcl" | "tbc" => Some(RgbColours::theme().code_lua.colour),
-            "vala" => Some(RgbColours::thors_thunder()),
-            "awk" => Some(RgbColours::thors_thunder()),
-            "v" => Some(RgbColours::malibu_blue()),
+            "dart" => Some(colors::theme().file_type_go.color),
+            "swift" => Some(colors::theme().file_type_rust.color),
+            "scala" => Some(colors::theme().file_type_ruby.color),
+            "groovy" | "gvy" | "gradle" => Some(colors::theme().file_type_java.color),
+            "r" | "rdata" | "rds" => Some(colors::theme().file_type_go.color),
+            "jl" => Some(colors::theme().file_type_javascript.color),
+            "pl" | "pm" | "pod" | "t" | "plx" => Some(colors::theme().file_type_lua.color),
+            "d" | "di" => Some(colors::theme().file_type_ruby.color),
+            "cr" => Some(colors::theme().file_type_c.color),
+            "purs" => Some(colors::theme().file_type_php.color),
+            "tcl" | "tbc" => Some(colors::theme().file_type_lua.color),
+            "vala" => Some(colors::theme().file_type_c.color),
+            "awk" => Some(colors::theme().file_type_c.color),
+            "v" => Some(colors::theme().file_type_go.color),
 
             // Assembly / Low-level
-            "asm" | "s" => Some(RgbColours::thors_thunder()),
-            "hc" => Some(RgbColours::thors_thunder()),
+            "asm" | "s" => Some(colors::theme().file_type_c.color),
+            "hc" => Some(colors::theme().file_type_c.color),
 
             // HDL
-            "sv" | "svh" | "vhdl" => Some(RgbColours::thors_thunder()),
+            "sv" | "svh" | "vhdl" => Some(colors::theme().file_type_c.color),
 
             // Web markup/styles
-            "html" | "htm" | "xhtml" | "shtml" => Some(RgbColours::scoville_high()),
-            "css" => Some(RgbColours::cyber_grape()),
-            "scss" | "sass" | "less" | "styl" | "stylus" => Some(RgbColours::cyber_grape()),
+            "html" | "htm" | "xhtml" | "shtml" => Some(colors::theme().file_type_html.color),
+            "css" => Some(colors::theme().file_type_css.color),
+            "scss" | "sass" | "less" | "styl" | "stylus" => {
+                Some(colors::theme().file_type_css.color)
+            }
 
             // Data formats
-            "json" | "json5" | "jsonc" | "avro" => Some(RgbColours::theme().web_json.colour),
-            "xml" | "xul" | "opml" | "plist" => Some(RgbColours::theme().web_xml.colour),
-            "yaml" | "yml" => Some(RgbColours::hawaii_morning()),
-            "toml" | "tml" => Some(RgbColours::hawaii_morning()),
-            "ini" | "cfg" | "conf" | "config" => Some(RgbColours::hawaii_morning()),
-            "env" => Some(RgbColours::hawaii_morning()),
+            "json" | "json5" | "jsonc" | "avro" => Some(colors::theme().file_type_json.color),
+            "xml" | "xul" | "opml" | "plist" => Some(colors::theme().file_type_xml.color),
+            "yaml" | "yml" => Some(colors::theme().file_type_yaml.color),
+            "toml" | "tml" => Some(colors::theme().file_type_yaml.color),
+            "ini" | "cfg" | "conf" | "config" => Some(colors::theme().file_type_yaml.color),
+            "env" => Some(colors::theme().file_type_yaml.color),
 
             // Document types
-            "txt" | "text" | "rtf" => Some(RgbColours::theme().doc_text.colour),
+            "txt" | "text" | "rtf" => Some(colors::theme().file_type_text.color),
             "md" | "markdown" | "mkd" | "mdx" | "rmd" | "rdoc" | "jmd" => {
-                Some(RgbColours::extraordinary_abundance())
+                Some(colors::theme().file_type_markdown.color)
             }
-            "pdf" => Some(RgbColours::theme().doc_pdf.colour),
-            "rst" => Some(RgbColours::theme().doc_text.colour),
-            "org" | "norg" => Some(RgbColours::theme().doc_text.colour),
+            "pdf" => Some(colors::theme().file_type_pdf.color),
+            "rst" => Some(colors::theme().file_type_text.color),
+            "org" | "norg" => Some(colors::theme().file_type_text.color),
             "tex" | "latex" | "ltx" | "sty" | "cls" | "bst" | "bib" => {
-                Some(RgbColours::theme().doc_text.colour)
+                Some(colors::theme().file_type_text.color)
             }
-            "typ" => Some(RgbColours::theme().doc_text.colour),
-            "doc" | "docx" | "docm" => Some(RgbColours::theme().doc_text.colour),
-            "odt" | "fodt" => Some(RgbColours::theme().doc_text.colour),
-            "epub" | "mobi" | "ebook" => Some(RgbColours::theme().doc_pdf.colour),
-            "djvu" | "djv" => Some(RgbColours::theme().doc_pdf.colour),
+            "typ" => Some(colors::theme().file_type_text.color),
+            "doc" | "docx" | "docm" => Some(colors::theme().file_type_text.color),
+            "odt" | "fodt" => Some(colors::theme().file_type_text.color),
+            "epub" | "mobi" | "ebook" => Some(colors::theme().file_type_pdf.color),
+            "djvu" | "djv" => Some(colors::theme().file_type_pdf.color),
 
             // Spreadsheets
             "xls" | "xlsx" | "xlsm" | "xlr" | "csv" | "tsv" => {
-                Some(RgbColours::theme().code_javascript.colour)
+                Some(colors::theme().file_type_javascript.color)
             }
-            "ods" | "fods" => Some(RgbColours::theme().code_javascript.colour),
-            "gsheet" => Some(RgbColours::theme().code_javascript.colour),
+            "ods" | "fods" => Some(colors::theme().file_type_javascript.color),
+            "gsheet" => Some(colors::theme().file_type_javascript.color),
 
             // Presentations
-            "ppt" | "pptx" | "pps" | "ppsx" => Some(RgbColours::almost_apricot()),
-            "odp" | "fodp" | "gslides" => Some(RgbColours::almost_apricot()),
+            "ppt" | "pptx" | "pps" | "ppsx" => Some(colors::theme().file_type_rust.color),
+            "odp" | "fodp" | "gslides" => Some(colors::theme().file_type_rust.color),
 
             // Image types
             "png" | "jpg" | "jpeg" | "jpe" | "jif" | "jfif" | "jfi" => {
-                Some(RgbColours::sachet_pink())
+                Some(colors::theme().file_type_image.color)
             }
-            "gif" | "webp" | "avif" | "jxl" => Some(RgbColours::sachet_pink()),
-            "bmp" | "ico" | "tif" | "tiff" => Some(RgbColours::sachet_pink()),
-            "svg" | "eps" | "ps" => Some(RgbColours::sachet_pink()),
-            "psd" | "psb" | "xcf" | "kra" | "krz" => Some(RgbColours::sachet_pink()),
-            "raw" | "cr2" | "nef" | "orf" | "arw" | "dng" => Some(RgbColours::sachet_pink()),
-            "heic" | "heif" => Some(RgbColours::sachet_pink()),
-            "jp2" | "j2k" | "j2c" | "jpf" | "jpx" => Some(RgbColours::sachet_pink()),
-            "pbm" | "pgm" | "ppm" | "pnm" | "pxm" | "xpm" => Some(RgbColours::sachet_pink()),
-            "ai" => Some(RgbColours::sachet_pink()),
-            "cbr" | "cbz" => Some(RgbColours::sachet_pink()),
+            "gif" | "webp" | "avif" | "jxl" => Some(colors::theme().file_type_image.color),
+            "bmp" | "ico" | "tif" | "tiff" => Some(colors::theme().file_type_image.color),
+            "svg" | "eps" | "ps" => Some(colors::theme().file_type_image.color),
+            "psd" | "psb" | "xcf" | "kra" | "krz" => Some(colors::theme().file_type_image.color),
+            "raw" | "cr2" | "nef" | "orf" | "arw" | "dng" => {
+                Some(colors::theme().file_type_image.color)
+            }
+            "heic" | "heif" => Some(colors::theme().file_type_image.color),
+            "jp2" | "j2k" | "j2c" | "jpf" | "jpx" => Some(colors::theme().file_type_image.color),
+            "pbm" | "pgm" | "ppm" | "pnm" | "pxm" | "xpm" => {
+                Some(colors::theme().file_type_image.color)
+            }
+            "ai" => Some(colors::theme().file_type_image.color),
+            "cbr" | "cbz" => Some(colors::theme().file_type_image.color),
 
             // Video types
-            "mp4" | "m4v" | "mkv" | "webm" => Some(RgbColours::mandarin_sorbet()),
-            "avi" | "mov" | "wmv" | "flv" => Some(RgbColours::mandarin_sorbet()),
-            "mpeg" | "mpg" | "m2v" | "m2ts" => Some(RgbColours::mandarin_sorbet()),
-            "vob" | "ogv" | "ogm" => Some(RgbColours::mandarin_sorbet()),
-            "3gp" | "3g2" | "3gpp" | "3gpp2" => Some(RgbColours::mandarin_sorbet()),
-            "h264" | "heics" | "cast" => Some(RgbColours::mandarin_sorbet()),
+            "mp4" | "m4v" | "mkv" | "webm" => Some(colors::theme().file_type_video.color),
+            "avi" | "mov" | "wmv" | "flv" => Some(colors::theme().file_type_video.color),
+            "mpeg" | "mpg" | "m2v" | "m2ts" => Some(colors::theme().file_type_video.color),
+            "vob" | "ogv" | "ogm" => Some(colors::theme().file_type_video.color),
+            "3gp" | "3g2" | "3gpp" | "3gpp2" => Some(colors::theme().file_type_video.color),
+            "h264" | "heics" | "cast" => Some(colors::theme().file_type_video.color),
 
             // Audio types
             "mp3" | "wav" | "flac" | "m4a" | "ogg" | "opus" => {
-                Some(RgbColours::exhilarating_green())
+                Some(colors::theme().file_type_music.color)
             }
             "aac" | "wma" | "aif" | "aiff" | "aifc" | "alac" => {
-                Some(RgbColours::exhilarating_green())
+                Some(colors::theme().file_type_music.color)
             }
-            "ape" | "mka" | "wv" | "mp2" | "pcm" => Some(RgbColours::exhilarating_green()),
-            "mid" | "sf2" | "sfz" => Some(RgbColours::exhilarating_green()),
+            "ape" | "mka" | "wv" | "mp2" | "pcm" => Some(colors::theme().file_type_music.color),
+            "mid" | "sf2" | "sfz" => Some(colors::theme().file_type_music.color),
 
             // Subtitles
             "srt" | "sub" | "ass" | "ssa" | "vtt" | "lrc" => {
-                Some(RgbColours::theme().doc_text.colour)
+                Some(colors::theme().file_type_document.color)
             }
 
             // Playlists
-            "m3u" | "m3u8" | "pls" | "cue" => Some(RgbColours::exhilarating_green()),
+            "m3u" | "m3u8" | "pls" | "cue" => Some(colors::theme().file_type_music.color),
 
             // Archive types
-            "zip" | "tar" | "gz" | "7z" | "rar" => Some(RgbColours::theme().archive.colour),
+            "zip" | "tar" | "gz" | "7z" | "rar" => Some(colors::theme().file_type_compressed.color),
             "bz" | "bz2" | "bz3" | "xz" | "lz" | "lz4" | "lzma" | "lzo" | "lzh" => {
-                Some(RgbColours::theme().archive.colour)
+                Some(colors::theme().file_type_compressed.color)
             }
             "tgz" | "tbz" | "tbz2" | "txz" | "tlz" | "taz" | "tz" | "tzo" => {
-                Some(RgbColours::theme().archive.colour)
+                Some(colors::theme().file_type_compressed.color)
             }
             "zst" | "z" | "ar" | "arj" | "cpio" | "par" | "cab" => {
-                Some(RgbColours::theme().archive.colour)
+                Some(colors::theme().file_type_compressed.color)
             }
             "deb" | "rpm" | "pkg" | "apk" | "apkm" | "xapk" => {
-                Some(RgbColours::theme().archive.colour)
+                Some(colors::theme().file_type_compressed.color)
             }
             "dmg" | "iso" | "img" | "qcow" | "qcow2" | "vdi" | "vmdk" | "vhd" | "tc" => {
-                Some(RgbColours::theme().archive.colour)
+                Some(colors::theme().file_type_compressed.color)
             }
 
             // Database
             "sql" | "sqlite" | "sqlite3" | "db" | "db3" | "s3db" | "sl3" => {
-                Some(RgbColours::mega_blue())
+                Some(colors::theme().file_type_python.color)
             }
-            "mdb" | "ldb" | "odb" | "dump" | "prql" => Some(RgbColours::mega_blue()),
+            "mdb" | "ldb" | "odb" | "dump" | "prql" => Some(colors::theme().file_type_python.color),
 
             // Fonts
-            "ttf" | "otf" | "woff" | "woff2" | "eot" => Some(RgbColours::theme().doc_text.colour),
+            "ttf" | "otf" | "woff" | "woff2" | "eot" => {
+                Some(colors::theme().file_type_document.color)
+            }
             "fon" | "fnt" | "bdf" | "psf" | "flc" | "flf" | "lff" | "font" => {
-                Some(RgbColours::theme().doc_text.colour)
+                Some(colors::theme().file_type_document.color)
             }
 
             // 3D/CAD
-            "obj" | "fbx" | "stl" | "ply" | "3mf" | "blend" => Some(RgbColours::malibu_blue()),
-            "dwg" | "dxf" | "step" | "stp" | "ste" | "iges" | "igs" | "ige" => {
-                Some(RgbColours::malibu_blue())
+            "obj" | "fbx" | "stl" | "ply" | "3mf" | "blend" => {
+                Some(colors::theme().file_type_document.color)
             }
-            "ifc" | "brep" | "f3d" | "f3z" | "skp" | "slvs" => Some(RgbColours::malibu_blue()),
-            "fcstd" | "fcstd1" | "scad" => Some(RgbColours::malibu_blue()),
+            "dwg" | "dxf" | "step" | "stp" | "ste" | "iges" | "igs" | "ige" => {
+                Some(colors::theme().file_type_document.color)
+            }
+            "ifc" | "brep" | "f3d" | "f3z" | "skp" | "slvs" => {
+                Some(colors::theme().file_type_document.color)
+            }
+            "fcstd" | "fcstd1" | "scad" => Some(colors::theme().file_type_document.color),
 
             // Security/Keys
             "pem" | "crt" | "cert" | "key" | "p12" | "pfx" | "pub" => {
-                Some(RgbColours::theme().code_ruby.colour)
+                Some(colors::theme().file_type_crypto.color)
             }
             "gpg" | "asc" | "age" | "sig" | "signature" => {
-                Some(RgbColours::theme().code_ruby.colour)
+                Some(colors::theme().file_type_crypto.color)
             }
-            "kdb" | "kdbx" | "kbx" => Some(RgbColours::theme().code_ruby.colour),
+            "kdb" | "kdbx" | "kbx" => Some(colors::theme().file_type_crypto.color),
 
             // Checksums
             "md5" | "sha1" | "sha224" | "sha256" | "sha384" | "sha512" => {
-                Some(RgbColours::theme().checksum.colour)
+                Some(colors::theme().checksum.color)
             }
 
             // Build/Config
-            "cmake" | "mk" | "ninja" => Some(RgbColours::thors_thunder()),
-            "dockerfile" | "dockerignore" => Some(RgbColours::malibu_blue()),
-            "tf" | "tfstate" | "tfvars" => Some(RgbColours::theme().code_php.colour),
-            "nix" => Some(RgbColours::malibu_blue()),
-            "ebuild" => Some(RgbColours::theme().code_php.colour),
+            "cmake" | "mk" | "ninja" => Some(colors::theme().file_type_build.color),
+            "dockerfile" | "dockerignore" => Some(colors::theme().file_type_build.color),
+            "tf" | "tfstate" | "tfvars" => Some(colors::theme().file_type_build.color),
+            "nix" => Some(colors::theme().file_type_build.color),
+            "ebuild" => Some(colors::theme().file_type_build.color),
 
             // Git
             "git" | "gitignore" | "gitattributes" | "gitmodules" => {
-                Some(RgbColours::almost_apricot())
+                Some(colors::theme().file_type_rust.color)
             }
-            "diff" | "patch" => Some(RgbColours::theme().code_javascript.colour),
+            "diff" | "patch" => Some(colors::theme().file_type_source.color),
 
             // Notebooks
-            "ipynb" => Some(RgbColours::mega_blue()),
+            "ipynb" => Some(colors::theme().file_type_python.color),
 
             // Misc
-            "graphql" | "gql" => Some(RgbColours::theme().code_ruby.colour),
-            "dot" | "gv" => Some(RgbColours::thors_thunder()),
-            "po" | "pot" | "mo" | "qm" => Some(RgbColours::theme().doc_text.colour),
+            "graphql" | "gql" => Some(colors::theme().file_type_ruby.color),
+            "dot" | "gv" => Some(colors::theme().file_type_source.color),
+            "po" | "pot" | "mo" | "qm" => Some(colors::theme().file_type_document.color),
 
             _ => None,
         };
 
-        if let Some(colour) = themed_colour {
-            return colour;
+        if let Some(color) = themed_color {
+            return color;
         }
 
         // Fall back to static extension map for non-themed extensions
-        if let Some(colour) = EXTENSION_COLOURS.get(extension) {
-            return *colour;
+        if let Some(color) = EXTENSION_COLORS.get(extension) {
+            return *color;
         }
     }
 
-    default_file_colour()
+    default_file_color()
 }

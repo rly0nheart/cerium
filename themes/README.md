@@ -1,6 +1,6 @@
 # Cerium Themes
 
-Pre-made colour themes for Cerium. Each file is a complete, ready-to-use configuration.
+Pre-made color themes for Cerium. Each file is a complete, ready-to-use configuration.
 
 ## Available Themes
 
@@ -8,9 +8,9 @@ Pre-made colour themes for Cerium. Each file is a complete, ready-to-use configu
 |------------------------------------------------|-------------------------------------------------------|
 | [catppuccin-mocha.toml](catppuccin-mocha.toml)                   | Soothing pastel theme (default)                       |
 | [gruvbox.toml](gruvbox.toml)                            | Warm retro palette by Pavel Pertsev                   |
-| [dracula.toml](dracula.toml)                            | Dark theme with vibrant colours by Zeno Rocha         |
-| [nord.toml](nord.toml)                         | Arctic, bluish colour palette by Arctic Ice Studio    |
-| [solarized-dark.toml](solarized-dark.toml)                     | Precision colours by Ethan Schoonover                 |
+| [dracula.toml](dracula.toml)                            | Dark theme with vibrant colors by Zeno Rocha         |
+| [nord.toml](nord.toml)                         | Arctic, bluish color palette by Arctic Ice Studio    |
+| [solarized-dark.toml](solarized-dark.toml)                     | Precision colors by Ethan Schoonover                 |
 | [tokyo-night.toml](tokyo-night.toml)                        | Inspired by Downtown Tokyo at night                   |
 | [one-dark.toml](one-dark.toml)                           | Atom's iconic dark theme                              |
 | [rose-pine.toml](rose-pine.toml)                          | All natural pine with soho vibes                      |
@@ -28,7 +28,7 @@ cp themes/dracula.toml ~/.config/cerium.toml
 cat themes/dracula.toml > ~/.config/cerium.toml
 ```
 
-3. Run `ce` to see the new colours
+3. Run `ce` to see the new colors
 
 ## Switching Themes
 
@@ -45,7 +45,7 @@ Every key is **optional**. Anything you don't set keeps its built-in
 A config that exists but can't be parsed prints a non-fatal warning and uses
 the default; an individual unresolvable key uses its own default.
 
-A colour can be written four ways:
+A color can be written four ways:
 
 - **RGB table**: `{ r = 255, g = 128, b = 0 }`
 - **Hex**: `"#ff8000"`, `"#f80"`, or `"#ff8000ff"` (alpha ignored)
@@ -54,54 +54,59 @@ A colour can be written four ways:
 
 ### Palette layer
 
-Define base colours once in `[palette]`, then map semantic keys to them under
-`[colors]`:
+Define base colors once in `[palette]`, then reference them by name:
 
 ```toml
+header = "accent"
+
 [palette]
 accent  = "#89b4fa"
 surface = "#1e1e2e"
 fg      = "#cdd6f4"
 
-[colors]
-entry_directory = "accent"
-entry_symlink   = "accent"
-entry_file      = "fg"
-table_header    = "accent"
-# every other key -> Catppuccin Mocha default
+[filekind]
+directory = "accent"
+symlink   = "accent"
+normal    = "fg"
+# every other role -> Catppuccin Mocha default
 ```
 
-Semantic keys may also be placed at the top level, without the `[palette]`
-and `[colors]` tables (flat form).
+Unsectioned roles (`user`, `group`, `tree-edge`, `header`, `path`, `numeric`,
+`punctuation`, `summary`, `checksum`, `magic`, `mountpoint`) go at the top of
+the file, before the first section header.
 
-## Matugen (wallpaper-based colours)
+## Matugen (wallpaper-based colors)
 
 Cerium ships a [matugen](https://github.com/InioX/matugen) template so its
-colours can follow your wallpaper. See
+colors can follow your wallpaper. See
 [`matugen/README.md`](matugen/README.md) for setup.
 
 ## Contributing a Theme
 
 1. Create a new `.toml` file in this directory
 2. Use an existing theme as a template
-3. Update all colour values to match your palette
+3. Update all color values to match your palette
 4. Add a header comment with:
    - Theme name
    - Original author/source
-   - Link to the colour palette
+   - Link to the color palette
 
-## Colour Categories
+## Roles
 
-Each theme defines colours for:
+Role names follow the conventions used by [lsd](https://github.com/lsd-rs/lsd)
+(`permission`, `date`, `size`, `tree-edge`) and
+[eza](https://github.com/eza-community/eza) (`filekind`, `file_type`), so a
+palette ported from either tool maps across directly.
 
-- **Size gradients**: `size_bytes`, `size_kb`, `size_mb`, `size_gb`
-- **Date gradients**: `date_recent` through `date_old`
-- **Permissions**: `perm_read`, `perm_write`, `perm_execute`, etc.
-- **Entry types**: `entry_directory`, `entry_symlink`, `entry_file`
-- **Code files**: `code_rust`, `code_python`, `code_javascript`, etc.
-- **Web files**: `web_html`, `web_css`, `web_json`, `web_yaml`, `web_xml`
-- **Documents**: `doc_text`, `doc_markdown`, `doc_pdf`
-- **Media**: `media_image`, `media_video`, `media_audio`
-- **UI elements**: `tree_connector`, `table_header`, `path_display`, etc.
-- **Summary**: `summary`
-- **CLI help**: `cli_help_header`, `cli_help_usage`, etc.
+- `[size]`: `none`, `small`, `medium`, `large`
+- `[date]`: `minute-old`, `hour-old`, `day-old`, `week-old`, `month-old`, `older`
+- `[permission]`: `read`, `write`, `exec`, `no-access`, `exec-sticky`,
+  `filetype`, `acl`, `context`, `attribute`
+- `[filekind]`: `normal`, `directory`, `symlink`
+- `[file_type]`: `source`, `build`, `document`, `crypto`, `image`, `video`,
+  `music`, `compressed`, plus per-language refinements (`rust`, `python`,
+  `javascript`, `c`, `go`, `java`, `ruby`, `php`, `lua`, `html`, `css`,
+  `json`, `xml`, `yaml`, `markdown`, `pdf`, `text`)
+- Top level: `user`, `group`, `tree-edge`, `header`, `path`, `numeric`,
+  `punctuation`, `summary`, `checksum`, `magic`, `mountpoint`
+- `[cli_help]`: `header`, `usage`, `literal`, `placeholder`

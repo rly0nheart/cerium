@@ -1,26 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use std::ffi::CString;
 use std::io;
@@ -28,7 +6,9 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
 
 /// Minimal POSIX-like metadata struct loaded via `libc::lstat` or `libc::stat`.
-#[derive(Clone, Debug)]
+///
+/// [`Default`] gives the all-zero placeholder used when a stat call fails.
+#[derive(Clone, Debug, Default)]
 pub struct Metadata {
     pub mode: u32,
     pub size: u64,
@@ -80,26 +60,6 @@ impl Metadata {
                 mtime: st.st_mtime,
                 ctime: st.st_ctime,
             })
-        }
-    }
-
-    /// Creates a zeroed-out [`Metadata`] instance, useful as a default placeholder.
-    ///
-    /// # Returns
-    /// A [`Metadata`] with all fields set to `0`.
-    pub fn empty() -> Self {
-        Self {
-            mode: 0,
-            size: 0,
-            ino: 0,
-            nlink: 0,
-            uid: 0,
-            gid: 0,
-            blocks: 0,
-            blksize: 0,
-            atime: 0,
-            mtime: 0,
-            ctime: 0,
         }
     }
 }

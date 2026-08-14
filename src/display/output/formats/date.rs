@@ -1,95 +1,60 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use crate::cli::flags::DateFormat;
-use crate::display::output::formats::format::Format;
-use chrono::{DateTime, Local};
 use human::HumanRelative;
 use std::sync::Arc;
-use std::time::SystemTime;
+use std::time::{SystemTime, UNIX_EPOCH};
 
-impl Format<Option<SystemTime>> for Date {
-    /// Formats an optional [`SystemTime`] according to the configured date format.
-    fn format(&self, input: Option<SystemTime>) -> Arc<str> {
-        self.format_date(input)
+/// Formats a timestamp according to the selected [`DateFormat`].
+///
+/// # Parameters
+/// - `mode`: The display format to use.
+/// - `system_time`: The timestamp to format, or `None` when unavailable.
+pub(crate) fn format(mode: DateFormat, system_time: Option<SystemTime>) -> Arc<str> {
+    let Some(time) = system_time else {
+        return "-".into();
+    };
+
+    match mode {
+        DateFormat::Human => HumanRelative::new(time).to_string().into(),
+        DateFormat::Locale => locale(time),
+        DateFormat::Timestamp => match time.duration_since(UNIX_EPOCH) {
+            Ok(elapsed) => elapsed.as_secs().to_string().into(),
+            Err(_) => "-".into(),
+        },
     }
 }
 
-/// Formats timestamps according to the selected [`DateFormat`].
-pub(crate) struct Date {
-    date_format: DateFormat,
-}
+/// Formats a timestamp as local `%b %d %H:%M` via libc.
+///
+/// # Parameters
+/// - `time`: The timestamp to format.
+///
+/// # Returns
+/// The formatted date, or `"-"` if the time predates the epoch or libc rejects it.
+fn locale(time: SystemTime) -> Arc<str> {
+    let Ok(elapsed) = time.duration_since(UNIX_EPOCH) else {
+        return "-".into();
+    };
 
-impl Date {
-    /// Creates a new [`Date`] formatter.
-    ///
-    /// # Parameters
-    /// - `date_format`: The display format to use.
-    pub(crate) fn new(date_format: DateFormat) -> Self {
-        Self { date_format }
-    }
+    let seconds = elapsed.as_secs() as libc::time_t;
+    let mut parts: libc::tm = unsafe { std::mem::zeroed() };
+    let mut buffer = [0u8; 32];
 
-    /// Dispatches to the appropriate date formatting method.
-    ///
-    /// # Parameters
-    /// - `system_time`: The timestamp to format, or `None` for a placeholder.
-    fn format_date(&self, system_time: Option<SystemTime>) -> Arc<str> {
-        match self.date_format {
-            DateFormat::Human => match system_time {
-                Some(st) => self.humanised(st),
-                None => "-".into(),
-            },
-            DateFormat::Locale => Self::locale(system_time),
-            DateFormat::Timestamp => match system_time {
-                Some(st) => match st.duration_since(SystemTime::UNIX_EPOCH) {
-                    Ok(dur) => dur.as_secs().to_string().into(),
-                    Err(_) => "-".into(),
-                },
-                None => "-".into(),
-            },
+    let written = unsafe {
+        if libc::localtime_r(&seconds, &mut parts).is_null() {
+            return "-".into();
         }
-    }
+        libc::strftime(
+            buffer.as_mut_ptr() as *mut libc::c_char,
+            buffer.len(),
+            c"%b %d %H:%M".as_ptr(),
+            &parts,
+        )
+    };
 
-    /// Formats the timestamp as a human-readable relative duration.
-    ///
-    /// # Parameters
-    /// - `system_time`: The timestamp to format.
-    fn humanised(&self, system_time: SystemTime) -> Arc<str> {
-        Arc::from(HumanRelative::new(system_time).to_string())
-    }
-
-    /// Formats the timestamp using the locale date format.
-    ///
-    /// # Parameters
-    /// - `system_time`: The timestamp to format, or `None` for `"-"`.
-    fn locale(system_time: Option<SystemTime>) -> Arc<str> {
-        match system_time {
-            Some(st) => {
-                let datetime: DateTime<Local> = st.into();
-                datetime.format("%b %d %H:%M").to_string().into()
-            }
-            None => "-".into(),
-        }
+    match std::str::from_utf8(&buffer[..written]) {
+        Ok(formatted) => formatted.into(),
+        Err(_) => "-".into(),
     }
 }

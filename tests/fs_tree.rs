@@ -1,7 +1,7 @@
 mod common;
 
 use cerium::fs::entry::Entry;
-use cerium::fs::tree::{TreeBuilder, TreeNode};
+use cerium::fs::tree::{self, TreeNode};
 use common::default_args;
 use std::fs::{self, File};
 use tempfile::TempDir;
@@ -22,10 +22,9 @@ fn setup_test_dir() -> TempDir {
 #[test]
 fn test_tree_build() {
     let temp_dir = setup_test_dir();
-    let builder = TreeBuilder::new(temp_dir.path().to_path_buf());
     let args = default_args();
 
-    let tree = builder.build(&args);
+    let tree = tree::build(temp_dir.path().to_path_buf(), &args);
 
     assert!(tree.entry.is_dir());
     assert!(!tree.children.is_empty());
@@ -34,10 +33,9 @@ fn test_tree_build() {
 #[test]
 fn test_tree_nested() {
     let temp_dir = setup_test_dir();
-    let builder = TreeBuilder::new(temp_dir.path().to_path_buf());
     let args = default_args();
 
-    let tree = builder.build(&args);
+    let tree = tree::build(temp_dir.path().to_path_buf(), &args);
 
     let subdir = tree
         .children

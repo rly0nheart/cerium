@@ -1,26 +1,4 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 //! File search functionality using glob patterns.
 
@@ -88,6 +66,7 @@ impl Search {
 
         for mut entry in dir_reader.list(args) {
             let is_dir_like = entry.is_dir_like();
+            let path = entry.path().clone();
 
             // Check if entry matches (respecting --dirs/--files filters)
             let dominated_match = if (args.dirs && !is_dir_like) || (args.files && is_dir_like) {
@@ -98,7 +77,7 @@ impl Search {
 
             if dominated_match {
                 if args.verbose {
-                    println!("Match: {}", entry.path().display());
+                    println!("Match: {}", path.display());
                 }
 
                 entry.conditional_metadata(args);
@@ -107,13 +86,12 @@ impl Search {
                 let display_name = self.relative_display_name(&entry);
                 entry.set_name(display_name.into());
 
-                matches.push(entry.clone());
+                matches.push(entry);
             }
 
             // Recurse into subdirectories if -R flag is set
             if args.recursive && is_dir_like {
-                let subdir = DirReader::from(entry.path().clone());
-                self.search_dir(&subdir, args, matches);
+                self.search_dir(&DirReader::from(path), args, matches);
             }
         }
     }

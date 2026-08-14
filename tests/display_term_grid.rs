@@ -1,5 +1,5 @@
 use cerium::display::layout::alignment::Alignment;
-use cerium::display::layout::term_grid::{Cell, Direction, Filling, GridOptions, TermGrid};
+use cerium::display::layout::term_grid::{Cell, Direction, TermGrid};
 
 fn make_cell(contents: &str) -> Cell {
     Cell {
@@ -11,35 +11,25 @@ fn make_cell(contents: &str) -> Cell {
 
 #[test]
 fn test_empty_grid() {
-    let grid = TermGrid::new(GridOptions {
-        direction: Direction::TopToBottom,
-        filling: Filling::Spaces(2),
-    });
+    let grid = TermGrid::new(Direction::TopToBottom);
 
     let display = grid.fit_into_width(80);
-    assert!(display.is_some());
-    assert_eq!(display.unwrap().to_string(), "");
+    assert_eq!(display.to_string(), "");
 }
 
 #[test]
 fn test_single_cell() {
-    let mut grid = TermGrid::new(GridOptions {
-        direction: Direction::TopToBottom,
-        filling: Filling::Spaces(2),
-    });
+    let mut grid = TermGrid::new(Direction::TopToBottom);
 
     grid.add(make_cell("hello"));
 
-    let display = grid.fit_into_width(80).unwrap();
+    let display = grid.fit_into_width(80);
     assert_eq!(display.to_string(), "hello\n");
 }
 
 #[test]
 fn test_multiple_cells_top_to_bottom() {
-    let mut grid = TermGrid::new(GridOptions {
-        direction: Direction::TopToBottom,
-        filling: Filling::Spaces(2),
-    });
+    let mut grid = TermGrid::new(Direction::TopToBottom);
 
     grid.add(make_cell("a"));
     grid.add(make_cell("b"));
@@ -61,24 +51,19 @@ fn test_multiple_cells_top_to_bottom() {
 
 #[test]
 fn test_fit_into_width() {
-    let mut grid = TermGrid::new(GridOptions {
-        direction: Direction::LeftToRight,
-        filling: Filling::Spaces(2),
-    });
+    let mut grid = TermGrid::new(Direction::LeftToRight);
 
     // Add cells with varying widths
     grid.add(make_cell("short"));
     grid.add(make_cell("medium_len"));
     grid.add(make_cell("x"));
 
-    // With width 80, should fit multiple columns
-    let display = grid.fit_into_width(80);
-    assert!(display.is_some());
+    // With width 80, all three fit on one line
+    assert_eq!(grid.fit_into_width(80).to_string().lines().count(), 1);
 
     // With width 5, should only fit 1 column
     let display = grid.fit_into_width(5);
-    assert!(display.is_some());
-    let output = display.unwrap().to_string();
+    let output = display.to_string();
     // Each cell should be on its own line
     assert_eq!(output.lines().count(), 3);
 }

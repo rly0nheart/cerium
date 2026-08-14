@@ -1,32 +1,24 @@
 # Contributing to Cerium
 
-Thanks for your interest in contributing to Cerium! This guide will help you get started.
+## Getting started
 
----
-
-## Getting Started
-
-### Prerequisites
-
-- **Rust** (edition 2024) with `cargo`
-- **libmagic** (optional, for the `magic` feature) -- installed automatically by `make setup`
-- A terminal with [Nerd Font](https://www.nerdfonts.com/) support (for icon rendering)
-
-### Setup
+You need Rust (edition 2024) with `cargo`. The `magic` feature needs libmagic,
+which `make setup` installs. Icons need a terminal with a
+[Nerd Font](https://www.nerdfonts.com/).
 
 ```sh
 git clone https://codeberg.org/rly0nheart/cerium.git
 cd cerium
-make setup    # installs libmagic and generates the source map
+make setup    # installs libmagic
 make build    # release build
 make test     # run the test suite
 ```
 
-### Useful Make Targets
+The Makefile covers the rest:
 
 | Command         | Description                                      |
 |-----------------|--------------------------------------------------|
-| `make setup`    | Install dependencies and generate the source map |
+| `make setup`    | Install libmagic for the `magic` feature          |
 | `make build`    | Build the release binary                         |
 | `make run`      | Run cerium (pass args with `ARGS="..."`)         |
 | `make fmt`      | Format code with `cargo fmt`                     |
@@ -36,12 +28,9 @@ make test     # run the test suite
 | `make clean`    | Remove build artefacts                           |
 | `make rebuild`  | Clean and rebuild from scratch                   |
 
----
+## Architecture
 
-## Project Architecture
-
-Cerium is organised into three top-level modules. Refer to the
-[source map](src/README.md) for a full file-by-file breakdown.
+Three top-level modules:
 
 | Module     | Purpose                                            |
 |------------|----------------------------------------------------|
@@ -49,50 +38,38 @@ Cerium is organised into three top-level modules. Refer to the
 | `display/` | Output formatting, layout, styling, and theming    |
 | `fs/`      | Filesystem operations, metadata, and entry types   |
 
-### Feature Flags
+Two feature flags:
 
-| Feature    | What it enables                                              | External dependency |
-|------------|--------------------------------------------------------------|---------------------|
-| `magic`    | Content-based file type identification via libmagic          | `libmagic-dev`      |
-| `checksum` | File checksums (CRC32, MD5, SHA-224/256/384/512)             | None (pure Rust)    |
+| Feature    | What it enables                                     | External dependency |
+|------------|-----------------------------------------------------|---------------------|
+| `magic`    | Content-based file type identification via libmagic | `libmagic-dev`      |
+| `checksum` | File checksums (CRC32, MD5, SHA-224/256/384/512)    | None (pure Rust)    |
 
-When adding code that depends on a feature flag, gate it with `#[cfg(feature = "...")]`.
+Gate code that needs one behind `#[cfg(feature = "...")]`.
 
----
+## Code style
 
-## Code Style
+Give every struct, function, and module one job. If a function outgrows that,
+split it. Many small named functions beat one long one.
 
-### Single Responsibility Principle
+Cerium renders the same listing twice in some paths and once in others. Before
+you add work to a per-entry code path, check whether the value already exists.
+The width pass and the render pass share their results on purpose.
 
-Every struct, function, and module should have **one clear responsibility**. Before writing new code, ask:
+### Doc comments
 
-- Does this function do exactly one thing?
-- Could this struct be split into smaller, more focused types?
-- Does this module mix unrelated concerns?
+Every function, method, struct, enum, and trait needs a doc comment, public or
+private.
 
-If a function grows beyond a single responsibility, refactor it into smaller pieces. Prefer many small, well-named functions over fewer large ones.
-
-### Documentation (Doc Strings)
-
-**Every** public and private function, method, struct, enum, and trait **must** have doc comments. Here is a quick summary:
-
-#### Structs / Enums / Traits
-
-One-line summary describing what it represents:
+Structs, enums, and traits get a one-line summary of what they represent:
 
 ```rust
-/// Thread-safe caching layer for formatted display strings and computed values.
+/// Thread-local caching layer for formatted display strings and computed values.
 pub struct Cache;
 ```
 
-#### Functions / Methods
-
-Every function gets:
-
-1. **Summary line** -- one sentence starting with a verb (e.g., "Loads", "Builds", "Returns").
-2. **`# Parameters`** section -- if the method takes any parameters (excluding `&self`).
-   Use `- \`param\`: description` format.
-3. **`# Returns`** section -- unless the return value is trivially obvious (e.g., simple getters).
+Functions get a summary line starting with a verb, then `# Parameters` if they
+take any beyond `&self`, then `# Returns` unless the answer is obvious:
 
 ```rust
 /// Loads metadata for a path using a raw libc stat call.
@@ -106,25 +83,22 @@ Every function gets:
 pub fn load(path: &Path, dereference: bool) -> io::Result<Metadata> {}
 ```
 
-#### Formatting Rules
+The rules for those comments: use `///`, and `//!` only for module docs. Say
+`# Parameters`, not `# Arguments`. Say `# Returns`, not `# Return Value`. Put
+no blank line between the summary and `# Parameters`, and one blank line
+before `# Returns`. Use backticks for inline code and [`Type`] links for crate
+types. Skip `# Examples`, `# Errors`, and `# Panics`, and fold error
+behaviour into `# Returns`. Leave struct fields undocumented. Trivial getters
+get the summary line and nothing else.
 
-- Use `///` (not `//!` except for module-level docs).
-- Use `# Parameters` (not `# Arguments`).
-- Use `# Returns` (not `# Return Value`).
-- No blank line between the summary and `# Parameters`.
-- One blank line between `# Parameters` and `# Returns`.
-- Use backticks for inline code references and [`Type`] link syntax for crate types.
-- **Do not** add `# Examples`, `# Errors`, or `# Panics` sections -- fold error info into `# Returns`.
-- **Do not** add doc comments to individual struct fields.
-- **Trivial getters** get a one-line summary only, no `# Parameters` or `# Returns`.
+Do not write comments that argue with the reader or defend a choice. State
+what the code does, or why a non-obvious constraint exists, and stop.
 
-#### British English
-
-Use British English spellings in all doc comments:
+Spell in British English, with one exception: write `color`, not `colour`.
+That keeps the code matching the theme file keys, which follow lsd and eza.
 
 | American    | British      |
 |-------------|--------------|
-| color       | colour       |
 | behavior    | behaviour    |
 | initialize  | initialise   |
 | customize   | customise    |
@@ -134,17 +108,13 @@ Use British English spellings in all doc comments:
 | center      | centre       |
 | favor       | favour       |
 
----
+## Commit messages
 
-## Commit Messages
-
-This project uses **conventional commits**:
+Conventional commits:
 
 ```
 <type>(<scope>): <description>
 ```
-
-### Types
 
 | Type       | When to use                                          |
 |------------|------------------------------------------------------|
@@ -156,9 +126,7 @@ This project uses **conventional commits**:
 | `test`     | Adding or updating tests                             |
 | `style`    | Formatting, whitespace (no logic changes)            |
 
-### Scopes (optional)
-
-Use a scope when the change is limited to a specific area, e.g.:
+Add a scope when the change sits in one area:
 
 ```
 feat(tree): add collapsible node support
@@ -167,64 +135,46 @@ chore(ci): fix nightly build workflow
 docs(readme): update installation instructions
 ```
 
-Keep descriptions in lowercase, imperative mood, and concise.
-
----
+Keep descriptions lowercase, imperative, and short.
 
 ## Testing
 
-### Running Tests
+Run `make test`.
+
+Tests live in `tests/`, named `<module>_<topic>.rs`. `fs_entry.rs` covers
+`fs::entry`. `display_theme.rs` covers `display::theme`. `common/mod.rs` holds
+shared fixtures.
+
+Add a test for any new public function or behaviour change. Use `tempfile` for
+filesystem fixtures, already a dev dependency. Name tests after the scenario:
+`test_sort_by_extension`, `test_broken_symlink`.
+
+## Submitting changes
+
+Fork the repository on [Codeberg](https://codeberg.org/rly0nheart/cerium) and
+branch from `dev`. Write the code, document it, then run:
 
 ```sh
+make fmt
+make lint
 make test
 ```
 
-### Test Organisation
-
-Tests live in the `tests/` directory and follow the naming convention `<module>_<topic>.rs`:
-
-- `fs_entry.rs` -- tests for `fs::entry`
-- `display_theme.rs` -- tests for `display::theme`
-- `common/mod.rs` -- shared test helpers and fixtures
-
-### Writing Tests
-
-- Add tests for any new public function or behaviour change.
-- Use `tempfile` for temporary filesystem fixtures (already a dev dependency).
-- Test names should describe the scenario: `test_sort_by_extension`, `test_broken_symlink`.
-
----
-
-## Submitting Changes
-
-1. **Fork** the repository on [Codeberg](https://codeberg.org/rly0nheart/cerium).
-2. **Create a branch** from `dev` for your changes.
-3. **Write code** following the style guidelines above.
-4. **Add doc strings** to all new functions, structs, and traits.
-5. **Run the checks** before pushing:
-   ```sh
-   make fmt
-   make lint
-   make test
-   ```
-6. **Open a pull request** against the `dev` branch on Codeberg.
-
-> **Note:** The [GitHub mirror](https://github.com/rly0nheart/cerium) is read-only and used for crates.io deployments. Please submit all contributions on Codeberg.
-
----
+Open the pull request against `dev` on Codeberg. The
+[GitHub mirror](https://github.com/rly0nheart/cerium) is read-only and exists
+for crates.io deployments.
 
 ## Themes
 
-Cerium supports TOML-based themes in `~/.config/cerium.toml`. Pre-made themes are in the
-[`themes/`](themes) directory. See [`themes/README.md`](themes/README.md) for details on
-creating new themes.
-
----
+Themes are TOML files read from `~/.config/cerium.toml`. Bundled ones live in
+[`themes/`](themes). Role names follow lsd and eza.
+[`themes/README.md`](themes/README.md) lists every role and shows how to write
+a new theme.
 
 ## Versioning
 
-This project follows [Semantic Versioning](https://semver.org/) and uses the
-[Keep a Changelog](https://keepachangelog.com/) format for [`CHANGELOG.md`](CHANGELOG.md).
-
-When your change warrants a changelog entry, add it under the `[Unreleased]` section in the
-appropriate category: Added, Changed, Deprecated, Removed, Fixed, or Security.
+The project follows [Semantic Versioning](https://semver.org/) and keeps
+[`CHANGELOG.md`](CHANGELOG.md) in the
+[Keep a Changelog](https://keepachangelog.com/) format. If your change
+deserves an entry, add it under `[Unreleased]` in one of Added, Changed,
+Deprecated, Removed, Fixed, or Security.

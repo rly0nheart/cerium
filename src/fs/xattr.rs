@@ -1,103 +1,72 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use std::ffi::CString;
 use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
 use std::sync::Arc;
 
-/// Utilities for listing extended attributes on files via `listxattr`.
-pub struct Xattr;
+/// Reads a file's extended attribute names via a two-pass `listxattr` call.
+///
+/// The first call sizes the buffer, the second fills it with the
+/// null-terminated name list.
+///
+/// # Parameters
+/// - `path`: Path to the file to query.
+///
+/// # Returns
+/// The raw name list, empty if the file has no extended attributes or the
+/// path/call is unusable.
+pub(crate) fn list_names(path: &Path) -> Vec<u8> {
+    let Ok(path_c) = CString::new(path.as_os_str().as_bytes()) else {
+        return Vec::new();
+    };
 
-impl Xattr {
-    /// Lists extended attribute names for a file as a display string.
-    ///
-    /// # Parameters
-    /// - `path`: Path to the file to query.
-    ///
-    /// # Returns
-    /// A comma-separated list of xattr names (e.g. `"user.mime_type, security.selinux"`),
-    /// or `"-"` if the file has no extended attributes or an error occurs.
-    pub fn list(path: &Path) -> Arc<str> {
-        match Self::list_xattrs(path) {
-            Ok(attrs) if !attrs.is_empty() => attrs.join(", ").into(),
-            _ => "-".into(),
-        }
+    // First call to get size needed
+    let size = unsafe { libc::listxattr(path_c.as_ptr(), std::ptr::null_mut(), 0) };
+
+    if size <= 0 {
+        return Vec::new();
     }
 
-    /// Retrieves extended attribute names via a two-pass `listxattr` call.
-    ///
-    /// First call determines the buffer size, second call reads the
-    /// null-terminated attribute name list.
-    ///
-    /// # Parameters
-    /// - `path`: Path to the file to query.
-    ///
-    /// # Returns
-    /// `Ok(Vec<String>)` of attribute names (possibly empty), or `Err(())`
-    /// if the path contains a null byte or the libc call fails.
-    fn list_xattrs(path: &Path) -> Result<Vec<String>, ()> {
-        let path_c = CString::new(path.as_os_str().as_bytes()).map_err(|_| ())?;
+    // Second call to get actual data
+    let mut buffer = vec![0u8; size as usize];
+    // c_char is i8 on most platforms but u8 on Android
+    let read = unsafe {
+        libc::listxattr(
+            path_c.as_ptr(),
+            buffer.as_mut_ptr() as *mut libc::c_char,
+            size as usize,
+        )
+    };
 
-        // First call to get size needed
-        let size = unsafe { libc::listxattr(path_c.as_ptr(), std::ptr::null_mut(), 0) };
+    if read < 0 {
+        return Vec::new();
+    }
 
-        if size < 0 {
-            return Err(());
-        }
+    buffer.truncate(read as usize);
+    buffer
+}
 
-        if size == 0 {
-            return Ok(Vec::new());
-        }
+/// Lists extended attribute names for a file as a display string.
+///
+/// # Parameters
+/// - `path`: Path to the file to query.
+///
+/// # Returns
+/// A comma-separated list of xattr names (e.g. `"user.mime_type, security.selinux"`),
+/// or `"-"` if the file has no extended attributes or an error occurs.
+pub(crate) fn list(path: &Path) -> Arc<str> {
+    let names = list_names(path);
 
-        // Second call to get actual data
-        let mut buffer = vec![0u8; size as usize];
-        // c_char is i8 on most platforms but u8 on Android
-        let result = unsafe {
-            libc::listxattr(
-                path_c.as_ptr(),
-                buffer.as_mut_ptr() as *mut libc::c_char,
-                size as usize,
-            )
-        };
+    let attrs: Vec<&str> = names
+        .split(|&byte| byte == 0)
+        .filter(|name| !name.is_empty())
+        .filter_map(|name| std::str::from_utf8(name).ok())
+        .collect();
 
-        if result < 0 {
-            return Err(());
-        }
-
-        // Parse null-terminated attribute names
-        let mut attrs = Vec::new();
-        let mut start = 0;
-        for (i, &byte) in buffer.iter().enumerate() {
-            if byte == 0 && start < i {
-                if let Ok(name) = std::str::from_utf8(&buffer[start..i]) {
-                    attrs.push(name.to_string());
-                }
-                start = i + 1;
-            }
-        }
-
-        Ok(attrs)
+    if attrs.is_empty() {
+        "-".into()
+    } else {
+        attrs.join(", ").into()
     }
 }

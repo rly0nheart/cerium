@@ -1,7 +1,7 @@
 use cerium::fs::permissions::Permissions;
 use libc::{S_IFDIR, S_IFLNK, S_IFREG, S_ISGID, S_ISUID, S_ISVTX};
 use std::fs::File;
-use std::path::PathBuf;
+
 use tempfile::TempDir;
 
 #[test]
@@ -25,8 +25,7 @@ fn test_file_type_symlink() {
 #[test]
 fn test_permission_from_mode_644() {
     let mode = 0o644;
-    let path = PathBuf::from("/tmp");
-    let perm = Permissions::from_mode(mode, &path);
+    let perm = Permissions::from_mode(mode);
 
     assert!(perm.user_read);
     assert!(perm.user_write);
@@ -44,8 +43,7 @@ fn test_permission_from_mode_644() {
 #[test]
 fn test_permission_from_mode_755() {
     let mode = 0o755;
-    let path = PathBuf::from("/tmp");
-    let perm = Permissions::from_mode(mode, &path);
+    let perm = Permissions::from_mode(mode);
 
     assert!(perm.user_read);
     assert!(perm.user_write);
@@ -63,8 +61,7 @@ fn test_permission_from_mode_755() {
 #[test]
 fn test_permission_setuid() {
     let mode = S_ISUID | 0o755;
-    let path = PathBuf::from("/tmp");
-    let perm = Permissions::from_mode(mode, &path);
+    let perm = Permissions::from_mode(mode);
 
     assert!(perm.setuid);
     assert!(!perm.setgid);
@@ -74,8 +71,7 @@ fn test_permission_setuid() {
 #[test]
 fn test_permission_setgid() {
     let mode = S_ISGID | 0o755;
-    let path = PathBuf::from("/tmp");
-    let perm = Permissions::from_mode(mode, &path);
+    let perm = Permissions::from_mode(mode);
 
     assert!(!perm.setuid);
     assert!(perm.setgid);
@@ -85,8 +81,7 @@ fn test_permission_setgid() {
 #[test]
 fn test_permission_sticky() {
     let mode = S_ISVTX | 0o755;
-    let path = PathBuf::from("/tmp");
-    let perm = Permissions::from_mode(mode, &path);
+    let perm = Permissions::from_mode(mode);
 
     assert!(!perm.setuid);
     assert!(!perm.setgid);

@@ -1,36 +1,15 @@
-/*
-MIT License
-
-Copyright (c) 2025 Ritchie Mwewa
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+// SPDX-License-Identifier: MIT
 
 use crate::cli::args::Args;
 
 #[cfg(feature = "checksum")]
 use crate::cli::flags::HashAlgorithm;
 
-use crate::display::layout::alignment::{Align, Alignment};
-use crate::display::layout::width::Width;
+use crate::display::layout::alignment::{self, Alignment};
+use crate::display::layout::width;
+use crate::display::styles::column::ColumnStyle;
 use crate::display::styles::element::ElementStyle;
-use std::collections::HashMap;
+use crate::fs::entry::Entry;
 
 /// Identifies a data column in the tabular output.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -110,31 +89,137 @@ impl Column {
             _ => Alignment::Left,
         }
     }
+}
 
-    /// Prints styled column headers aligned to the given widths.
+/// A rendered cell: the styled text plus its display width, measured once.
+pub(crate) struct Cell {
+    text: String,
+    width: usize,
+}
+
+impl Cell {
+    /// Measures a styled string, pairing it with its display width.
     ///
     /// # Parameters
-    /// - `widths`: Pre-calculated column widths.
-    /// - `args`: Command-line arguments (checked for `headers` flag).
-    pub(crate) fn headers(widths: &HashMap<Column, usize>, args: &Args) {
-        if !args.headers {
-            return;
-        }
-        let columns = Selector::select(args);
-
-        let parts: Vec<String> = columns
-            .iter()
-            .map(|column| {
-                let style = ElementStyle::table_header(column.header());
-                let width = *widths
-                    .get(column)
-                    .unwrap_or(&Width::measure_ansi_text(column.header()));
-                Align::pad(&style, width, column.alignment())
-            })
-            .collect();
-
-        println!("{}", parts.join(" "));
+    /// - `text`: The styled cell text (may contain ANSI codes).
+    fn new(text: String) -> Self {
+        let width = width::measure(&text);
+        Self { text, width }
     }
+}
+
+/// Renders every column of one entry.
+///
+/// # Parameters
+/// - `entry`: The entry to render.
+/// - `columns`: The columns to display.
+/// - `args`: Command-line arguments controlling display options.
+/// - `add_alignment_space`: Whether to add a space for quote-alignment.
+pub(crate) fn render_row(
+    entry: &Entry,
+    columns: &[Column],
+    args: &Args,
+    add_alignment_space: bool,
+) -> Vec<Cell> {
+    columns
+        .iter()
+        .map(|column| Cell::new(ColumnStyle::get(entry, column, args, add_alignment_space)))
+        .collect()
+}
+
+/// Computes the width of each column from the rendered rows.
+///
+/// # Parameters
+/// - `columns`: The columns being displayed.
+/// - `rows`: The rendered rows to measure.
+/// - `headers`: Whether header labels must also fit.
+pub(crate) fn widths<'a>(
+    columns: &[Column],
+    rows: impl IntoIterator<Item = &'a [Cell]>,
+    headers: bool,
+) -> Vec<usize> {
+    let mut widths: Vec<usize> = columns
+        .iter()
+        .map(|column| {
+            if headers {
+                width::measure(column.header())
+            } else {
+                0
+            }
+        })
+        .collect();
+
+    for row in rows {
+        for (width, cell) in widths.iter_mut().zip(row) {
+            *width = (*width).max(cell.width);
+        }
+    }
+
+    widths
+}
+
+/// Renders one entry and measures it in a single pass, ready for [`widths`].
+///
+/// # Parameters
+/// - `entries`: The entries to render.
+/// - `columns`: The columns to display.
+/// - `args`: Command-line arguments controlling display options.
+/// - `add_alignment_space`: Whether to add a space for quote-alignment.
+pub(crate) fn render_rows(
+    entries: &[Entry],
+    columns: &[Column],
+    args: &Args,
+    add_alignment_space: bool,
+) -> Vec<Vec<Cell>> {
+    entries
+        .iter()
+        .map(|entry| render_row(entry, columns, args, add_alignment_space))
+        .collect()
+}
+
+/// Appends the styled, aligned header line.
+///
+/// # Parameters
+/// - `out`: The buffer to append to.
+/// - `columns`: The columns being displayed.
+/// - `widths`: Pre-calculated column widths.
+pub(crate) fn write_headers(out: &mut String, columns: &[Column], widths: &[usize]) {
+    let cells: Vec<Cell> = columns
+        .iter()
+        .map(|column| Cell::new(ElementStyle::table_header(column.header())))
+        .collect();
+
+    write_row(out, &cells, columns, widths);
+}
+
+/// Appends one aligned row, trimmed of trailing padding.
+///
+/// # Parameters
+/// - `out`: The buffer to append to.
+/// - `cells`: The rendered cells of this row.
+/// - `columns`: The columns being displayed (supplies alignment).
+/// - `widths`: Pre-calculated column widths.
+pub(crate) fn write_row(out: &mut String, cells: &[Cell], columns: &[Column], widths: &[usize]) {
+    out.push_str(row_text(cells, columns, widths).trim_end());
+    out.push('\n');
+}
+
+/// Joins one row's cells, each padded to its column width.
+///
+/// # Parameters
+/// - `cells`: The rendered cells of this row.
+/// - `columns`: The columns being displayed (supplies alignment).
+/// - `widths`: Pre-calculated column widths.
+pub(crate) fn row_text(cells: &[Cell], columns: &[Column], widths: &[usize]) -> String {
+    cells
+        .iter()
+        .zip(columns)
+        .zip(widths)
+        .map(|((cell, column), width)| {
+            alignment::pad(&cell.text, cell.width, *width, column.alignment())
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// Builds the ordered list of columns to display based on CLI arguments.
@@ -150,84 +235,60 @@ impl Selector {
     /// An ordered vector of [`Column`] variants to display.
     pub(crate) fn select(args: &Args) -> Vec<Column> {
         let mut columns = Vec::new();
-
-        if args.long {
-            for column in [
-                Column::Permissions,
-                Column::User,
-                Column::Group,
-                Column::Size,
-                Column::Modified,
-            ] {
-                if !columns.contains(&column) {
-                    columns.push(column);
-                }
+        let mut push = |wanted: bool, column: Column| {
+            if wanted && !columns.contains(&column) {
+                columns.push(column);
             }
-        }
+        };
 
-        if args.size && !columns.contains(&Column::Size) {
-            columns.push(Column::Size);
-        }
-        if args.permissions && !columns.contains(&Column::Permissions) {
-            columns.push(Column::Permissions);
-        }
-        if args.user && !columns.contains(&Column::User) {
-            columns.push(Column::User);
-        }
-        if args.group && !columns.contains(&Column::Group) {
-            columns.push(Column::Group);
+        // `--long` implies its own set, in this order, before any explicit flags.
+        push(args.long, Column::Permissions);
+        push(args.long, Column::User);
+        push(args.long, Column::Group);
+        push(args.long, Column::Size);
+        push(args.long, Column::Modified);
+
+        for (wanted, column) in [
+            (args.size, Column::Size),
+            (args.permissions, Column::Permissions),
+            (args.user, Column::User),
+            (args.group, Column::Group),
+        ] {
+            push(wanted, column);
         }
 
         #[cfg(all(feature = "magic", not(target_os = "android")))]
-        if args.magic && !columns.contains(&Column::Magic) {
-            columns.push(Column::Magic);
+        push(args.magic, Column::Magic);
+
+        #[cfg(feature = "checksum")]
+        if let Some(algo) = args.checksum {
+            push(true, Column::Checksum(algo));
+        }
+
+        for (wanted, column) in [
+            (args.xattr, Column::Xattr),
+            (args.acl, Column::Acl),
+            (args.context, Column::Context),
+            (args.mountpoint, Column::Mountpoint),
+            (args.inode, Column::Inode),
+            (args.blocks, Column::Blocks),
+            (args.hard_links, Column::HardLinks),
+            (args.block_size, Column::BlockSize),
+            (args.created, Column::Created),
+            (args.modified, Column::Modified),
+            (args.accessed, Column::Accessed),
+        ] {
+            push(wanted, column);
         }
 
         #[cfg(feature = "checksum")]
         if let Some(algo) = args.checksum {
-            let checksum_column = Column::Checksum(algo);
-            if !columns.contains(&checksum_column) {
-                columns.push(checksum_column);
-            }
+            push(true, Column::Checksum(algo));
         }
 
-        if args.xattr && !columns.contains(&Column::Xattr) {
-            columns.push(Column::Xattr);
-        }
-        if args.acl && !columns.contains(&Column::Acl) {
-            columns.push(Column::Acl);
-        }
-        if args.context && !columns.contains(&Column::Context) {
-            columns.push(Column::Context);
-        }
-        if args.mountpoint && !columns.contains(&Column::Mountpoint) {
-            columns.push(Column::Mountpoint);
-        }
-        if args.inode && !columns.contains(&Column::Inode) {
-            columns.push(Column::Inode);
-        }
-        if args.blocks && !columns.contains(&Column::Blocks) {
-            columns.push(Column::Blocks);
-        }
-        if args.hard_links && !columns.contains(&Column::HardLinks) {
-            columns.push(Column::HardLinks);
-        }
-        if args.block_size && !columns.contains(&Column::BlockSize) {
-            columns.push(Column::BlockSize);
-        }
-        if args.created && !columns.contains(&Column::Created) {
-            columns.push(Column::Created);
-        }
-        if args.modified && !columns.contains(&Column::Modified) {
-            columns.push(Column::Modified);
-        }
-        if args.accessed && !columns.contains(&Column::Accessed) {
-            columns.push(Column::Accessed);
-        }
-        // Name and Separator are always last if not tree
-        if !args.tree && !columns.contains(&Column::Name) {
-            columns.push(Column::Name);
-        }
+        // Name always comes last, and never in tree mode (the tree draws it itself).
+        push(!args.tree, Column::Name);
+
         columns
     }
 }

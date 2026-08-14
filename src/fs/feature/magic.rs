@@ -1,43 +1,24 @@
-#[cfg(all(feature = "magic", not(target_os = "android")))]
+// SPDX-License-Identifier: MIT
+
+//! Content-based file type identification via libmagic.
+
+#![cfg(all(feature = "magic", not(target_os = "android")))]
+
+use crate::fs::cache::Cache;
+use filemagic::Magic;
 use std::fs::read_link;
-
-#[cfg(all(feature = "magic", not(target_os = "android")))]
-use std::path::PathBuf;
-
-#[cfg(all(feature = "magic", not(target_os = "android")))]
+use std::path::Path;
 use std::sync::Arc;
 
-#[cfg(all(feature = "magic", not(target_os = "android")))]
-use crate::fs::cache::Cache;
-
-#[cfg(all(feature = "magic", not(target_os = "android")))]
-use filemagic::Magic as FileMagic;
-
-#[cfg(all(feature = "magic", not(target_os = "android")))]
-/// Truncates a string to include only content up to and including the second comma.
+/// Truncates libmagic output to the first two comma-separated segments.
 ///
-/// Primarily used to simplify libmagic output for display in tables,
-/// where file type descriptions can be excessively long but the first two segments
-/// usually contain the most relevant information.
+/// Descriptions run long, and the first two parts carry the useful bits.
 ///
 /// # Parameters
-///
-/// - `text`: The input string to truncate.
+/// - `text`: The description to truncate.
 ///
 /// # Returns
-///
-/// An `Arc<str>` containing the text up to the second comma (inclusive).
-/// If the input has fewer than two commas, the entire string is returned.
-///
-/// # Examples
-///
-/// ```text
-/// clip_2nd_comma("text/plain, ASCII text, with CRLF line terminators")
-/// // => "text/plain, ASCII text"
-///
-/// clip_2nd_comma("application/pdf")
-/// // => "application/pdf"
-/// ```
+/// The text up to the second comma, or all of it when it has fewer commas.
 fn clip_2nd_comma(text: String) -> Arc<str> {
     let mut parts = text.splitn(3, ',');
     let first = parts.next().unwrap_or("");
@@ -50,57 +31,45 @@ fn clip_2nd_comma(text: String) -> Arc<str> {
     }
 }
 
-#[cfg(all(feature = "magic", not(target_os = "android")))]
-/// Detects file types using `libmagic`.
-pub(crate) struct Magic;
+/// Returns the libmagic description for a path.
+///
+/// # Parameters
+/// - `path`: The file to identify.
+///
+/// # Returns
+/// A truncated description, or an empty string for directories.
+pub(crate) fn describe(path: &Path) -> Arc<str> {
+    if path.is_dir() {
+        return "".into();
+    }
 
-#[cfg(all(feature = "magic", not(target_os = "android")))]
-impl Magic {
-    /// Returns the `libmagic` file type description for a path.
-    ///
-    /// # Parameters
-    /// - `path`: The file to identify.
-    ///
-    /// # Returns
-    /// A truncated magic description, or an empty string for directories.
-    pub(crate) fn file(path: &PathBuf) -> Arc<str> {
-        if path.is_dir() {
-            return "".into();
+    if path.is_symlink() {
+        return format!("Symbolic link, to {:?}", read_link(path).unwrap_or_default()).into();
+    }
+
+    Cache::magic(path.to_path_buf(), |path| {
+        thread_local! {
+            static MAGIC: std::cell::RefCell<Option<Magic>> = const { std::cell::RefCell::new(None) };
         }
 
-        if path.is_symlink() {
-            return format!(
-                "Symbolic link, to {:?}",
-                read_link(path).unwrap_or_default()
-            )
-            .into();
-        }
+        MAGIC.with(|cell| {
+            let mut maybe_magic = cell.borrow_mut();
 
-        Cache::magic(path, || {
-            thread_local! {
-                static MAGIC: std::cell::RefCell<Option<FileMagic>> = const { std::cell::RefCell::new(None) };
+            if maybe_magic.is_none()
+                && let Ok(magic) = Magic::open(Default::default())
+            {
+                let _ = magic.load::<String>(&[]);
+                *maybe_magic = Some(magic);
             }
 
-            MAGIC.with(|cell| {
-                let mut maybe_magic = cell.borrow_mut();
-
-                if maybe_magic.is_none()
-                    && let Ok(magic) = FileMagic::open(Default::default())
-                {
-                    let _ = magic.load::<String>(&[]);
-                    *maybe_magic = Some(magic);
-                }
-
-                if let Some(magic) = maybe_magic.as_ref() {
-                    clip_2nd_comma(
-                        magic
-                            .file(path.to_str().unwrap_or_default())
-                            .unwrap_or_default(),
-                    )
-                } else {
-                    "Magic library unavailable".into()
-                }
-            })
+            match maybe_magic.as_ref() {
+                Some(magic) => clip_2nd_comma(
+                    magic
+                        .file(path.to_str().unwrap_or_default())
+                        .unwrap_or_default(),
+                ),
+                None => "Magic library unavailable".into(),
+            }
         })
-    }
+    })
 }

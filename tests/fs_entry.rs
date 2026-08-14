@@ -1,6 +1,6 @@
 mod common;
 
-use cerium::fs::entry::Entry;
+use cerium::fs::entry::{Entry, Kind};
 use cerium::fs::metadata::Metadata;
 use common::default_args;
 use std::fs::{self, File};
@@ -23,8 +23,8 @@ fn test_entry_new_regular_file() {
     assert_eq!(entry.path(), &file_path);
     assert!(!entry.is_dir());
     assert!(!entry.is_symlink());
-    assert!(entry.is_file());
-    assert_eq!(entry.extension().as_ref(), "txt");
+    assert_eq!(entry.kind, Kind::File);
+    assert_eq!(entry.extension(), "txt");
     assert!(entry.metadata().is_none());
 }
 
@@ -40,8 +40,8 @@ fn test_entry_new_directory() {
     assert_eq!(entry.path(), &dir_path);
     assert!(entry.is_dir());
     assert!(!entry.is_symlink());
-    assert!(!entry.is_file());
-    assert_eq!(entry.extension().as_ref(), "");
+    assert_ne!(entry.kind, Kind::File);
+    assert_eq!(entry.extension(), "");
 }
 
 #[test]
@@ -58,7 +58,7 @@ fn test_entry_new_symlink_without_target() {
     assert_eq!(entry.name().as_ref(), "link.txt");
     assert!(entry.is_symlink());
     assert!(!entry.is_dir());
-    assert!(!entry.is_file());
+    assert_ne!(entry.kind, Kind::File);
     // Name should not contain arrow when show_link_target is false
     assert!(!entry.name().contains("->"));
 }
@@ -108,7 +108,8 @@ fn test_broken_symlink() {
     let entry = Entry::from_path(link_path.clone(), false);
 
     assert!(entry.is_symlink());
-    assert!(entry.is_broken_symlink());
+    // "broken" means the target does not resolve
+    assert!(std::fs::metadata(entry.path()).is_err());
     assert!(!entry.is_dir_like());
 }
 
@@ -121,7 +122,7 @@ fn test_get_extension_lowercase() {
     let entry = Entry::from_path(file_path, false);
 
     // Extension should be lowercase
-    assert_eq!(entry.extension().as_ref(), "txt");
+    assert_eq!(entry.extension(), "txt");
 }
 
 #[test]
@@ -132,7 +133,7 @@ fn test_get_extension_no_extension() {
 
     let entry = Entry::from_path(file_path, false);
 
-    assert_eq!(entry.extension().as_ref(), "");
+    assert_eq!(entry.extension(), "");
 }
 
 #[test]
@@ -144,7 +145,7 @@ fn test_get_extension_multiple_dots() {
     let entry = Entry::from_path(file_path, false);
 
     // Should only get the last extension
-    assert_eq!(entry.extension().as_ref(), "gz");
+    assert_eq!(entry.extension(), "gz");
 }
 
 #[test]
@@ -156,7 +157,7 @@ fn test_get_extension_directory() {
     let entry = Entry::from_path(dir_path, false);
 
     // Directories should have empty extension
-    assert_eq!(entry.extension().as_ref(), "");
+    assert_eq!(entry.extension(), "");
 }
 
 #[test]
@@ -296,7 +297,7 @@ fn test_metadata_timestamps() {
 
 #[test]
 fn test_metadata_empty() {
-    let meta = Metadata::empty();
+    let meta = Metadata::default();
 
     assert_eq!(meta.mode, 0);
     assert_eq!(meta.size, 0);
@@ -399,7 +400,7 @@ fn test_entry_with_special_characters() {
     let entry = Entry::from_path(file_path, false);
 
     assert_eq!(entry.name().as_ref(), "file with spaces.txt");
-    assert_eq!(entry.extension().as_ref(), "txt");
+    assert_eq!(entry.extension(), "txt");
 }
 
 #[test]

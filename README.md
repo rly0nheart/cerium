@@ -2,37 +2,20 @@
 
 **A light `ls` alternative.**
 
-Cerium is a lightweight file listing tool inspired by lsd and eza. It focuses on
-staying small with minimal dependencies while doing what it's supposed to do...
-**list your files and directories**.
+Cerium lists files and directories. It borrows ideas from lsd and eza, and
+stays small: eight crates, plus four more only if you turn on the optional
+features.
 
 ## Table of Contents
 
 - [Availability](#availability)
 - [Development](#development)
 - [Installation](#installation)
-  - [Prebuilt Binary](#prebuilt-binary)
-  - [With Cargo](#with-cargo)
-  - [Build from Source](#build-from-source)
-- [Features (optional)](#features-optional)
-  - [Magic](#magic)
-  - [Checksum](#checksum)
+- [Optional features](#optional-features)
 - [Usage](#usage)
-  - [Display Options](#display-options)
-  - [Filtering](#filtering)
-  - [Metadata Display](#metadata-display)
-  - [Sorting & Traversal](#sorting--traversal)
-  - [Formatting](#formatting)
-  - [Appearance](#appearance)
 - [Examples](#examples)
-  - [Basic Operation](#basic-operations)
-  - [Metadata Inspection](#metadata-inspection)
-  - [Advanced Usage](#advanced-usage)
-  - [Combined Operations](#combined-operations)
 - [Themes](#themes)
-  - [Quick Start](#quick-start)
-  - [Available Themes](#available-themes)
-- [License](#licence)
+- [Licence](#licence)
 
 ## Availability
 
@@ -46,19 +29,19 @@ staying small with minimal dependencies while doing what it's supposed to do...
 ## Development
 
 Development happens on [Codeberg](https://codeberg.org/rly0nheart/cerium). The
-[GitHub repository](https://github.com/rly0nheart/cerium) is a read-only mirror
-used solely for crates.io deployments. Issues should be opened on either GitHub
-or Codeberg, but pull requests should be opened only on Codeberg.
+[GitHub repository](https://github.com/rly0nheart/cerium) mirrors it read-only
+for crates.io deployments. Open issues on either host. Open pull requests on
+Codeberg.
 
 ## Installation
 
-### Prebuilt Binary
+### Prebuilt binary
 
 ```bash
 curl -fsSL https://codeberg.org/rly0nheart/cerium/raw/branch/master/scripts/install.sh | sh
 ```
 
-**Options:**
+The installer takes three options:
 
 |        Option        |                      Description                       |
 |:--------------------:|:------------------------------------------------------:|
@@ -67,7 +50,9 @@ curl -fsSL https://codeberg.org/rly0nheart/cerium/raw/branch/master/scripts/inst
 | `--features <value>` | Feature variant to install: `checksum`, `magic`, `all` |
 
 > [!NOTE]
-> The `magic` and `all` variants require libmagic at runtime, which the installer will attempt to install automatically. Without `--features`, a no-dependency binary is installed.
+> The `magic` and `all` variants need libmagic at runtime. The installer tries
+> to install it for you. Without `--features` you get a binary with no
+> external dependencies.
 
 ```bash
 # Nightly build
@@ -76,58 +61,49 @@ curl -fsSL .../install.sh | bash -s -- --nightly
 # Custom install directory
 curl -fsSL .../install.sh | bash -s -- --dir ~/.local/bin
 
-# Install with checksum support
+# With checksum support
 curl -fsSL .../install.sh | bash -s -- --features checksum
 
-# Install with all features (requires libmagic for the filemagic feature)
+# With every feature (needs libmagic)
 curl -fsSL .../install.sh | bash -s -- --features all
 ```
 
 ### With Cargo
 
 ```shell
-# Standard installation with all features
+# Everything
 cargo install cerium --all-features
 
-# Minimal installation
+# Nothing optional
 cargo install cerium
 
-# Specific features
+# Pick one
 cargo install cerium --features magic
 cargo install cerium --features checksum
 ```
 
-### Build from Source
+### From source
 
 ```bash
-# Clone the repo
 git clone https://codeberg.org/rly0nheart/cerium.git
-
-# Move to cerium directory
 cd cerium
-
-# Build and install: This will build cerium with all its features
 make install
 ```
 
-## Features (optional)
+`make install` builds with all features.
 
-### Magic
+## Optional features
 
-Content-based file type identification using libmagic. Shows actual file types
-regardless of extension.
-
-**Requirements:** libmagic library (`scripts/libmagic.sh`)
+`magic` reads the start of each file and names its type, so a mislabelled
+`.txt` still shows up as a PNG. It needs the libmagic library, which
+`scripts/libmagic.sh` installs.
 
 ```bash
 ce --magic
 ```
 
-### Checksum
-
-Calculate file checksums with multiple algorithms.
-
-**Supported:** `crc32`, `md5`, `sha224`, `sha256`, `sha384`, `sha512`
+`checksum` hashes each file. It supports `crc32`, `md5`, `sha224`, `sha256`,
+`sha384`, and `sha512`, and pulls in no C libraries.
 
 ```bash
 ce --checksum sha256
@@ -139,13 +115,17 @@ ce --checksum sha256
 ce [OPTIONS] [PATH]
 ```
 
-### Display Options
+### Display
 
 ```bash
 -1, --oneline          One entry per line
 -l, --long             Long format (permissions, user, group, size, modified)
 -t, --tree             Tree view
--H, --column-headers   Show column headers
+-H, --headers          Show column headers
+-w, --width <COLS>     Output width (0 removes the limit)
+-F, --classify         Append an indicator (one of */=@|) to names
+--file-type            Like --classify, but no '*' on executables
+--slash                Append / to directories
 ```
 
 ### Filtering
@@ -154,15 +134,15 @@ ce [OPTIONS] [PATH]
 -a, --all              Include hidden entries
 -d, --dirs             Directories only
 -f, --files            Files only
---find <QUERY>         Search for entries that match a query
---hide <ENTRIES>       Exclude specific entries (comma-separated)
---prune                Omit empty directories
+--find <QUERY>         Show entries matching a glob
+--hide <ENTRIES>       Drop entries matching these globs (comma-separated)
+--prune                Drop empty files and directories
 ```
 
-### Metadata Display
+### Metadata
 
 ```bash
--p, --permission       File permissions
+-p, --permissions      File permissions
 -u, --user             Owner
 -g, --group            Group
 -s, --size             File size
@@ -171,19 +151,22 @@ ce [OPTIONS] [PATH]
 --accessed             Access time
 -i, --inode            Inode number
 -b, --blocks           Block count
+-B, --block-size       Block size
 --hard-links           Hard link count
 --acl                  ACL indicator
 -x, --xattr            Extended attributes
+-Z, --context          SELinux context
 --mountpoint           Mount point
+-L, --dereference      Report on a symlink's target, not the link
 ```
 
-### Sorting & Traversal
+### Sorting and traversal
 
 ```bash
 --sort <BY>            name, size, created, accessed, modified, extension, inode
 -r, --reverse          Reverse order
 -R, --recursive        Recurse into subdirectories
--S, --dir-size         Show recursive byte size of directories instead of item count
+-S, --dir-size         Size column shows recursive bytes, not item count
 ```
 
 ### Formatting
@@ -199,76 +182,77 @@ ce [OPTIONS] [PATH]
 ### Appearance
 
 ```bash
--C, --colo[u]rs <WHEN>   always, auto, never
+-C, --color <WHEN>       always, auto, never
 -I, --icons <WHEN>       always, auto, never
--Q, --quote-name         auto, double, single, never
+--hyperlink <WHEN>       always, auto, never
+-q, --quote-name <HOW>   auto, double, single, never
 ```
+
+`--color` also answers to `--colour`, `--colors`, and `--colours`.
 
 ## Examples
 
-### Basic Operations
+Everyday listings:
 
 ```bash
 ce -la                                    # Long format, all files
 ce -t                                     # Tree view
 ce -lt --icons=always                     # Tree with metadata and icons
-ce --find=*.rs --sort=size -r             # Find Rust files, sort by size
+ce --find='*.rs' --sort=size -r           # Rust files, largest first
 ```
 
-### Metadata Inspection
+Looking at metadata:
 
 ```bash
-ce -pugm --date-format=human              # Permissions, ownership, modified date, human dates
+ce -pugm --date-format=human              # Permissions, owner, group, relative dates
 ce -i --hard-links --sort=inode           # Inodes and hard links
 ce --acl -x                               # ACLs and extended attributes
 ce -lb --block-size                       # Block usage
 ```
 
-### Advanced Usage
+Less common flags:
 
 ```bash
-ce --magic --checksum sha256              # Type detection + checksums
-ce -RS --dir-size                         # Recursive with directory byte totals
-ce --hide=target,node_modules -t          # Tree excluding build artifacts
+ce --magic --checksum sha256              # Type detection and checksums
+ce -RS                                    # Recurse, with directory byte totals
+ce --hide=target,node_modules -t          # Tree without build output
 ce --permission-format=octal -p           # Octal permissions
-ce --ownership-format=id -ug              # Numeric UIDs/GIDs
+ce --ownership-format=id -ug              # Numeric UIDs and GIDs
 ```
 
-### Combined Operations
+Several at once:
 
 ```bash
 ce -laH --date-format=human --size-format=binary
-ce --find=.pdf --checksum md5 --sort=modified -r
+ce --find='*.pdf' --checksum md5 --sort=modified -r
 ce -t --prune --hide=.git,target --icons=always
 ```
 
 ## Themes
 
-Cerium supports customisable themes via a TOML configuration file
-(`~/.config/cerium.toml`). By default, it uses the Catppuccin Mocha palette.
+Cerium reads a TOML theme from `~/.config/cerium.toml`. Without one it uses
+Catppuccin Mocha.
 
-Every key is optional and falls back per-field to the default, so a config can
-override just a few colours. Colours accept RGB tables, hex strings, named
-colours, or references into an optional `[palette]` table. A
-[matugen](https://github.com/InioX/matugen) template is included so colours can
-follow your wallpaper.
+Every role is optional. Anything you leave out keeps its default, so a config
+can be one line. Values can be RGB tables, hex strings, named colors, or
+references into a `[palette]` table you define. A
+[matugen](https://github.com/InioX/matugen) template ships with the repo if you
+want colors to track your wallpaper.
 
-### Quick Start
+Role names follow lsd (`permission`, `date`, `size`, `tree-edge`) and eza
+(`filekind`, `file_type`), so a palette from either tool maps across.
 
 ```bash
-# Apply a pre-made theme
+# Use a theme as-is
 cp themes/dracula.toml ~/.config/cerium.toml
 
-# Or override just one colour
-echo 'entry_directory = "#89b4fa"' > ~/.config/cerium.toml
+# Or change one role
+printf '[filekind]\ndirectory = "#89b4fa"\n' > ~/.config/cerium.toml
 ```
 
-### Available Themes
-
-See [`themes/README.md`](themes/README.md) for the full list of pre-made themes,
-installation instructions, and customisation guide.
+[`themes/README.md`](themes/README.md) lists the bundled themes and every role
+you can set.
 
 ## Licence
 
-MIT Licence. See [choosealicense](https://choosealicense.com/licenses/mit/) for
-more details.
+MIT Licence. See [choosealicense](https://choosealicense.com/licenses/mit/).
