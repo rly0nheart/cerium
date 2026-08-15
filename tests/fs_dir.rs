@@ -92,7 +92,7 @@ fn test_hide_entries() {
     let temp_dir = setup_test_dir();
     let dir_reader = DirReader::from(temp_dir.path().to_path_buf());
     let mut args = default_args();
-    args.hide = vec!["file1.txt".to_string(), "subdir".to_string()];
+    args.ignore = vec!["file1.txt".to_string(), "subdir".to_string()];
 
     let entries = dir_reader.list(&args);
 
@@ -215,4 +215,53 @@ fn test_list_special_file_types() {
     // Should return exactly 1 entry (the socket itself)
     assert_eq!(entries.len(), 1, "Special file types should be listed");
     assert_eq!(entries[0].name().as_ref(), "test.sock");
+}
+
+/// Returns the locale governing collation, following POSIX precedence.
+fn collation_locale() -> String {
+    for name in ["LC_ALL", "LC_COLLATE", "LANG"] {
+        if let Ok(value) = std::env::var(name)
+            && !value.is_empty()
+        {
+            return value;
+        }
+    }
+
+    // No locale set means the "C" default.
+    "C".to_string()
+}
+
+/// Reports whether the active locale sorts by byte value rather than by a
+/// collation table. Charset and modifier suffixes do not change the answer,
+/// so `C.UTF-8` counts the same as `C`.
+fn collates_by_byte() -> bool {
+    let locale = collation_locale();
+    let base = locale.split(['.', '@']).next().unwrap_or("C").to_string();
+
+    base == "C" || base == "POSIX"
+}
+
+#[test]
+fn test_name_sort_uses_locale_collation() {
+    let temp_dir = TempDir::new().unwrap();
+    for name in ["data.txt", "Database", "note.md", "Notebook"] {
+        std::fs::File::create(temp_dir.path().join(name)).unwrap();
+    }
+
+    let dir_reader = DirReader::from(temp_dir.path().to_path_buf());
+    let entries = dir_reader.list(&default_args());
+    let names: Vec<_> = entries.iter().map(|e| e.name().to_string()).collect();
+
+    // "C" and "C.UTF-8" carry no collation table and sort by byte value, so
+    // every capital lands before every lowercase letter. A locale with a table
+    // ignores case and punctuation first, pairing each name with its relative.
+    let expected: [&str; 4] = if collates_by_byte() {
+        ["Database", "Notebook", "data.txt", "note.md"]
+    } else {
+        ["Database", "data.txt", "Notebook", "note.md"]
+    };
+
+    // Sorting on lowercased bytes, as this once did, gives neither order: it
+    // would return "data.txt" first in both cases.
+    assert_eq!(names, expected, "locale: {}", collation_locale());
 }

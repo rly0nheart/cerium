@@ -63,7 +63,7 @@ jobs:
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo test --all-features
 
-      # Build release binaries (all 4 feature variants)
+      # Build release binaries (both feature variants)
       - name: Build minimal binary
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo build --release --target x86_64-unknown-linux-gnu
@@ -72,14 +72,6 @@ jobs:
         if: steps.check_crates.outputs.publish == 'true'
         run: cp target/x86_64-unknown-linux-gnu/release/ce /tmp/ce-minimal
 
-      - name: Build checksum binary
-        if: steps.check_crates.outputs.publish == 'true'
-        run: cargo build --release --features checksum --target x86_64-unknown-linux-gnu
-
-      - name: Prepare checksum artifact
-        if: steps.check_crates.outputs.publish == 'true'
-        run: cp target/x86_64-unknown-linux-gnu/release/ce /tmp/ce-checksum
-
       - name: Build magic binary
         if: steps.check_crates.outputs.publish == 'true'
         run: cargo build --release --features magic --target x86_64-unknown-linux-gnu
@@ -87,10 +79,6 @@ jobs:
       - name: Prepare magic artifact
         if: steps.check_crates.outputs.publish == 'true'
         run: cp target/x86_64-unknown-linux-gnu/release/ce /tmp/ce-magic
-
-      - name: Build all-features binary
-        if: steps.check_crates.outputs.publish == 'true'
-        run: cargo build --release --all-features --target x86_64-unknown-linux-gnu
 
       # Extract changelog for this version
       - name: Extract changelog
@@ -146,9 +134,7 @@ jobs:
         run: |
           mkdir -p release
           cp /tmp/ce-minimal release/ce-linux-x86_64
-          cp /tmp/ce-checksum release/ce-linux-x86_64-checksum
           cp /tmp/ce-magic release/ce-linux-x86_64-magic
-          cp target/x86_64-unknown-linux-gnu/release/ce release/ce-linux-x86_64-all
 
       # Create GitHub release with binary
       - name: Create GitHub release

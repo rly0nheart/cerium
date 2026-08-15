@@ -35,7 +35,7 @@ usage() {
     echo "Options:"
     echo "  --nightly            Install the latest nightly build instead of stable"
     echo "  --dir <path>         Installation directory (default: /usr/local/bin)"
-    echo "  --features <value>   Feature variant to install: checksum, magic, all"
+    echo "  --features <value>   Feature variant to install: magic"
     echo "  -h, --help           Show this help message"
 }
 
@@ -52,10 +52,10 @@ done
 # Validate features value
 if [ -n "$FEATURES" ]; then
     case "$FEATURES" in
-        checksum|magic|all) ;;
+        magic) ;;
         *)
             echo "error: invalid --features value: ${FEATURES}"
-            echo "valid values: checksum, magic, all"
+            echo "valid values: magic"
             exit 1
             ;;
     esac
@@ -211,7 +211,7 @@ sys.exit(1)
     DOWNLOAD_URL=""
     for prefix in "$BIN_NAME" "cerium"; do
         ASSET_PATTERN="${prefix}-${OS}-${ARCH}${ASSET_SUFFIX}"
-        # Use exact match (end of URL) to avoid e.g. ce-linux-x86_64 matching ce-linux-x86_64-checksum
+        # Use exact match (end of URL) to avoid e.g. ce-linux-x86_64 matching ce-linux-x86_64-magic
         DOWNLOAD_URL=$(echo "$RELEASE_JSON" | grep -o "\"browser_download_url\": *\"[^\"]*/${ASSET_PATTERN}\"" | head -1 | grep -o 'https://[^"]*') || true
 
         if [ -n "$DOWNLOAD_URL" ]; then
@@ -241,7 +241,7 @@ sys.exit(1)
     echo "* download complete"
 
     # Install libmagic runtime when needed (non-fatal)
-    if [ "$FEATURES" = "magic" ] || [ "$FEATURES" = "all" ]; then
+    if [ "$FEATURES" = "magic" ]; then
         install_libmagic || echo "warning: libmagic not installed; file type detection (--magic) will not work"
     fi
 

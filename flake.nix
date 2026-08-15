@@ -21,7 +21,7 @@
           nativeBuildInputs = [ pkg-config ];
           buildInputs = [ file ];
 
-          buildFeatures = [ "magic" "checksum" ];
+          buildFeatures = [ "magic" ];
 
           # wcwidth reads the locale, so the width tests need a UTF-8 one.
           preCheck = ''

@@ -99,14 +99,3 @@ pub enum QuoteStyle {
     Never,
 }
 
-#[cfg(feature = "checksum")]
-/// Hash algorithm selection for checksum computation
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ValueEnum)]
-pub enum HashAlgorithm {
-    Crc32,
-    Md5,
-    Sha224,
-    Sha256,
-    Sha384,
-    Sha512,
-}

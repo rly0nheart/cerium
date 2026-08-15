@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pub mod cli;
-pub mod display;
+pub mod render;
 pub mod fs;
 
 use std::env;

@@ -4,10 +4,12 @@ use crate::cli::args::Args;
 use crate::cli::flags::SortBy;
 use crate::fs::entry::Entry;
 use crate::fs::glob::Glob;
-use std::ffi::OsStr;
+use std::ffi::{CString, OsStr};
 use std::fs;
 use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
+use std::ptr;
+use std::sync::Once;
 
 /// Reports whether a filename is hidden (dot-prefixed), without allocating.
 ///
@@ -15,6 +17,37 @@ use std::path::{Path, PathBuf};
 /// - `name`: The filename to inspect.
 fn is_hidden(name: &OsStr) -> bool {
     name.as_bytes().first() == Some(&b'.')
+}
+
+/// Transforms a name into a byte key that orders by the locale's collation table.
+///
+/// # Parameters
+/// - `name`: The filename to transform.
+///
+/// # Returns
+/// A key that orders identically to `strcoll`, or the raw bytes if `name`
+/// contains an interior NUL and cannot be handed to libc.
+fn collation_key(name: &str) -> Vec<u8> {
+    // strxfrm reads the locale set by setlocale; without this it stays in the
+    // "C" locale and yields plain byte ordering.
+    static LOCALE: Once = Once::new();
+    LOCALE.call_once(|| unsafe {
+        // Empty string means inherit from environment (LANG, LC_COLLATE, etc.)
+        libc::setlocale(libc::LC_COLLATE, c"".as_ptr());
+    });
+
+    let Ok(source) = CString::new(name) else {
+        return name.as_bytes().to_vec();
+    };
+
+    // Called with a null destination, strxfrm returns the length it needs.
+    let len = unsafe { libc::strxfrm(ptr::null_mut(), source.as_ptr(), 0) };
+
+    let mut key = vec![0u8; len + 1];
+    unsafe { libc::strxfrm(key.as_mut_ptr().cast(), source.as_ptr(), len + 1) };
+    key.truncate(len); // drop the trailing NUL so it cannot skew comparisons
+
+    key
 }
 
 /// Reads and lists directory contents, applying filtering, hiding, and sorting
@@ -85,8 +118,8 @@ impl DirReader {
                 entries.push(entry);
             }
 
-            if !args.hide.is_empty() {
-                self.hide_entries(&mut entries, &args.hide, args.verbose);
+            if !args.ignore.is_empty() {
+                self.hide_entries(&mut entries, &args.ignore, args.verbose);
             }
         } else if fs::symlink_metadata(&self.path).is_ok() {
             // lstat() handles all file types including broken symlinks
@@ -247,10 +280,10 @@ impl DirReader {
                 entries.sort_by_key(|entry| entry.metadata().map(|m| m.ino).unwrap_or(0));
             }
             SortBy::Extension => {
-                entries.sort_by_cached_key(|entry| entry.extension().to_lowercase());
+                entries.sort_by_cached_key(|entry| collation_key(entry.extension()));
             }
             SortBy::Name => {
-                entries.sort_by_cached_key(|entry| entry.name().to_lowercase());
+                entries.sort_by_cached_key(|entry| collation_key(entry.name()));
             }
         }
 

@@ -5,8 +5,6 @@ use crate::cli::flags::{
     ShowColor, ShowHyperlink, ShowIcons, SizeFormat, SortBy,
 };
 
-#[cfg(feature = "checksum")]
-use crate::cli::flags::HashAlgorithm;
 
 use clap::{Parser, ValueHint};
 use std::path::PathBuf;
@@ -78,7 +76,7 @@ pub struct Args {
 
     /// Omit (a comma-separated list of) implied entries from output
     #[arg(long, value_name = "ENTRIES", value_delimiter = ',')]
-    pub hide: Vec<String>,
+    pub ignore: Vec<String>,
 
     /// Hyperlink entry names WHEN
     #[arg(long, value_enum, default_value = "never", value_name = "WHEN")]
@@ -187,11 +185,6 @@ pub struct Args {
     )]
     pub icons: ShowIcons,
 
-    #[cfg(feature = "checksum")]
-    /// Checksum!
-    #[arg(long, value_name = "ALGORITHM", help_heading = "Features")]
-    pub checksum: Option<HashAlgorithm>,
-
     #[cfg(all(feature = "magic", not(target_os = "android")))]
     /// File magic type
     #[arg(long, help_heading = "Features")]
@@ -233,21 +226,14 @@ impl Args {
     /// Checks if any table-specific columns are requested.
     ///
     /// # Returns
-    /// `true` if any table-only columns (magic, checksum, xattr, acl, context, mountpoint, or oneline) are requested.
+    /// `true` if any table-only columns (magic, xattr, acl, context, mountpoint, or oneline) are requested.
     pub(crate) fn wants_table_column(&self) -> bool {
         #[cfg(all(feature = "magic", not(target_os = "android")))]
         let magic = self.magic;
         #[cfg(any(not(feature = "magic"), target_os = "android"))]
         let magic = false;
 
-        #[cfg(feature = "checksum")]
-        let checksum = self.checksum.is_some();
-
-        #[cfg(not(feature = "checksum"))]
-        let checksum = false;
-
         magic
-            || checksum
             || self.xattr
             || self.acl
             || self.context

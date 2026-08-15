@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 
 use cerium::cli::args::Args;
-use cerium::display::factory;
-use cerium::display::styles::cli_help;
-use cerium::display::theme::colors;
-use cerium::display::theme::config;
-use cerium::display::theme::icons;
+use cerium::render;
+use cerium::render::style::cli_help;
+use cerium::render::theme::colors;
+use cerium::render::theme::config;
+use cerium::render::theme::icons;
 use cerium::fs::dir::DirReader;
 use cerium::fs::hyperlink;
 use clap::{CommandFactory, FromArgMatches};
 use std::process;
 
-/// Parses CLI arguments, validates the target directory, and invokes the appropriate display mode.
+/// Parses CLI arguments, validates the target directory, and invokes the appropriate renderer.
 fn main() {
     // Load theme from config file (or use built-in Gruvbox) BEFORE parsing args
     let theme = config::load_theme();
@@ -43,7 +43,7 @@ fn main() {
         process::exit(1);
     }
 
-    // Use the factory to create the appropriate display mode
-    let display = factory::create(&dir_reader, args);
-    display.print();
+    // Create the appropriate renderer for the requested output mode
+    let renderer = render::create(&dir_reader, args);
+    renderer.show();
 }

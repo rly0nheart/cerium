@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 use crate::cli::flags::ShowHyperlink;
-use crate::display::output::terminal::is_tty;
-use crate::display::output::toggle::Toggle;
+use crate::render::output::terminal::is_tty;
+use crate::render::output::toggle::Toggle;
 use std::path::Path;
 
 static HYPERLINKS: Toggle = Toggle::new(false);

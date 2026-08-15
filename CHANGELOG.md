@@ -19,6 +19,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
+## [0.4.0] - 2026-08-15
+
+### Changed
+- `src/display/` is now `src/render/`. The module already used `render_*` names
+  throughout, and `render` does not collide with `fmt::Display`. Inside it,
+  `styles/` is now `style/` and `output/formats/` is now `output/format/`.
+- `DisplayMode` is now `Renderer`. It sits in `render`, not `render::mode`.
+- `render::factory::create` is now `render::create`.
+- The vendored `term_grid` copy was four files. `GridCell`, `GridLayout` and
+  `GridDisplay` now sit in `render::grid`, next to their only caller.
+- `layout::unicode_width::char_width` moved into `layout::width`. That module
+  measures text and nothing else now. `width::terminal()` became
+  `output::terminal::width()`.
+- `Grid` and `List` were one type with one differing method. They repeated
+  their fields, constructor and three trait impls. `render::listing::Listing`
+  replaces both and picks between `Mode::Grid` and `Mode::Long`.
+  `render::grid` now holds the cell packing alone.
+- Tree connectors use literals such as `"├── "` in place of
+  `\u{251C}\u{2500}\u{2500}\u{0020}`. Output is unchanged.
+- `fs::glob` matches with `fnmatch` instead of rewriting globs as POSIX regex.
+  Character classes such as `[abc]` now work, as they do in the shell.
+- `fs::mountpoint` reads the mount table with `setmntent` and `getmntent`.
+  libc unescapes the paths, so the octal decoder is gone.
+
+### Removed
+- The `checksum` feature and the `--checksum` flag. The `md5`, `sha2` and
+  `crc32fast` dependencies go with them, leaving `magic` as the only feature.
+  The `checksum` theme role stays. It colours files that are checksums, such as
+  `.md5` and `.sha256`, and never depended on the feature.
+- The `all` installer variant. `install.sh --features all` now fails. Use
+  `--features magic`. Releases ship two binaries, `ce-linux-x86_64` and
+  `ce-linux-x86_64-magic`. The `-checksum` and `-all` assets are gone.
+- `Direction` in the grid layout. Nothing ever built anything but
+  `TopToBottom`. The enum, its field on `GridLayout` and `GridDisplay`, and the
+  two branches it guarded are gone. `GridLayout::new()` takes no argument.
+
+### Fixed
+- Name and extension sorting reads the locale's collation table through
+  `strxfrm`. It compared lowercased bytes before, which sorted `data.txt` ahead
+  of `Database`. Listings match `ls` now.
+
 ## [0.3.1] - 2026-08-14
 
 ### Changed

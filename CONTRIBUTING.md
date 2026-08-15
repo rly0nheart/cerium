@@ -35,15 +35,14 @@ Three top-level modules:
 | Module     | Purpose                                            |
 |------------|----------------------------------------------------|
 | `cli/`     | Command-line argument parsing and flag definitions |
-| `display/` | Output formatting, layout, styling, and theming    |
+| `render/`  | Output formatting, layout, styling, and theming    |
 | `fs/`      | Filesystem operations, metadata, and entry types   |
 
-Two feature flags:
+One feature flag:
 
 | Feature    | What it enables                                     | External dependency |
 |------------|-----------------------------------------------------|---------------------|
 | `magic`    | Content-based file type identification via libmagic | `libmagic-dev`      |
-| `checksum` | File checksums (CRC32, MD5, SHA-224/256/384/512)    | None (pure Rust)    |
 
 Gate code that needs one behind `#[cfg(feature = "...")]`.
 

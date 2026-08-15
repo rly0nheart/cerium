@@ -21,9 +21,9 @@ features.
 
 |        OS        | Tested |        Features         |
 |:----------------:|:------:|:-----------------------:|
-| Android (Termux) | `yes`  |       `checksum`        |
-|      Fedora      | `yes`  | `checksum`, `filemagic` |
-|      Ubuntu      | `yes`  | `checksum`, `filemagic` |
+| Android (Termux) | `yes`  |         `none`          |
+|      Fedora      | `yes`  |       `filemagic`       |
+|      Ubuntu      | `yes`  |       `filemagic`       |
 |      MacOS       |  `no`  |      `not tested`       |
 
 ## Development
@@ -47,10 +47,10 @@ The installer takes three options:
 |:--------------------:|:------------------------------------------------------:|
 |     `--nightly`      |   Install the latest nightly build instead of stable   |
 |    `--dir <path>`    |   Installation directory (default: `/usr/local/bin`)   |
-| `--features <value>` | Feature variant to install: `checksum`, `magic`, `all` |
+| `--features <value>` |       Feature variant to install: `magic`         |
 
 > [!NOTE]
-> The `magic` and `all` variants need libmagic at runtime. The installer tries
+> The `magic` variant needs libmagic at runtime. The installer tries
 > to install it for you. Without `--features` you get a binary with no
 > external dependencies.
 
@@ -61,25 +61,18 @@ curl -fsSL .../install.sh | bash -s -- --nightly
 # Custom install directory
 curl -fsSL .../install.sh | bash -s -- --dir ~/.local/bin
 
-# With checksum support
-curl -fsSL .../install.sh | bash -s -- --features checksum
-
-# With every feature (needs libmagic)
-curl -fsSL .../install.sh | bash -s -- --features all
+# With file type detection (needs libmagic)
+curl -fsSL .../install.sh | bash -s -- --features magic
 ```
 
 ### With Cargo
 
 ```shell
-# Everything
-cargo install cerium --all-features
-
 # Nothing optional
 cargo install cerium
 
-# Pick one
+# With file type detection (needs libmagic)
 cargo install cerium --features magic
-cargo install cerium --features checksum
 ```
 
 ## Optional features
@@ -90,13 +83,6 @@ cargo install cerium --features checksum
 
 ```bash
 ce --magic
-```
-
-`checksum` hashes each file. It supports `crc32`, `md5`, `sha224`, `sha256`,
-`sha384`, and `sha512`, and pulls in no C libraries.
-
-```bash
-ce --checksum sha256
 ```
 
 ## Themes
