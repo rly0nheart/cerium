@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Security
 
-## [0.4.0] - 2026-08-15
+## [0.4.1] - 2026-08-15
 
 ### Changed
 - `src/display/` is now `src/render/`. The module already used `render_*` names
